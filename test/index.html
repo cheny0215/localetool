@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="output" contenteditable
+        style="width: 400px;height: 200px;border: 1px solid #ccc;margin:0 0 20px;overflow: auto; text-wrap: wrap;"></div>
+    <button id="btnToNbsp">转换&amp;nbsp;并复制</button>
+    <button id="btnToNbsp2">转换:nbsp:并复制</button>
+    <button id="btnToClear">清除内容</button>
+</body>
+<script>
+    let btnToNbsp = document.getElementById('btnToNbsp')
+    let btnToNbsp2 = document.getElementById('btnToNbsp2')
+    let btnToClear = document.getElementById('btnToClear')
+    let output = document.getElementById('output')
+
+    function replaceSpacesWithNbsp(replacer) {
+        // 使用正则表达式匹配英文单词之间的空格  
+        // \b 表示单词边界，\s+ 表示一个或多个空格  
+        // 替换为 &nbsp;  
+        const preOutputValue = output.innerText
+        const newText = preOutputValue.replace(/\b\s+\b/g, replacer)
+        // console.log('转换成功：', newText);
+        output.innerText = newText
+        navigator.clipboard.writeText(newText).then(function () {
+            console.log('文本已复制到剪贴板');
+        }).catch(function (err) {
+            console.error('复制失败: ', err);
+        });
+    }
+
+    function clearTheTextValue() {
+        output.innerText = ''
+    }
+    
+    btnToNbsp.addEventListener('click', function () {
+        replaceSpacesWithNbsp('&nbsp;')
+    });
+
+    btnToNbsp2.addEventListener('click', function () {
+        replaceSpacesWithNbsp(':nbsp:')
+    });
+
+    btnToClear.addEventListener('click',function () {
+        clearTheTextValue()
+    })
+
+
+
+    // 示例文本  
+    // var text = "适用于 iPad 的 AppleCare+ 服务计划为使用过程中的意外损坏提供不限次数的保修服务。意外损坏保修服务每次收取相应的服务费。对于所有 11 英寸 iPad Pro (M4)、13 英寸 iPad Pro (M4)、11 英寸 iPad Air (M2) 和 13 英寸 iPad Air (M2) 机型，针对屏幕维修收取 RMB 188 的服务费，针对其他意外损坏维修收取 RMB 628 的服务费。对于其他所有 iPad 机型，针对意外损坏维修收取 RMB 368 元的服务费。屏幕维修服务费仅适用于 11 英寸 iPad Pro (M4)、13 英寸 iPad Pro (M4)、11 英寸 iPad Air (M2) 和 13 英寸 iPad Air (M2) 机型，且不包括其他损坏情况。对于 Apple Pencil 或 Apple 品牌的 iPad 键盘，维修收取 RMB 188 的服务费。";
+
+</script>
+
+</html>

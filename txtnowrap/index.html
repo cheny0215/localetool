@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index.txt文本去除换行符</title>
+</head>
+
+<body>
+    <p style="font-size: 14px;color: #999;">说明：将导出的txt文本内容粘贴到文本框，然后点击下方按钮将转换好的文本内容粘贴回txt内</p>
+    <div id="nowrapTxt" contenteditable="true"
+        style="width: 800px;height: 250px;border: 1px solid #d48383;overflow: auto;text-wrap: nowrap;border-radius: 4px;margin-bottom: 20px;">
+    </div>
+    <button id="noWrapBtn">&gt;&gt;点击清除换行符&lt;&lt;</button>&nbsp;&nbsp;
+    <button id="clearBtn">&gt;&gt;清空内容&lt;&lt;</button>
+
+
+    <script>
+
+        const noWrapBtn = document.getElementById('noWrapBtn')
+        const clearBtn = document.getElementById('clearBtn')
+        const nowrapTxt = document.getElementById('nowrapTxt')
+
+        noWrapBtn.addEventListener('click', function () {
+            processText(nowrapTxt.innerText)
+        })
+
+        clearBtn.addEventListener('click', function () {
+            nowrapTxt.innerText = ''
+        })
+
+        function processText(input) {
+            // console.log("🚀 ~ nowrapTxt:", input)
+            // 第一步：用特殊标记替换所有空行
+            let textWithMarkers = input.replace(/\n\s*\n/g, '\n<<EMPTY_LINE>>\n');
+
+            // 第二步：删除所有换行符
+            let textWithoutNewlines = textWithMarkers.replace(/\n/g, '');
+
+            // 第三步：将特殊标记转换为空行
+            let finalText = textWithoutNewlines.replace(/<<EMPTY_LINE>>/g, '\n\n');
+
+            // 第四步：在所有 `${clicks.get` 前添加一个换行符
+            finalText = finalText.replace(/(\${clicks\.get[^\}]+\})/g, '\n$1');
+            finalText = finalText.replace(/(\${global[^\}]+\})/g, '\n$1');
+
+            // // 第五步：复制内容到剪贴板
+            // navigator.clipboard.writeText(finalText.trim())
+            //     .then(() => {
+            //         console.log('文本已成功复制到剪贴板');
+            //     })
+            //     .catch(err => {
+            //         console.error('复制到剪贴板失败: ', err);
+            //     });
+
+
+            // 创建一个临时的文本区域
+            const textArea = document.createElement('textarea');
+            textArea.value = finalText.trim();
+
+            // 将文本区域添加到文档中
+            document.body.appendChild(textArea);
+
+            // 选择文本区域的内容
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // 对于移动设备的兼容
+
+            // 执行复制命令
+            document.execCommand('copy');
+
+            // 移除临时文本区域
+            document.body.removeChild(textArea);
+            alert('文本已成功复制到剪贴板')
+
+        }
+
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>preact</title>
+</head>
+
+<body>
+    <script type="module">
+        import { h, Component, render } from 'https://esm.sh/preact';
+        import { useState } from 'https://esm.sh/preact/hooks';
+        import htm from 'https://esm.sh/htm';
+        import Ceshi from './index.js'
+        // 为 Preact 初始化 htm
+        const html = htm.bind(h);
+        
+        function App (props) {
+          console.log("🚀 ~ Ceshi:", Ceshi())
+            const arr = ['2','4','6']
+            const [count,useCount] = useState(4)
+          return (
+            html`
+            <div>${count * props.name}</div>
+            <div>${Ceshi()}</div>
+            `
+          );
+        }
+      
+        render(html`<${App} name="3" />`, document.body);
+      </script>
+</body>
+
+</html>
