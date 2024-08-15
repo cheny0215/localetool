@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本对比工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/elegant.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .CodeMirror {
+            border: 1px solid #ddd;
+            min-height: 300px;
+            /* height: auto; */
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .container > div {
+            flex: 50%;
+            overflow: auto;
+        }
+        textarea {
+            width: 100%;
+            height: 300px; /* Adjust height as needed */
+        }
+        .diffBox{
+            width: 100%;
+        }
+        .diff-output {
+            width: 100%;
+            overflow: auto;
+            white-space:nowrap;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f8f8f8;
+        }
+        .diff-added {
+            background-color: #d4fcbc;
+        }
+        .diff-removed {
+            background-color: #fbb6c2;
+        }
+    </style>
+</head>
+<body>
+
+    <h3>文本对比工具</h3>
+
+    <div class="container">
+        <div>
+            <p style="color: #fbb6c2;">文本1</p>
+            <textarea id="code1"></textarea>
+        </div>
+        <div>
+            <p style="color: #97cf77;">文本2</p>
+            <textarea id="code2"></textarea>
+        </div>
+    </div>
+
+    <button onclick="compare()" style="margin-top: 20px;cursor: pointer;">对比</button>
+
+    <h3>对比结果</h3>
+    <div class="diffBox">
+        <div id="diff-output" class="diff-output"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
+    <script>
+        // 初始化CodeMirror编辑器
+        var editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
+            lineNumbers: true,
+            mode: "javascript",
+            theme: "elegant"
+        });
+
+        var editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
+            lineNumbers: true,
+            mode: "javascript",
+            theme: "elegant"
+        });
+      
+
+        // 对比文本的函数
+        function compare() {
+            var text1 = editor1.getValue();
+            var text2 = editor2.getValue();
+
+            // 使用jsdiff库进行文本对比
+            // var diff = Diff.diffLines(text1, text2);
+            var diff = Diff.diffWords(text1, text2);
+            console.log('diff',diff);
+            
+
+            var diffHtml = diff.map(function(part) {
+                var color = part.added ? 'diff-added' : part.removed ? 'diff-removed' : '';
+                return `<span class="${color}">${part.value.replace(/\n/g, '<br>')}</span>`;
+            }).join('');
+
+            document.getElementById('diff-output').innerHTML = diffHtml;
+        }
+    </script>
+
+</body>
+</html>
