@@ -5,6 +5,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Padding检查</title>
+  <style>
+    .dragText{
+      width: 120px;
+      height: 40px;
+      padding: 8px;
+      line-height: 20px;
+      font-size: 12px;
+      display: block;
+      margin-top: 20px;
+      border-radius: 4px;
+      background-color: rgb(136 39 39);
+      border: 1px solid rgb(220, 156, 156);
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -13,6 +30,7 @@
 
     <p style="font-size: 14px;color: #999;">说明：点击下方按钮复制代码到ic (desktop和mobile需分别右击进入控制台) 或者页面的控制台</p>
     <button id="yemian">&gt;点击获取js代码&lt;</button>
+    <a class="dragText" href='javascript:(function(){let checkPadding_bol=document.getElementById("iframe_0").contentWindow.document.querySelectorAll(`div[style*="pointer-events: none"]`);function checkPadding(){let iframewindow_des=document.getElementById("iframe_0").contentWindow;let iframewindow_mob=document.getElementById("iframe_1").contentWindow;if(checkPadding_bol.length==0){function highlightPadding(element,level,iframewindow){const colors=["rgba(255, 0, 0, 0.5)","rgba(0, 0, 255, 0.5)","rgba(255, 255, 0, 0.5)"];const color=colors[level%colors.length];const style=iframewindow.getComputedStyle(element);const paddingRight=parseFloat(style.paddingRight);const paddingLeft=parseFloat(style.paddingLeft);if(paddingRight>0||paddingLeft>0){const paddingOverlay=document.createElement("div");paddingOverlay.style.position="absolute";paddingOverlay.style.top=0;paddingOverlay.style.left=0;paddingOverlay.style.width="100%";paddingOverlay.style.height="100%";paddingOverlay.style.boxSizing="border-box";paddingOverlay.style.pointerEvents="none";paddingOverlay.style.borderRight=paddingRight+"px solid "+color;paddingOverlay.style.borderLeft=paddingLeft+"px solid "+color;element.appendChild(paddingOverlay);element.style.position="relative";}Array.from(element.children).forEach(child=>highlightPadding(child,level+1,iframewindow));}highlightPadding(document.getElementById("iframe_0").contentWindow.document.body,0,iframewindow_des);highlightPadding(document.getElementById("iframe_1").contentWindow.document.body,0,iframewindow_mob);}else{function clearPaddingHighlights(iframewindow){const overlays=iframewindow.document.querySelectorAll(`div[style*="pointer-events: none"]`);overlays.forEach(overlay=>{overlay.parentElement.style.position="";overlay.remove();});}clearPaddingHighlights(document.getElementById("iframe_0").contentWindow);clearPaddingHighlights(document.getElementById("iframe_1").contentWindow);}}checkPadding();})();'>将我拖拽到浏览器上方<br>可存为书签直接使用</a>
     <span style="display: none;font-size: 12px;color: #259e3f;margin-top: 6px;"
       id="textHidden">文本已成功复制到剪贴板，请粘贴到页面控制台</span>
 
