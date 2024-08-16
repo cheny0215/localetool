@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA</title>
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    .box{
+      width: 1000px;
+      margin: 0 auto;
+      padding-top: 50px;
+    }
+
+    .padding_box{
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+    }
+    .padding_text{
+      padding: 10px 10px 0;
+      box-sizing: border-box;
+      width: 400px;
+      height: 300px;
+    }
+    .padding_btn{
+      cursor: pointer;
+      width: 50px;
+      height: 40px;
+    }
+    .padding_out{
+      padding: 10px 10px 0;
+      box-sizing: border-box;
+      width: 400px;
+      height: 300px;
+      border: 1px solid #000;
+      overflow: auto;
+    }
+    .padding_btn_copy{
+      cursor: pointer;
+      width: 50px;
+      height: 40px;
+    }
+    .title{
+      margin: 10px 0;
+    }
+    .qa_text{
+      padding: 10px 10px 0;
+      box-sizing: border-box;
+      width: 400px;
+      height: 300px;
+    }
+    .qa_btn{
+      cursor: pointer;
+      width: 50px;
+      height: 40px;
+    }
+    .qa_out{
+      padding: 10px 10px 0;
+      box-sizing: border-box;
+      width: 400px;
+      height: 300px;
+      border: 1px solid #000;
+      overflow: auto;
+    }
+    .qa_btn_copy{
+      cursor: pointer;
+      width: 50px;
+      height: 40px;
+    }
+    #input-box {
+      width: 100%;
+      height: 100px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 16px;
+      resize: none;
+    }
+    #drop-area {
+      border: 2px dashed #ccc;
+      padding: 20px;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="box" >
+    <h4 class="title" >一键添加 padding => 示例：<span style="font-weight: normal;" >你好，:br:哈哈。:br(s):问号？:br(m):好的</span></h4>
+    <div class="padding_box" >
+      <textarea class="padding_text" placeholder="请输入" ></textarea>
+      <button class="padding_btn" >转换</button>
+      <div class="padding_out" contenteditable="true" ></div>
+      <button class="padding_btn_copy" >复制</button>
+    </div>
+
+    <h4 class="title">一键QA</h4>
+    <!-- <div>
+      <div>
+        <input type="checkbox" name="h1" style="width: 20px; height: 20px;" ><span>给h1...和p标签设置外边距为0</span>
+      </div>
+      <div>
+        <input type="checkbox" name="h1" style="width: 20px; height: 20px;" ><span></span>
+      </div>
+    </div> -->
+    <div class="padding_box" >
+      <textarea class="qa_text" placeholder="请输入" ></textarea>
+      <button class="qa_btn" >转换</button>
+      <div class="qa_out" contenteditable="true" ></div>
+      <button class="qa_btn_copy" >复制</button>
+    </div>
+  </div>
+
+
+  <script>
+
+
+// 多行添加 padding
+
+    const padding_text = document.querySelector('.padding_text')
+    const padding_btn = document.querySelector('.padding_btn')
+    const padding_out = document.querySelector('.padding_out')
+    const padding_btn_copy = document.querySelector('.padding_btn_copy')
+
+    function formatString(input) {
+      // Define the split patterns
+      const splitPatterns = [':br:', ':br(s):', ':br(m):'];
+      
+      // Split the input based on the patterns
+      const parts = input.split(/(:br:|:br\(s\):|:br\(m\):)/);
+      
+      // Function to wrap text in span if it ends with common punctuation
+      const wrapWithSpan = (text) => {
+          const punctuation = /[。，、：；？！\.\,\:\;\!\?]$/;
+          if (punctuation.test(text)) {
+              return `<span style="padding-left: 1em;">${text}</span>`;
+          }
+          return text;
+      };
+    
+      // Process each part
+      let result = parts.map((part, index) => {
+          if (splitPatterns.includes(part)) {
+              return part;
+          } else {
+              return wrapWithSpan(part);
+          }
+      }).join('');
+    
+      return result;
+    }
+
+    padding_btn.onclick = () => {
+      console.log(formatString(padding_text.value));
+      padding_out.innerText = formatString(padding_text.value)
+    }
+
+    padding_btn_copy.onclick = async function (){
+      try {
+          await navigator.clipboard.writeText(padding_out.innerText);
+            console.log('已复制');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+// 
+      
+    const qa_text = document.querySelector('.qa_text')
+    const qa_btn = document.querySelector('.qa_btn')
+    const qa_out = document.querySelector('.qa_out')
+    const qa_btn_copy = document.querySelector('.qa_btn_copy')
+
+    qa_text.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        qa_text.style.backgroundColor = '#f0f0f0';
+    });
+
+    qa_text.addEventListener('dragleave', () => {
+      qa_text.style.backgroundColor = '';
+    });
+
+    qa_text.addEventListener('drop', (event) => {
+        event.preventDefault();
+        qa_text.style.backgroundColor = '';
+
+        const file = event.dataTransfer.files[0];
+        if (file && (file.type === "text/plain" || file.type === "text/html")) {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+              qa_text.value += e.target.result;
+            };
+
+            reader.onerror = (e) => {
+                console.error("File could not be read: ", e);
+            };
+
+            reader.readAsText(file);
+        } else {
+            alert('Please drop a txt or html file.');
+        }
+    });
+
+    qa_btn.onclick = () => {
+      // 创建DOMParser对象
+      const parser = new DOMParser();
+      // 将HTML字符串解析为DOM文档
+      const doc = parser.parseFromString(qa_text.value, 'text/html');
+      // console.log();
+
+      console.log(doc.querySelector('html').lang); // zh-HK zh-TW zh-CN en-HK
+      
+      let p = doc.querySelectorAll('p')
+      let a = doc.querySelectorAll('a')
+      let h1 = doc.querySelectorAll('h1')
+      let h2 = doc.querySelectorAll('h2')
+      let h3 = doc.querySelectorAll('h3')
+      let h4 = doc.querySelectorAll('h4')
+      let h5 = doc.querySelectorAll('h5')
+      let h6 = doc.querySelectorAll('h6')
+      // // p
+      for (let i = 0; i < p.length; i++) {
+        if (!p[i].style.margin && !p[i].style.marginTop && !p[i].style.marginRight && !p[i].style.marginBottom && !p[i].style.marginLeft) {
+          p[i].style.margin = '0'
+        }
+      }
+      // // a
+      for (let i = 0; i < a.length; i++) {
+        if (a[i].style.textDecoration !== 'underline') {
+          a[i].style.textDecoration = 'none'
+        }
+      }
+      // h1
+      for (let i = 0; i < h1.length; i++) {
+        if (!h1[i].style.margin && !h1[i].style.marginTop && !h1[i].style.marginRight && !h1[i].style.marginBottom && !h1[i].style.marginLeft) {
+          h1[i].style.margin = '0'
+        }
+      }
+      for (let i = 0; i < h2.length; i++) {
+        if (!h2[i].style.margin && !h2[i].style.marginTop && !h2[i].style.marginRight && !h2[i].style.marginBottom && !h2[i].style.marginLeft) {
+          h2[i].style.margin = '0'
+        }
+      }
+      for (let i = 0; i < h3.length; i++) {
+        if (!h3[i].style.margin && !h3[i].style.marginTop && !h3[i].style.marginRight && !h3[i].style.marginBottom && !h3[i].style.marginLeft) {
+          h3[i].style.margin = '0'
+        }
+      }
+      for (let i = 0; i < h4.length; i++) {
+        if (!h4[i].style.margin && !h4[i].style.marginTop && !h4[i].style.marginRight && !h4[i].style.marginBottom && !h4[i].style.marginLeft) {
+          h4[i].style.margin = '0'
+        }
+      }
+      for (let i = 0; i < h5.length; i++) {
+        if (!h5[i].style.margin && !h5[i].style.marginTop && !h5[i].style.marginRight && !h5[i].style.marginBottom && !h5[i].style.marginLeft) {
+          h5[i].style.margin = '0'
+        }
+      }
+      for (let i = 0; i < h6.length; i++) {
+        if (!h6[i].style.margin && !h6[i].style.marginTop && !h6[i].style.marginRight && !h6[i].style.marginBottom && !h6[i].style.marginLeft) {
+          h6[i].style.margin = '0'
+        }
+      }
+
+      qa_out.innerText = doc.documentElement.outerHTML
+
+    }
+
+    qa_btn_copy.onclick = async function () {
+      try {
+          await navigator.clipboard.writeText(qa_out.innerText);
+            console.log('已复制');
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+
+  </script>
+</body>
+</html>
