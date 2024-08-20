@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本对比工具</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/elegant.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+    
+        .signs {
+            color: #bebdbd;
+            font-size: 12px;
+            padding: 5px;
+        }
+    
+        .dragText {
+            width: 50px;
+            height: 30px;
+            padding: 8px;
+            margin: 0px 8px;
+            line-height: 15px;
+            font-size: 12px;
+            display: block;
+            margin-top: 20px;
+            border-radius: 4px;
+            background-color: rgb(136 39 39);
+            border: 1px solid rgb(220, 156, 156);
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+        }
+        .a-box{
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="signs">将以下元素拖拽到浏览器上方<br>即可存为书签直接使用</div>
+    <div class="a-box">
+
+        <a class="dragText" href='javascript:(function(){let checkPadding_bol=document.getElementById("iframe_0").contentWindow.document.querySelectorAll(`div[style*="pointer-events: none"]`);function checkPadding(){let iframewindow_des=document.getElementById("iframe_0").contentWindow;let iframewindow_mob=document.getElementById("iframe_1").contentWindow;if(checkPadding_bol.length==0){function highlightPadding(element,level,iframewindow){const colors=["rgba(255, 0, 0, 0.5)","rgba(0, 0, 255, 0.5)","rgba(255, 255, 0, 0.5)"];const color=colors[level%colors.length];const style=iframewindow.getComputedStyle(element);const paddingRight=parseFloat(style.paddingRight);const paddingLeft=parseFloat(style.paddingLeft);if(paddingRight>0||paddingLeft>0){const paddingOverlay=document.createElement("div");paddingOverlay.style.position="absolute";paddingOverlay.style.top=0;paddingOverlay.style.left=0;paddingOverlay.style.width="100%";paddingOverlay.style.height="100%";paddingOverlay.style.boxSizing="border-box";paddingOverlay.style.pointerEvents="none";paddingOverlay.style.borderRight=paddingRight+"px solid "+color;paddingOverlay.style.borderLeft=paddingLeft+"px solid "+color;element.appendChild(paddingOverlay);element.style.position="relative";}Array.from(element.children).forEach(child=>highlightPadding(child,level+1,iframewindow));}highlightPadding(document.getElementById("iframe_0").contentWindow.document.body,0,iframewindow_des);highlightPadding(document.getElementById("iframe_1").contentWindow.document.body,0,iframewindow_mob);}else{function clearPaddingHighlights(iframewindow){const overlays=iframewindow.document.querySelectorAll(`div[style*="pointer-events: none"]`);overlays.forEach(overlay=>{overlay.parentElement.style.position="";overlay.remove();});}clearPaddingHighlights(document.getElementById("iframe_0").contentWindow);clearPaddingHighlights(document.getElementById("iframe_1").contentWindow);}}checkPadding();})();'>Padding Check</a>
+    
+        <a class="dragText" href='javascript:(function(){let iframewindow_des=document.getElementById("iframe_0").contentWindow,iframewindow_mob=document.getElementById("iframe_1").contentWindow,link1="",link2="";const diffBoxs=document.createElement("div");diffBoxs.className="diffBox";const header=document.createElement("div"),headerText=document.createElement("span");headerText.textContent="对比结果: ";const toggleButton=document.createElement("span");toggleButton.className="clkTosmalls";toggleButton.textContent="收起>";const toggleClickButton=document.createElement("span");toggleClickButton.className="clkToclear";toggleClickButton.textContent="清空文本";const toggleStyleButton=document.createElement("span");toggleStyleButton.className="clkTostyle";toggleStyleButton.textContent="链接样式";header.appendChild(headerText);header.appendChild(toggleButton);header.appendChild(toggleClickButton);header.appendChild(toggleStyleButton);const diffLink=document.createElement("div");diffLink.appendChild(document.createElement("div"));diffLink.appendChild(document.createElement("div"));diffLink.id="diff-link";diffBoxs.appendChild(header);diffBoxs.appendChild(diffLink);document.body.appendChild(diffBoxs);const style=document.createElement("style");const script=document.createElement("script");style.textContent=`a.highlight{color:red!important;font-weight:bold!important;text-decoration:underline!important;background:yellow!important;padding:5px!important;border:2px solid black!important;}.diff{background-color:yellow;}.diffBox{width:100%;position:fixed;top:0;background-color:rgba(255,255,255,0.93);padding:10px 0;border:1px solid #666;}.diff-output{width:100%;overflow:auto;white-space:nowrap;margin-top:10px;border:1px solid #ddd;padding:4px;font-size:14px;}.diff-added{background-color:#d4fcbc;}.diff-removed{background-color:#fbb6c2;}.clkTosmalls,.clkToclear,.clkTostyle{font-size:12px;color:#000;background-color:#b6d5fb;cursor:pointer;border:1px solid #000;padding:5px;border-radius:4px;margin-right:4px;white-space:nowrap;}`;const iframeStyle_des=iframewindow_des.document.createElement("style");const iframeStyle_mob=iframewindow_mob.document.createElement("style");iframeStyle_des.textContent=`a.highlight{color:red!important;font-weight:bold!important;text-decoration:underline!important;background:yellow!important;padding:5px!important;border:2px solid black!important;}`;iframeStyle_mob.textContent=`a.highlight{color:red!important;font-weight:bold!important;text-decoration:underline!important;background:yellow!important;padding:5px!important;border:2px solid black!important;}`;script.src=`https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js`;document.head.appendChild(style);iframewindow_des.document.head.appendChild(iframeStyle_des);iframewindow_mob.document.head.appendChild(iframeStyle_mob);document.head.appendChild(script);const links_des=iframewindow_des.document.querySelectorAll("a");const links_mob=iframewindow_mob.document.querySelectorAll("a");const diffBox=document.querySelector(".diffBox");const clkTosmalls=document.querySelector(".clkTosmalls");const clkToclear=document.querySelector(".clkToclear");const clkTostyle=document.querySelector(".clkTostyle");const spanslist=document.querySelectorAll("#diff-link div");toggleButton.onclick=()=>{if(spanslist[0].style.display==="none"){spanslist[0].style.display="block";spanslist[1].style.display="block";toggleButton.textContent="收起>";}else{spanslist[0].style.display="none";spanslist[1].style.display="none";toggleButton.textContent="展开<";}};let clkTosmalls_switch=true;clkTosmalls.addEventListener("click",function(){clkTosmalls_switch?diffBox.style.width="10%":diffBox.style.width="100%";clkTosmalls_switch=!clkTosmalls_switch});clkToclear.addEventListener("click",function(){spanslist[0].innerText=link1="";spanslist[1].innerText=link2="";});function changeIframeLinkStyle(links){clkTostyle.addEventListener("click",function(){if(links[0].classList.contains("highlight")){links.forEach(link=>{link.classList.remove("highlight");})}else{links.forEach(link=>{link.classList.add("highlight");})}});links.forEach(link=>{link.classList.add("highlight");link.addEventListener("click",function(event){event.preventDefault();compareLinks(link);});});}changeIframeLinkStyle(links_des);changeIframeLinkStyle(links_mob);function compareLinks(link){if(link1&&link2){spanslist[0].innerText=link1=spanslist[1].innerText=link2="";}link1=link2;link2=link.href;console.log("link1:",link1,"link2:",link2);var diff=Diff.diffWords(link1,link2);console.log("diff",diff);var difflink1=diff.map(function(part){var color=part.removed?"diff-removed":"";if((!part.removed&&!part.added)||part.removed){return`<span class="${color}">${part.value.replace(/\n/g,"<br>")}</span>`;}}).join("");var difflink2=diff.map(function(part){var color=part.added?"diff-added":"";if((!part.removed&&!part.added)||part.added){return`<span class="${color}">${part.value.replace(/\n/g,"<br>")}</span>`;}}).join("");spanslist.forEach(o=>{o.classList.add("diff-output")});spanslist[0].innerHTML=difflink1;spanslist[1].innerHTML=difflink2;}
+    })();
+    '>Link Compare</a>
+
+    </div>
+    <script>
+      
+    </script>
+
+</body>
+</html>
