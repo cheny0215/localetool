@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>nbspAdd</title>
 </head>
 
 <body>
@@ -13,6 +13,8 @@
     <button id="btnToNbsp">转换&amp;nbsp;并复制</button>
     <button id="btnToNbsp2">转换:nbsp:并复制</button>
     <button id="btnToClear">清除内容</button>
+    <span style="display: none;font-size: 12px;color: #259e3f;margin-top: 6px;"
+    id="textHidden">转换后的文本已成功复制到剪贴板</span>
 </body>
 <script>
     let btnToNbsp = document.getElementById('btnToNbsp')
@@ -26,12 +28,15 @@
         // 替换为 &nbsp;  
         const preOutputValue = output.innerText
         const newText = preOutputValue.replace(/\b\s+\b/g, replacer)
-        // console.log('转换成功：', newText);
         output.innerText = newText
         navigator.clipboard.writeText(newText).then(function () {
-            console.log('文本已复制到剪贴板');
+            textHidden.style.display = "block"
+            const timers = setTimeout(()=>{
+                textHidden.style.display = "none"
+                clearTimeout(timers);
+            },2000)
         }).catch(function (err) {
-            console.error('复制失败: ', err);
+            alert('复制失败: '+ err);
         });
     }
 
