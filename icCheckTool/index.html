@@ -54,83 +54,8 @@
             Compare</a>
 
         <a class="dragText"
-            href="let uikit_link=document.createElement('link');uikit_link.rel='stylesheet',uikit_link.href='https://cdn.jsdelivr.net/npm/uikit@3.21.9/dist/css/uikit.min.css';let uikit_script=document.createElement('script');uikit_script.src='https://cdn.jsdelivr.net/npm/uikit@3.21.9/dist/js/uikit.min.js',uikit_script.defer=!0;let head=document.head||document.getElementsByTagName('head')[0];head.appendChild(uikit_link),head.appendChild(uikit_script);const frame0=document.getElementById('iframe_0'),frame1=document.getElementById('iframe_1'),frame2=document.getElementById('iframe_2'),htmlElement=`
-            <div class='diff-output'>
-            <div style='padding: 5px 8px;'>
-            <button class='cyBtn uk-button uk-button-secondary'>收起</button>
-            <button class='cyBtn uk-button uk-button-default'>Desktop/Mobile文本对比</button>
-            <button class='cyBtn uk-button uk-button-default'>HTML/TXT文本对比</button>
-            <button class='cyBtn uk-button uk-button-secondary'>Desktop/Mobile链接对比</button>
-            </div>
-            <div class='diff-title'><strong></strong><strong></strong></div>
-            <div class='diff-box'>
-            <div></div>
-            <div></div>
-            </div>
-            </div>
-            `;if(!frame2)throw alert('请将右上角下拉菜单切换到Local，再重新打开工具'),document.querySelector('.input-group').style.border='3px solid red',Error('错误信息，text-compare工具只适用于destop和mobile、text对比');const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js',document.head.appendChild(script);const style=document.createElement('style');style.textContent=`
-                       .diff-added {
-                          background-color: #b4fb8b;
-                      }
-                      .diff-removed {
-                          background-color: #fa92a3;
-                      }
-                          .diff-box {
-                    display: flex;
-                    justify-content: space-between;
-                    padding:0 10px;
-                  }
-                  .diff-box>div {
-                    width: 48%;
-                    border: 1px solid #999;
-                    font-size: 14px;
-                    padding: 10px;
-                  }
-                  .diff-output {
-                    width: 100%;
-                    max-height:100vh;
-                    overflow:auto;
-                    position: fixed;
-                    top: 0;
-                    background-color: rgba(255,250,254,0.98);
-                    padding: 10px 0;
-                    border: 1px solid #666;
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                  }
-                   .uk-button {
-                        margin-right:4px;
-                        border-radius: 4px;
-                        font-size: 12px;
-                        line-height: 20px;
-                        padding: 0 6px;
-                    }
-                        .uk-button-default{
-                        border:1px solid #333;
-                        }
-                    .uk-button-link {
-                        text-decoration: underline;
-                    }
-              .diff-title{
-                display: flex;
-                justify-content: space-around;
-                padding: 6px 0;
-              }
-                .diff_linkbox{
-                    border: 1px solid #999;
-                    font-size: 14px;
-                    padding: 6px;
-                    overflow:auto;
-                    white-space: nowrap;
-                    box-sizing: border-box;
-                }
-                    .diff_linkbox::-webkit-scrollbar {
-                     display: none;
-            }
-                     .diff-con{
-                     border-radius:4px;
-                     padding:2px;
-                     }
-                        `,document.head.appendChild(style),document.body.insertAdjacentHTML('beforeend',htmlElement);let diffCount1=0,diffCount2=0;const spansText=document.querySelectorAll('.diff-box div'),cyBtn=document.querySelectorAll('.cyBtn'),diffTitle=document.querySelectorAll('.diff-title strong'),desktopContainer=frame0.contentWindow.document.querySelector('.desktop-container'),mobileContainer=frame0.contentWindow.document.querySelector('.mobile-container'),tableContainer=frame0.contentWindow.document.querySelector('table'),txtContainer=frame2.contentWindow.document.body,diffOutput=document.querySelector('.diff-output'),text_desktopContainer=desktopContainer.textContent.replace(/\s+/g,' ').trim(),text_mobileContainer=mobileContainer.textContent.replace(/\s+/g,' ').trim(),text_txtContainer=txtContainer.textContent.replace(/\s+/g,' ').replace(/https:\/\/[^\s]+/g,'').replace(/-{2,}\s*/g,'').trim(),text_htmlContainer=tableContainer.textContent.replace(/\s+/g,' ').trim();function getAllLinks(t){let e=t.querySelectorAll('a'),i=Array.from(e).map(t=>t.href);return i}const link_desktopContainer=getAllLinks(desktopContainer),link_mobileContainer=getAllLinks(mobileContainer);function compareTexts(t,e){diffCount1=diffCount2=0;let i=Diff.diffWords(t,e);console.log('diff',i);let n=i.map(function(t){diffCount1=t.removed?diffCount1+1:diffCount1;let e=t.removed?'diff-removed':'';if(!t.removed&&!t.added||t.removed)return`<span class='${e}'>${t.value.replace(/\n/g,'<br>')}</span>`}).join(''),d=i.map(function(t){diffCount2=t.added?diffCount2+1:diffCount2;let e=t.added?'diff-added':'';if(!t.removed&&!t.added||t.added)return`<span class='${e}'>${t.value.replace(/\n/g,'<br>')}</span>`}).join('');spansText[0].innerHTML=n,spansText[1].innerHTML=d}function compareLinks(t,e){let i=Diff.diffLines(t,e),n=i.map(function(t){diffCount1=t.removed?diffCount1+1:diffCount1;let e=t.removed?'diff-removed':'';if(!t.removed&&!t.added||t.removed)return`<span class='${e}'>${t.value.replace(/\n/g,'<br>')}</span>`}).join(''),d=i.map(function(t){diffCount2=t.added?diffCount2+1:diffCount2;let e=t.added?'diff-added':'';if(!t.removed&&!t.added||t.added)return`<span class='${e}'>${t.value.replace(/\n/g,'<br>')}</span>`}).join('');spansText[0].insertAdjacentHTML('beforeend',`<div class='diff_linkbox'>${n}<div>`),spansText[1].insertAdjacentHTML('beforeend',`<div class='diff_linkbox'>${d}<div>`)}cyBtn[1].addEventListener('click',function(){compareTexts(text_desktopContainer,text_mobileContainer),diffTitle[0].innerHTML=`Desktop文本 <span class='diff-removed diff-con'>diff: ${diffCount1}</span>`,diffTitle[1].innerHTML=`Mobile文本 <span class='diff-added diff-con'>diff: ${diffCount2}</span>`}),cyBtn[2].addEventListener('click',function(){compareTexts(text_htmlContainer,text_txtContainer),diffTitle[0].innerHTML=`HTML文本 <span class='diff-removed diff-con'>diff: ${diffCount1}</span>`,diffTitle[1].innerHTML=`TXT文本 <span class='diff-added diff-con'>diff: ${diffCount2}</span>`}),cyBtn[3].addEventListener('click',function(){diffCount1=diffCount2=0,spansText[0].innerHTML='',spansText[1].innerHTML='',link_desktopContainer.forEach((t,e)=>{compareLinks(t,link_mobileContainer[e])}),diffTitle[0].innerHTML=`Desktop链接 <span class='diff-removed diff-con'>diff: ${diffCount1}</span>`,diffTitle[1].innerHTML=`Mobile链接 <span class='diff-added diff-con'>diff: ${diffCount2}</span>`}),cyBtn[0].addEventListener('click',function(){let t=diffOutput.style.height;'60px'==t?(diffOutput.style.height='auto',diffOutput.style.width='100%',cyBtn[0].innerText='收起',cyBtn[1].style.visibility=cyBtn[2].style.visibility=cyBtn[3].style.visibility='visible'):(diffOutput.style.height='60px',diffOutput.style.width='60px',diffOutput.style.overflow='hidden',cyBtn[0].innerText='展开',cyBtn[1].style.visibility=cyBtn[2].style.visibility=cyBtn[3].style.visibility='hidden')});">Text
+            href="javascript:(function(){let uikit_link=document.createElement('link');uikit_link.rel='stylesheet';uikit_link.href='https://cdn.jsdelivr.net/npm/uikit@3.21.9/dist/css/uikit.min.css';let uikit_script=document.createElement('script');uikit_script.src='https://cdn.jsdelivr.net/npm/uikit@3.21.9/dist/js/uikit.min.js';uikit_script.defer=true;let head=document.head||document.getElementsByTagName('head')[0];head.appendChild(uikit_link);head.appendChild(uikit_script);const frame0=document.getElementById('iframe_0'),frame1=document.getElementById('iframe_1'),frame2=document.getElementById('iframe_2'),htmlElement=`<div class='diff-output'><div style='padding: 5px 8px;'><button class='cyBtn uk-button uk-button-secondary'>收起</button><button class='cyBtn uk-button uk-button-default'>Desktop/Mobile文本对比</button><button class='cyBtn uk-button uk-button-default'>HTML/TXT文本对比</button><button class='cyBtn uk-button uk-button-secondary'>Desktop/Mobile链接对比</button></div><div class='diff-title'><strong></strong><strong></strong></div><div class='diff-box'><div></div><div></div></div></div>`;if(!frame2){alert('请将右上角下拉菜单切换到Local，再重新打开工具');document.querySelector('.input-group').style.border='3px solid red';throw new Error('错误信息，text-compare工具只适用于destop和mobile、text对比')}const script=document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js';document.head.appendChild(script);const style=document.createElement('style');style.textContent=`.diff-added{background-color:#b4fb8b;}.diff-removed{background-color:#fa92a3;}.diff-box{display:flex;justify-content:space-between;padding:0 10px;}.diff-box>div{width:48%;border:1px solid #999;font-size:14px;padding:10px;}.diff-output{width:100%;max-height:100vh;overflow:auto;position:fixed;top:0;background-color:rgba(255,250,254,0.98);padding:10px 0;border:1px solid #666;box-shadow:0 4px 8px rgba(0, 0, 0, 0.2);}.uk-button{margin-right:4px;border-radius:4px;font-size:12px;line-height:20px;padding:0 6px;}.uk-button-default{border:1px solid #333;}.uk-button-link{text-decoration:underline;}.diff-title{display:flex;justify-content:space-around;padding:6px 0;}.diff_linkbox{border:1px solid #999;font-size:14px;padding:6px;overflow:auto;white-space:nowrap;box-sizing:border-box;}.diff_linkbox::-webkit-scrollbar{display:none;}.diff-con{border-radius:4px;padding:2px;}`;document.head.appendChild(style);document.body.insertAdjacentHTML('beforeend',htmlElement);let diffCount1=0,diffCount2=0;const spansText=document.querySelectorAll('.diff-box div'),cyBtn=document.querySelectorAll('.cyBtn'),diffTitle=document.querySelectorAll('.diff-title strong'),desktopContainer=frame0.contentWindow.document.querySelector('.desktop-container'),mobileContainer=frame0.contentWindow.document.querySelector('.mobile-container'),tableContainer=frame0.contentWindow.document.querySelector('table'),txtContainer=frame2.contentWindow.document.body,diffOutput=document.querySelector('.diff-output'),text_desktopContainer=desktopContainer.textContent.replace(/\s+/g,' ').trim(),text_mobileContainer=mobileContainer.textContent.replace(/\s+/g,' ').trim(),text_txtContainer=txtContainer.textContent.replace(/\s+/g,' ').replace(/https:\/\/[^\s]+/g,'').replace(/-{2,}\s*/g,'').trim(),text_htmlContainer=tableContainer.textContent.replace(/\s+/g,' ').trim();function getAllLinks(container){const links=container.querySelectorAll('a'),linkAddresses=Array.from(links).map(link=>link.href);return linkAddresses}const link_desktopContainer=getAllLinks(desktopContainer),link_mobileContainer=getAllLinks(mobileContainer);function compareTexts(text1,text2){diffCount1=diffCount2=0;let diff=Diff.diffWords(text1,text2);console.log('diff',diff);const diff_text1=diff.map(function(part){diffCount1=part.removed?diffCount1+1:diffCount1;const color=part.removed?'diff-removed':'';if((!part.removed&&!part.added)||part.removed){return`<span class='${color}'>${part.value.replace(/\n/g,'<br>')}</span>`}}).join(''),diff_text2=diff.map(function(part){diffCount2=part.added?diffCount2+1:diffCount2;const color=part.added?'diff-added':'';if((!part.removed&&!part.added)||part.added){return`<span class='${color}'>${part.value.replace(/\n/g,'<br>')}</span>`}}).join('');spansText[0].innerHTML=diff_text1;spansText[1].innerHTML=diff_text2}function compareLinks(link1,link2){let diff=Diff.diffLines(link1,link2),diff_link1=diff.map(function(part){diffCount1=part.removed?diffCount1+1:diffCount1;const color=part.removed?'diff-removed':'';if((!part.removed&&!part.added)||part.removed){return`<span class='${color}'>${part.value.replace(/\n/g,'<br>')}</span>`}}).join(''),diff_link2=diff.map(function(part){diffCount2=part.added?diffCount2+1:diffCount2;const color=part.added?'diff-added':'';if((!part.removed&&!part.added)||part.added){return`<span class='${color}'>${part.value.replace(/\n/g,'<br>')}</span>`}}).join('');spansText[0].insertAdjacentHTML('beforeend',`<div class='diff_linkbox'>${diff_link1}<div>`);spansText[1].insertAdjacentHTML('beforeend',`<div class='diff_linkbox'>${diff_link2}<div>`)}cyBtn[1].addEventListener('click',function(){compareTexts(text_desktopContainer,text_mobileContainer);diffTitle[0].innerHTML=`Desktop文本 <span class='diff-removed diff-con'>diff: ${diffCount1}</span>`;diffTitle[1].innerHTML=`Mobile文本 <span class='diff-added diff-con'>diff: ${diffCount2}</span>`});cyBtn[2].addEventListener('click',function(){compareTexts(text_htmlContainer,text_txtContainer);diffTitle[0].innerHTML=`HTML文本 <span class='diff-removed diff-con'>diff: ${diffCount1}</span>`;diffTitle[1].innerHTML=`TXT文本 <span class='diff-added diff-con'>diff: ${diffCount2}</span>`});cyBtn[3].addEventListener('click',function(){diffCount1=diffCount2=0;spansText[0].innerHTML='';spansText[1].innerHTML='';link_desktopContainer.forEach((link,index)=>{compareLinks(link,link_mobileContainer[index])});diffTitle[0].innerHTML=`Desktop链接 <span class='diff-removed diff-con'>diff: ${diffCount1}</span>`;diffTitle[1].innerHTML=`Mobile链接 <span class='diff-added diff-con'>diff: ${diffCount2}</span>`});cyBtn[0].addEventListener('click',function(){const smalls=diffOutput.style.height;if(smalls=='60px'){diffOutput.style.height='auto';diffOutput.style.width='100%';cyBtn[0].innerText='收起';cyBtn[1].style.visibility=cyBtn[2].style.visibility=cyBtn[3].style.visibility='visible'}else{diffOutput.style.height='60px';diffOutput.style.width='60px';diffOutput.style.overflow='hidden';cyBtn[0].innerText='展开';cyBtn[1].style.visibility=cyBtn[2].style.visibility=cyBtn[3].style.visibility='hidden'}})})();
+">Text
             Compare</a>
 
     </div>
