@@ -13,8 +13,7 @@
         }
         .CodeMirror {
             border: 1px solid #ddd;
-            min-height: 300px;
-            /* height: auto; */
+            min-height: 400px;
         }
         .container {
             display: flex;
@@ -22,12 +21,11 @@
             gap: 10px;
         }
         .container > div {
-            flex: 50%;
-            overflow: auto;
+            width: 50%;
         }
         textarea {
-            width: 100%;
-            height: 300px; /* Adjust height as needed */
+            height: 400px;
+
         }
         .diffBox{
             width: 100%;
@@ -35,7 +33,6 @@
         .diff-output {
             width: 100%;
             overflow: auto;
-            white-space:nowrap;
             margin-top: 20px;
             border: 1px solid #ddd;
             padding: 10px;
@@ -55,16 +52,17 @@
 
     <div class="container">
         <div>
-            <p style="color: #fbb6c2;">文本1</p>
-            <textarea id="code1"></textarea>
+            <span style="color: #fa4f6b;line-height: 40px;">文本1</span>
+            <textarea id="code1" wrap="hard"></textarea>
         </div>
         <div>
-            <p style="color: #97cf77;">文本2</p>
-            <textarea id="code2"></textarea>
+            <span style="color: #58c31a;line-height: 40px;">文本2</span>
+            <textarea id="code2" wrap="hard"></textarea>
         </div>
     </div>
 
     <button onclick="compare()" style="margin-top: 20px;cursor: pointer;">对比</button>
+    <button onclick="wordWrap()" style="margin: 20px 0 0 12px;cursor: pointer;">text是否折行显示</button>
 
     <h3>对比结果</h3>
     <div class="diffBox">
@@ -76,16 +74,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
     <script>
         // 初始化CodeMirror编辑器
-        var editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
+        let editor1
+        let editor2
+         editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
             lineNumbers: true,
             mode: "javascript",
-            theme: "elegant"
+            theme: "elegant",
+            lineWrapping: true,
         });
 
-        var editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
+         editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
             lineNumbers: true,
             mode: "javascript",
-            theme: "elegant"
+            theme: "elegant",
+            lineWrapping: true,
         });
       
 
@@ -106,6 +108,13 @@
             }).join('');
 
             document.getElementById('diff-output').innerHTML = diffHtml;
+        }
+
+        function wordWrap() {
+            const currentWrap1 = editor1.getOption('lineWrapping');
+            editor1.setOption('lineWrapping', !currentWrap1);
+            const currentWrap2 = editor2.getOption('lineWrapping');
+            editor2.setOption('lineWrapping', !currentWrap2);
         }
     </script>
 
