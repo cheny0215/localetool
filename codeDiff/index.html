@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,25 +12,29 @@
             font-family: Arial, sans-serif;
             margin: 20px;
         }
+
         .CodeMirror {
             border: 1px solid #ddd;
-            min-height: 400px;
+            min-height: 50vh;
         }
+
         .container {
             display: flex;
             justify-content: space-between;
             gap: 10px;
         }
-        .container > div {
+
+        .container>div {
             width: 50%;
         }
-        textarea {
-            height: 400px;
 
+        textarea {
         }
-        .diffBox{
+
+        .diffBox {
             width: 100%;
         }
+
         .diff-output {
             width: 100%;
             overflow: auto;
@@ -38,24 +43,27 @@
             padding: 10px;
             background-color: #f8f8f8;
         }
+
         .diff-added {
             background-color: #d4fcbc;
         }
+
         .diff-removed {
             background-color: #fbb6c2;
         }
     </style>
 </head>
+
 <body>
 
     <h3>文本对比工具</h3>
 
     <div class="container">
-        <div>
+        <div style="border-top:1px solid #f994a5;">
             <span style="color: #fa4f6b;line-height: 40px;">文本1</span>
             <textarea id="code1" wrap="hard"></textarea>
         </div>
-        <div>
+        <div style="border-top:1px solid #71f77c;">
             <span style="color: #58c31a;line-height: 40px;">文本2</span>
             <textarea id="code2" wrap="hard"></textarea>
         </div>
@@ -63,6 +71,7 @@
 
     <button onclick="compare()" style="margin-top: 20px;cursor: pointer;">对比</button>
     <button onclick="wordWrap()" style="margin: 20px 0 0 12px;cursor: pointer;">text是否折行显示</button>
+    <button onclick="clearText()" style="margin: 20px 0 0 12px;cursor: pointer;">Clear</button>
 
     <h3>对比结果</h3>
     <div class="diffBox">
@@ -76,34 +85,43 @@
         // 初始化CodeMirror编辑器
         let editor1
         let editor2
-         editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
+        editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
             lineNumbers: true,
             mode: "javascript",
             theme: "elegant",
             lineWrapping: true,
         });
 
-         editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
+        editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
             lineNumbers: true,
             mode: "javascript",
             theme: "elegant",
             lineWrapping: true,
         });
-      
+        function escapeHtml(text) {
+            let element = document.createElement('div');
+            element.innerText = text;
+            return element.innerHTML;
+        }
+        function clearText() {
+            editor1.setValue('')
+            editor2.setValue('')
+            document.getElementById('diff-output').innerHTML = '';
+        }
 
         // 对比文本的函数
         function compare() {
-            var text1 = editor1.getValue();
-            var text2 = editor2.getValue();
+            let text1 = escapeHtml(editor1.getValue());
+            let text2 = escapeHtml(editor2.getValue());
 
             // 使用jsdiff库进行文本对比
-            // var diff = Diff.diffLines(text1, text2);
-            var diff = Diff.diffWords(text1, text2);
-            console.log('diff',diff);
-            
+            // let diff = Diff.diffLines(text1, text2);
+            let diff = Diff.diffWords(text1, text2);
+            console.log('diff', diff);
 
-            var diffHtml = diff.map(function(part) {
-                var color = part.added ? 'diff-added' : part.removed ? 'diff-removed' : '';
+
+            let diffHtml = diff.map(function (part) {
+                let color = part.added ? 'diff-added' : part.removed ? 'diff-removed' : '';
                 return `<span class="${color}">${part.value.replace(/\n/g, '<br>')}</span>`;
             }).join('');
 
@@ -119,4 +137,5 @@
     </script>
 
 </body>
+
 </html>
