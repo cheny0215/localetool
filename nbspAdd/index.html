@@ -60,7 +60,6 @@
         // \b 表示单词边界，\s+ 表示一个或多个空格  
         // 替换为 &nbsp;  
         const preOutputValue = output.innerText
-        console.log("🚀 ~ replaceSpacesWithNbsp ~ preOutputValue:", preOutputValue)
         // 将 HTML 标签替换为占位符，并记录标签
         const placeholderMap = {};
         const tempOutput = preOutputValue.replace(/<[^>]+>/g, (match) => {
