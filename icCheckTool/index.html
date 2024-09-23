@@ -34,6 +34,22 @@
             text-decoration: none;
             text-align: center;
         }
+        .dragText_tool {
+            width: 50px;
+            /* height: 30px; */
+            padding: 8px;
+            margin: 0px 8px;
+            line-height: 15px;
+            font-size: 12px;
+            display: block;
+            margin-top: 20px;
+            border-radius: 4px;
+            background-color: rgb(203, 79, 55);
+            border: 1px solid rgb(236, 138, 125);
+            color: #fff;
+            text-decoration: none;
+            text-align: center;
+        }
 
         .a-box {
             display: flex;
@@ -43,7 +59,8 @@
 
 <body>
     <div class="signs">将以下元素拖拽到浏览器上方<br>即可存为书签直接使用。</div>
-    <div class="a-box">
+       <div class="a-box">
+        <div style="line-height: 68px;font-size: 14px;width:80px;text-align: right;">Check Tool:</div>
 
         <a class="dragText"
             href="javascript:(function(){let checkPadding_bol=document.getElementById('iframe_0').contentWindow.document.querySelectorAll(`div[style*='pointer-events: none']`);function checkPadding(){let iframewindow_des=document.getElementById('iframe_0').contentWindow;let iframewindow_mob=document.getElementById('iframe_1').contentWindow;if(checkPadding_bol.length==0||checkPadding_bol.length==1){function highlightPadding(element,level,iframewindow){const colors=['rgba(255, 0, 0, 0.5)','rgba(0, 0, 255, 0.5)','rgba(255, 255, 0, 0.5)'];const color=colors[level%colors.length];const style=iframewindow.getComputedStyle(element);const paddingRight=parseFloat(style.paddingRight);const paddingLeft=parseFloat(style.paddingLeft);if(paddingRight>0||paddingLeft>0){const paddingOverlay=document.createElement('div');paddingOverlay.style.position='absolute';paddingOverlay.style.top=0;paddingOverlay.style.left=0;paddingOverlay.style.width='100%';paddingOverlay.style.height='100%';paddingOverlay.style.boxSizing='border-box';paddingOverlay.style.pointerEvents='none';paddingOverlay.style.borderRight=paddingRight+'px solid '+color;paddingOverlay.style.borderLeft=paddingLeft+'px solid '+color;element.appendChild(paddingOverlay);element.style.position='relative';}Array.from(element.children).forEach(child=>highlightPadding(child,level+1,iframewindow));}highlightPadding(document.getElementById('iframe_0').contentWindow.document.body,0,iframewindow_des);highlightPadding(document.getElementById('iframe_1').contentWindow.document.body,0,iframewindow_mob);}else{function clearPaddingHighlights(iframewindow){const overlays=iframewindow.document.querySelectorAll(`div[style*='pointer-events: none']`);overlays.forEach(overlay=>{overlay.parentElement.style.position='';overlay.remove();});}clearPaddingHighlights(document.getElementById('iframe_0').contentWindow);clearPaddingHighlights(document.getElementById('iframe_1').contentWindow);}}checkPadding();})();">Padding
@@ -68,7 +85,8 @@
                     `;function createHighlightstyle(){let t=iframewindow_des.document.createElement('style'),e=iframewindow_mob.document.createElement('style');t.innerHTML=e.innerHTML=highlightstyle,iframewindow_des.document.head.appendChild(t),iframewindow_mob.document.head.appendChild(e)}function handleClearStyle(){spacesBtn.disabled=wordsBtn.disabled=footnotesBtn.disabled=!0,iframewindow_des.location.reload(),iframewindow_mob.location.reload(),document.getElementById('iframe_1').onload=function(){UIkit.notification({message:`<span uk-icon='icon: check'></span> 样式已清除`,status:'primary'}),createHighlightstyle(),spacesBtn.disabled=wordsBtn.disabled=footnotesBtn.disabled=!1},spacesValue=wordsValue=footnotesValue=!1}function handleVisbleSpaces(){if(!spacesValue){if(wordsValue){UIkit.notification({message:`<span uk-icon='icon: warning'></span> 若要英文高亮和显示空格同时显示，须先点击显示空格`,status:'warning'});return}highlightSpaces(iframewindow_des.document.body),highlightSpaces(iframewindow_mob.document.body),spacesValue=!0,spacesBtn.disabled=!0}}function handleHighlightWords(){!wordsValue&&(colorizeEnglishWords(iframewindow_des.document.body),colorizeEnglishWords(iframewindow_mob.document.body),wordsValue=!0,wordsBtn.disabled=!0)}function handleVisbleFootnotes(){!footnotesValue&&(highlightFootnotes(iframewindow_des.document.body),highlightFootnotes(iframewindow_mob.document.body),footnotesValue=!0,footnotesBtn.disabled=!0)}function handleOneCheck(){UIkit.notification({message:`<span uk-icon='icon: check'></span> 一键检测完成`,status:'success'}),UIkit.offcanvas(document.getElementById('offcanvas-flip')).show(),!onecheckValue&&(oneButtonToCheck(iframewindow_des.document.body),onecheckValue=!0)}createHighlightstyle(),pickupBtn.onclick=function(){'展开'===pickupBtn.innerText?(diffOutput.style.height='auto',diffOutput.style.width='100%',document.querySelectorAll('button').forEach(t=>{t.style.visibility='visible'}),pickupBtn.innerText='收起'):(diffOutput.style.height='50px',diffOutput.style.width='60px',diffOutput.style.overflow='hidden',document.querySelectorAll('button').forEach(t=>{'收起'!==t.innerText&&(t.style.visibility='hidden')}),pickupBtn.innerText='展开')},clearBtn.onclick=handleClearStyle,spacesBtn.onclick=handleVisbleSpaces,wordsBtn.onclick=handleHighlightWords,footnotesBtn.onclick=handleVisbleFootnotes,onecheckBtn.onclick=handleOneCheck;})()">
             Quick Check</a>
 
-    </div>
+        </div>
+        <hr>
     <script>
     </script>
 

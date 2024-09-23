@@ -5,45 +5,108 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>nbspAdd</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
+    <style>
+        .diff-added {
+            background-color: #d4fcbc;
+            cursor: pointer;
+        }
+
+        .diff-removed {
+            background-color: #fbb6c2;
+        }
+
+        #diffBox {
+            font-size: 13px;
+            color: #6f7184;
+        }
+    </style>
 </head>
 
 <body>
     <div id="output" contenteditable
-        style="width: 400px;height: 200px;border: 1px solid #ccc;margin:0 0 20px;overflow: auto; text-wrap: wrap;"></div>
+        style="width: 400px;height: 200px;border: 1px solid #ccc;margin:0 0 20px;overflow: auto; text-wrap: wrap;">
+    </div>
     <button id="btnToNbsp">转换&amp;nbsp;并复制</button>
     <button id="btnToNbsp2">转换:nbsp:并复制</button>
     <button id="btnToClear">清除内容</button>
-    <span style="display: none;font-size: 12px;color: #259e3f;margin-top: 6px;"
-    id="textHidden">转换后的文本已成功复制到剪贴板</span>
+    <span style="visibility: hidden;font-size: 12px;color: #259e3f;margin-top: 6px;"
+        id="textHidden">转换后的文本已成功复制到剪贴板，前后文本差异已显示在下方，<span class="diff-removed">红色</span>代表原始文本被替换掉的内容，<span
+            class="diff-added">绿色</span>代表新的内容，点击不需要替换的地方可以恢复到原来的空格</span>
+    <div id="diffBox"></div>
 </body>
 <script>
     let btnToNbsp = document.getElementById('btnToNbsp')
     let btnToNbsp2 = document.getElementById('btnToNbsp2')
     let btnToClear = document.getElementById('btnToClear')
     let output = document.getElementById('output')
+    let diffBox = document.getElementById('diffBox')
+
+    function escapeHtml(text) {
+        let element = document.createElement('div');
+        element.innerText = text;
+        return element.innerHTML;
+    }
+    function upDateClipboard(finalText){
+        navigator.clipboard.writeText(finalText).then(function () {
+            textHidden.style.visibility = "visible"
+        }).catch(function (err) {
+            alert('复制失败: ' + err);
+        });
+    }
 
     function replaceSpacesWithNbsp(replacer) {
         // 使用正则表达式匹配英文单词之间的空格  
         // \b 表示单词边界，\s+ 表示一个或多个空格  
         // 替换为 &nbsp;  
         const preOutputValue = output.innerText
-        const newText = preOutputValue.replace(/\b\s+\b/g, replacer)
-        output.innerText = newText
-        navigator.clipboard.writeText(newText).then(function () {
-            textHidden.style.display = "block"
-            const timers = setTimeout(()=>{
-                textHidden.style.display = "none"
-                clearTimeout(timers);
-            },2000)
-        }).catch(function (err) {
-            alert('复制失败: '+ err);
+        // 将 HTML 标签替换为占位符，并记录标签
+        const placeholderMap = {};
+        const tempOutput = preOutputValue.replace(/<[^>]+>/g, (match) => {
+            const placeholder = `___HTML_TAG_${Object.keys(placeholderMap).length}___`;
+            placeholderMap[placeholder] = match; // 保存原标签
+            return placeholder;
         });
+        console.log("🚀 ~ ~ placeholderMap:", placeholderMap)
+        const newText = tempOutput.replace(/\b\s+\b/g, '&nbsp;');
+        // 恢复原来的 HTML 标签
+        const finalText = newText.replace(/___HTML_TAG_\d+___/g, (match) => placeholderMap[match]);
+
+        upDateClipboard(finalText)
+
+        // diff对比文本前后变化
+        const old_text1 = escapeHtml(output.innerText)
+        const old_text2 = escapeHtml(finalText)
+        let diff = Diff.diffWords(old_text1, old_text2);
+        let diffHtml = diff.map(function (part) {
+            let color = part.added ? 'diff-added' : part.removed ? 'diff-removed' : '';
+            return `<span class="${color}">${part.value.replace(/\n/g, '<br>')}</span>`;
+        }).join('');
+
+        diffBox.innerHTML = diffHtml;
+        const addSpans = diffBox.querySelectorAll('.diff-added')
+        const delSpans = diffBox.querySelectorAll('.diff-removed')
+        document.querySelectorAll('.diff-added').forEach((o, i) => {
+            o.onclick = () => {
+                diffBox.removeChild(addSpans[i - 1]);
+                const spaceTextNode = document.createTextNode(' ');
+                diffBox.replaceChild(spaceTextNode, delSpans[i - 1]);
+                let new_element = document.createElement('div');
+                new_element.innerHTML = diffBox.innerHTML
+                new_element.querySelectorAll('.diff-removed').forEach((o)=>{
+                    new_element.removeChild(o)
+                })
+                upDateClipboard(new_element.innerText)  //更新剪贴板
+            }
+        })
     }
 
     function clearTheTextValue() {
+        textHidden.style.visibility = "hidden"
         output.innerText = ''
+        diffBox.innerHTML = ''
     }
-    
+
     btnToNbsp.addEventListener('click', function () {
         replaceSpacesWithNbsp('&nbsp;')
     });
@@ -52,14 +115,14 @@
         replaceSpacesWithNbsp(':nbsp:')
     });
 
-    btnToClear.addEventListener('click',function () {
+    btnToClear.addEventListener('click', function () {
         clearTheTextValue()
     })
 
 
-
     // 示例文本  
-    // var text = "适用于 iPad 的 AppleCare+ 服务计划为使用过程中的意外损坏提供不限次数的保修服务。意外损坏保修服务每次收取相应的服务费。对于所有 11 英寸 iPad Pro (M4)、13 英寸 iPad Pro (M4)、11 英寸 iPad Air (M2) 和 13 英寸 iPad Air (M2) 机型，针对屏幕维修收取 RMB 188 的服务费，针对其他意外损坏维修收取 RMB 628 的服务费。对于其他所有 iPad 机型，针对意外损坏维修收取 RMB 368 元的服务费。屏幕维修服务费仅适用于 11 英寸 iPad Pro (M4)、13 英寸 iPad Pro (M4)、11 英寸 iPad Air (M2) 和 13 英寸 iPad Air (M2) 机型，且不包括其他损坏情况。对于 Apple Pencil 或 Apple 品牌的 iPad 键盘，维修收取 RMB 188 的服务费。";
+
+    // <p style="font-size: 12px; line-height: 16px; color: #6e6e73;"><span>1.</span> 裝置效能表現和噪音控制功能包括主動消噪功能、適應性音訊及通透模式，可能因碎屑或耳垢積聚而有所影響。定期清潔裝置，以保持效能表現和所有功能正常運作。有關 AirPods 4 清潔的指引請參閱 <a href="${clicks.get('FN1a')}" style="color: #424245;">support.apple.com/zh-hk/102672</a>。有關 AirPods Pro 2 清潔的指引請參閱 <a href="${clicks.get('FN1b')}" style="color: #424245;">support.apple.com/zh-hk/120409</a>。</p>
 
 </script>
 
