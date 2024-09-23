@@ -60,17 +60,18 @@
         // \b 表示单词边界，\s+ 表示一个或多个空格  
         // 替换为 &nbsp;  
         const preOutputValue = output.innerText
+        console.log("🚀 ~ replaceSpacesWithNbsp ~ preOutputValue:", preOutputValue)
         // 将 HTML 标签替换为占位符，并记录标签
         const placeholderMap = {};
         const tempOutput = preOutputValue.replace(/<[^>]+>/g, (match) => {
-            const placeholder = `___HTML_TAG_${Object.keys(placeholderMap).length}___`;
+            const placeholder = `@__HTML_TAG_${Object.keys(placeholderMap).length}__@`;
             placeholderMap[placeholder] = match; // 保存原标签
             return placeholder;
         });
         console.log("🚀 ~ ~ placeholderMap:", placeholderMap)
         const newText = tempOutput.replace(/\b\s+\b/g, '&nbsp;');
         // 恢复原来的 HTML 标签
-        const finalText = newText.replace(/___HTML_TAG_\d+___/g, (match) => placeholderMap[match]);
+        const finalText = newText.replace(/@__HTML_TAG_\d+__@/g, (match) => placeholderMap[match]);
 
         upDateClipboard(finalText)
 
@@ -122,7 +123,7 @@
 
     // 示例文本  
 
-    // <p style="font-size: 12px; line-height: 16px; color: #6e6e73;"><span>1.</span> 裝置效能表現和噪音控制功能包括主動消噪功能、適應性音訊及通透模式，可能因碎屑或耳垢積聚而有所影響。定期清潔裝置，以保持效能表現和所有功能正常運作。有關 AirPods 4 清潔的指引請參閱 <a href="${clicks.get('FN1a')}" style="color: #424245;">support.apple.com/zh-hk/102672</a>。有關 AirPods Pro 2 清潔的指引請參閱 <a href="${clicks.get('FN1b')}" style="color: #424245;">support.apple.com/zh-hk/120409</a>。</p>
+    // <p style="font-size: 12px; line-height: 16px; color: #6e6e73;"> <span>1.</span> 裝置效能表現和噪音控制功能包括主動消噪功能、適應性音訊及通透模式，可能因碎屑或耳垢積聚而有所影響。定期清潔裝置，以保持效能表現和所有功能正常運作。有關 AirPods 4 清潔的指引請參閱 <a href="${clicks.get('FN1a')}" style="color: #424245;">support.apple.com/zh-hk/102672</a>。有關 AirPods Pro 2 清潔的指引請參閱 <a href="${clicks.get('FN1b')}" style="color: #424245;">support.apple.com/zh-hk/120409</a>。</p>
 
 </script>
 
