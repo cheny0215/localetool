@@ -5,15 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>index.txt文本去除换行符</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../common/layui/css/layui.css"/>
+    <script src="../common/layui/layui.js"></script>
 </head>
 
 <body>
-    <p style="font-size: 14px;color: #999;">说明：将导出的txt文本内容粘贴到文本框，然后点击下方按钮将转换好的文本内容粘贴回txt内</p>
+    <p style="font-size: 14px;color: #999;padding:10px 0;">说明：将导出的txt文本内容粘贴到文本框，然后点击下方按钮将转换好的文本内容粘贴回txt内</p>
     <div id="nowrapTxt" contenteditable="true"
-        style="width: 800px;height: 250px;border: 1px solid #d48383;overflow: auto;text-wrap: nowrap;border-radius: 4px;margin-bottom: 20px;">
+        style="width: 800px;height: 250px;overflow: auto;text-wrap: nowrap;border-radius: 4px;margin-bottom: 20px;border: 1px solid #d3d2d2;">
     </div>
-    <button id="noWrapBtn">&gt;&gt;点击清除换行符&lt;&lt;</button>&nbsp;&nbsp;
-    <button id="clearBtn">&gt;&gt;清空内容&lt;&lt;</button>
+    <button id="noWrapBtn" class="layui-btn layui-btn-sm layui-btn-primary layui-border">&gt;&gt;点击清除换行符&lt;&lt;</button>&nbsp;&nbsp;
+    <button id="clearBtn" class="layui-btn layui-btn-sm layui-btn-primary layui-border">&gt;&gt;清空内容&lt;&lt;</button>
 
 
     <script>

@@ -4,53 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>自定义 Layout 组件</title>
+    <title>本地化开发工具</title>
     <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./common/layui/css/layui.css"/>
+    <script src="./common/layui/layui.js"></script>
     <style>
         /* 基本样式 */
         #layout {
             display: flex;
             height: 100vh;
             transition: margin-left 0.3s;
-            /* 平滑过渡效果 */
         }
 
         #sidebar {
             width: 200px;
-            background-color: #333;
-            color: rgb(171, 76, 76);
-            padding: 15px;
+            background-color: var(--sidebar-color);   /* 侧边栏背景色 */
+            color:var(--text-color);
+            padding: 0 15px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             transition: width 0.3s;
-            /* 平滑过渡效果 */
             overflow: hidden;
         }
 
         #sidebar-box {
-            height: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             cursor: pointer;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
-            margin: -10px -15px 0;
+            padding: 5px 0;
         }
 
         #sidebar.collapsed {
             width: 60px;
-            /* 收缩后的宽度 */
         }
 
-        #sidebar h2 {
-            height: 100%;
-            line-height: 40px;
-            margin-top: 0;
-            font-size: 18px;
-            transition: opacity 0.3s;
-            /* 平滑过渡效果 */
-        }
-
-        #sidebar.collapsed h2 {
+        #sidebar.collapsed b {
             display: none;
             /* 收缩时隐藏标题 */
         }
@@ -67,12 +52,10 @@
 
         #sidebar ul li {
             margin: 6px 0;
-            border: 1px solid rgba(0, 0, 0, 0);
-            border-radius: 8px;
         }
 
-        #sidebar ul li:hover {
-            box-shadow: 2px 2px 8px #d483836c;
+        #sidebar ul li:hover a{
+            color:var(--strong-text-color);
         }
 
         #sidebar ul li a {
@@ -80,7 +63,7 @@
             padding: 8px 10px;
             width: 100%;
             height: 100%;
-            color: rgb(171, 76, 76);
+            color:var(--text-color);
             text-decoration: none;
             cursor: pointer;
         }
@@ -92,7 +75,7 @@
             padding-bottom: 4px;
             background: none;
             border: none;
-            color: rgb(171, 76, 76);
+            color:var(--text-color);
             font-size: 24px;
             cursor: pointer;
         }
@@ -102,26 +85,30 @@
             display: flex;
             flex-direction: column;
             transition: margin-left 0.3s;
-            /* 平滑过渡效果 */
         }
-
-        #header {
-            background-color: #ffffff;
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            color: #333;
+        
+        .nav{
+            display: flex;
+            border-radius:0%;
+            color: #20222A;
+            background-color: #fff !important;
+        }
+        .layui-nav-item a{
+            color: #20222A;
         }
 
         #content {
             padding: 15px;
             flex: 1;
+            background-color: #f5f5f5;
         }
 
         #content .iframeBox {
             width: 100%;
             height: 100%;
             border: 0;
+            background-color: #fff;
+            padding: 8px;
         }
 
         .showIframe {
@@ -133,8 +120,10 @@
         }
 
         .activeButton {
-            border: 1px solid #d58080!important;
-            box-shadow: 2px 6px 8px #d4838330!important;
+            background: var(--main-gradient);
+        }
+        .activeButton a{
+        color: #fff !important;
         }
     </style>
 </head>
@@ -144,8 +133,9 @@
         <div id="sidebar">
             <div id="sidebar-box">
                 <button id="toggleSidebar" aria-label="Toggle Sidebar">☰</button>
-                <h2>菜单</h2>
+                <b>LOCALETOOL</b>
             </div>
+            <hr style="border:none;height: 1px;">
             <ul id="toggleBtn">
                 <li><a class="clickBTN" name="ic平台书签检查工具">icCheckTool</a></li>
                 <li><a class="clickBTN" name="txt文本去除换行">txtnowrap</a></li>
@@ -153,14 +143,28 @@
                 <li><a class="clickBTN" name="英文前后添加空格nbsp">nbspAdd</a></li>
                 <li><a class="clickBTN" name="文本对比工具">codeDiff</a></li>
                 <li><a class="clickBTN" name="preact">preact</a></li>
-                <li><a class="clickBTN" name="PIG">PIG</a></li>
+                <li><a class="clickBTN" name="DMcompatible">DMcompatible</a></li>
                 <li><a class="clickBTN" name="QA">QA</a></li>
             </ul>
         </div>
         <div id="main">
-            <div id="header">
-                标题
-            </div>
+            <ul class="layui-nav nav layui-bg-gray">
+                <li id="header" style="flex: 1;line-height: 60px;">标题</li>
+                <li class="layui-nav-item layui-this"><a href="">选中</a></li>
+                <li class="layui-nav-item">
+                  <a href="javascript:;">常规</a>
+                </li>
+                <li class="layui-nav-item"><a href="">导航</a></li>
+                <li class="layui-nav-item">
+                  <a href="javascript:;">主题</a>
+                  <dl class="layui-nav-child">
+                    <dd><a href="">主题1</a></dd>
+                    <dd><a href="">主题2</a></dd>
+                    <dd><a href="">主题3</a></dd>
+                  </dl>
+                </li>
+                <li class="layui-nav-item"><a href="">演示</a></li>
+              </ul>
             <div id="content">
                 <!-- <p>这里是内容区域。</p> -->
                 <iframe class="iframeBox hiddenIframe" src="./icCheckTool/index.html"></iframe>
@@ -169,19 +173,20 @@
                 <iframe class="iframeBox hiddenIframe" src="./nbspAdd/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./codeDiff/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./preact/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./pig/index.html"></iframe>
+                <iframe class="iframeBox hiddenIframe" src="./DMcompatible/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./qa/index.html"></iframe>
             </div>
         </div>
     </div>
     <script>
 
+        
         // 获取侧边栏和按钮
         const header = document.getElementById('header')
         const sidebar = document.getElementById('sidebar');
         const toggleSidebarButton = document.getElementById('sidebar-box');
         const toggleBtn = document.querySelectorAll('#toggleBtn li')
-
+        
         // 初始化状态
         let isCollapsed = false;
 

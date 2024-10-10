@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一键QA</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../common/layui/css/layui.css"/>
+    <script src="../common/layui/layui.js"></script>
+    <style>
+        .alpineData {
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            padding: 8px;
+        }
+
+        .leftAlpineBox {
+            flex: 3;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .centerAlpineBox {
+            padding: 8px;
+            flex: 3;
+            margin: 0 12px;
+            border-radius: 6px;
+        }
+        .centerAlpineBox .layui-form-checkbox{
+            margin-bottom: 4px;
+        }
+
+        .rightAlpineBox {
+            padding: 8px;
+            flex: 3;
+            border-radius: 6px;
+        }
+
+        .data_textarea {
+            resize: both;
+            border: 1px solid #c2c2c2;
+            border-radius: 4px;
+        }
+        .data_textarea::placeholder{
+            color: #ccc;
+        }
+
+        button {
+            width: 120px;
+            margin: 4px 0;
+            font-weight: 700;
+        }
+
+        .laybox {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* .tweHtml {} */
+    </style>
+</head>
+
+<body>
+    <div class="alpineData">
+        <div class="leftAlpineBox layui-panel">
+            <div class="tweHtml">
+                <h4>原始html：</h4>
+                <hr>
+                <textarea id="dataInput" class="data_textarea layui-textarea" placeholder="请输入"></textarea>
+                <div>
+                    <iframe id="myIframe" src="" frameborder="0"
+                        style="width: 100%;border: 1px solid #d8d8d8;margin-top: 10px;"></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="centerAlpineBox layui-panel">
+            <div class="layui-form laybox">
+                <input type="checkbox" id="allSelectCheckbox" name="allSelect" title="全选" checked
+                    lay-filter="checkbox-allSelect">
+                <hr>
+                <input type="checkbox" id="addMarginCheckbox" name="addMargin" title="h标签p标签加margin" checked>
+                <input type="checkbox" id="delUnderlineCheckbox" name="delUnderline" title="a标签去掉下划线" checked>
+                <input type="checkbox" id="replaceFontFamilyCheckbox" name="replaceFontFamily" title="替换所有font-family"
+                    checked>
+                <input type="checkbox" id="delNbspCheckbox" name="delNbsp" title="替换footer的最后两个nbsp" checked>
+                <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked>
+                <hr>
+            </div>
+            <div class="layui-btn-container">
+                <button id="submitButton"
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-component">一键添加QA</button>
+                <button id="outputButton"
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-fonts-code">生成code</button>
+            </div>
+        </div>
+        <div class="rightAlpineBox layui-panel">
+            <h4>转换后html：</h4>
+            <hr>
+            <textarea id="dataOutput" class="data_textarea layui-textarea" placeholder="待生成"></textarea>
+            <hr>
+            <div class="layui-btn-container">
+                <button id="copyButton"
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-file-b"
+                    lay-on="msg">复制代码</button>
+                <button id="resetButton"
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-refresh">重置所有数据</button>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dataInput = document.getElementById('dataInput');
+            const dataOutput = document.getElementById('dataOutput');
+            const iframe = document.getElementById('myIframe');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const allSelectCheckbox = document.getElementById('allSelectCheckbox');
+            const addMarginCheckbox = document.getElementById('addMarginCheckbox');
+            const delUnderlineCheckbox = document.getElementById('delUnderlineCheckbox');
+            const replaceFontFamilyCheckbox = document.getElementById('replaceFontFamilyCheckbox');
+            const delNbspCheckbox = document.getElementById('delNbspCheckbox');
+            const del414MediaCheckbox = document.getElementById('del414MediaCheckbox');
+
+            const submitButton = document.getElementById('submitButton');
+            const outputButton = document.getElementById('outputButton');
+            const copyButton = document.getElementById('copyButton');
+            const resetButton = document.getElementById('resetButton');
+
+            let html_doc = '';
+            let hiddenContent = [];
+            const pre_placeholder = '[[PRE_PLACEHOLDER]]';
+
+            // layui的一些方法
+            layui.use(function () {
+                let form = layui.form;
+                let layer = layui.layer;
+                let util = layui.util;
+
+                util.on('lay-on', {
+                    msg: function () {
+                        layer.msg('复制成功');
+                    }
+                })
+                // 全选
+                form.on('checkbox(checkbox-allSelect)', function (data) {
+                    const elem = data.elem; // 获得 checkbox 原始 DOM 对象
+                    const checked = elem.checked; // 获得 checkbox 选中状态
+                    const value = elem.value; // 获得 checkbox 值
+                    addMarginCheckbox.checked = elem.checked
+                    delUnderlineCheckbox.checked = elem.checked
+                    replaceFontFamilyCheckbox.checked = elem.checked
+                    delNbspCheckbox.checked = elem.checked
+                    del414MediaCheckbox.checked = elem.checked
+                });
+            })
+
+            // input事件
+            dataInput.addEventListener('input', function () {
+                html_doc = dataInput.value;
+                toPlaceholder()
+            });
+
+            // 占位符
+            function toPlaceholder() {
+                html_doc = html_doc.replace(/<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/, (match, content) => {
+                    console.log("🚀 ~ html_doc=html_doc.replace ~ match:", match)
+                    hiddenContent.push(match); // 存储内容
+                    return pre_placeholder; // 替换为占位符
+                });
+            }
+            function delPlaceholder(iframehtml) {
+                hiddenContent.forEach((content, index) => {
+                    iframehtml = iframehtml.replace(pre_placeholder, content); // 替换占位符为原内容
+                });
+                return iframehtml
+            }
+
+            // 按钮点击事件
+            submitButton.onclick = () => {
+                handleOutput()
+                iframe.onload = function () {
+                    console.log('iframe加载完成');
+                    if (addMarginCheckbox.checked) {
+                        addMargin();
+                    }
+                    if (delUnderlineCheckbox.checked) {
+                        delUnderline();
+                    }
+                    if (replaceFontFamilyCheckbox.checked) {
+                        replaceFontFamily();
+                    }
+                    if (delNbspCheckbox.checked) {
+                        delNbsp();
+                    }
+                    if (del414MediaCheckbox.checked) {
+                        del414Media();
+                    }
+                };
+            }
+            outputButton.onclick = () => {
+                // 去除tbody
+                const tbodies = iframeDoc.querySelectorAll('tbody');
+                tbodies.forEach(tbody => {
+                    while (tbody.firstChild) {
+                        tbody.parentNode.insertBefore(tbody.firstChild, tbody);
+                    }
+                    tbody.parentNode.removeChild(tbody);
+                });
+                // 去除占位符
+                let iframeOutHtml = iframeDoc.documentElement.outerHTML
+                iframeOutHtml = delPlaceholder(iframeOutHtml)
+                dataOutput.value = '<!DOCTYPE html>' + iframeOutHtml;
+                console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
+            }
+            copyButton.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(dataOutput.value);
+                    console.log('已复制');
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            resetButton.onclick = () => {
+                dataInput.value = dataOutput.value = ''
+                html_doc = ''
+                handleOutput()
+                const rightAlpineBox = document.querySelector('.rightAlpineBox')
+                let checkboxes = rightAlpineBox.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = true;
+                });
+            }
+
+            // function
+            function handleOutput() {
+                iframeDoc.open();
+                iframeDoc.write(html_doc);
+                iframeDoc.close();
+            }
+            // 给desktop，mobile加上margin：0；
+            function addMargin() {
+                const elements = iframeDoc.querySelectorAll('h1, h2, h3, h4, h5, h6, p');
+                console.log("🚀 ~ addMargin ~ elements:", elements)
+                elements.forEach(dom => {
+                    if (!dom.style.margin && !dom.style.marginTop && !dom.style.marginRight && !dom.style.marginBottom && !dom.style.marginLeft) {
+                        console.log('加 margin');
+                        dom.style.margin = '0';
+                    }
+                });
+            }
+            // 删除a标签下划线
+            function delUnderline() {
+                const elements = iframeDoc.querySelectorAll('a');
+                console.log("🚀 ~ delUnderline ~ elements:", elements)
+                elements.forEach(a => {
+                    if (!a.style.textDecoration) {
+                        console.log('从a标签中删除下划线');
+                        a.style.textDecoration = 'none';
+                    }
+                });
+            }
+            // 替换所有font-family
+            function replaceFontFamily() {
+                let newFontFamily
+                const langArr = [
+                    { lang: 'zh-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang HK', 'STHeiti', 'Helvetica Neue', Helvetica, '微軟正黑體Microsoft JhengHei', '微軟正黑體 Microsoft JhengHei', 'Microsoft JhengHei', '微軟正黑體', 'MingLiU', Arial, sans-serif, 'SF Pro Icons'!important;" },
+                    { lang: 'zh-TW', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang TC', 'STHeiti', 'Helvetica Neue', Helvetica, '微軟正黑體Microsoft JhengHei', '微軟正黑體 Microsoft JhengHei', 'Microsoft JhengHei', '微軟正黑體', 'MingLiU', Arial, sans-serif, 'SF Pro Icons'!important;" },
+                    { lang: 'zh-CN', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang SC', 'STHeiti', 'Helvetica Neue', Helvetica, 'Microsoft yahei', '微软雅黑', Arial, sans-serif, 'SF Pro Icons'!important;" },
+                    { lang: 'en-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'SF Pro Icons'!important;" },
+                ]
+                const curlang = iframeDoc.documentElement.lang;
+                console.log("🚀 ~ replaceFontFamily ~ curlang:", curlang)
+                langArr.forEach(o => {
+                    if (o.lang == curlang) {
+                        newFontFamily = o.font
+                    }
+                })
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                const regex = /font-family:\s*[^;]+;/g;
+                htmlContent = htmlContent.replace(regex, newFontFamily)
+                html_doc = htmlContent
+                handleOutput()
+            }
+            // 删除末尾footer部分nbsp
+            function delNbsp() {
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                const pattern = /(&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp;&nbsp;)/g;
+                let matches = htmlContent.match(pattern);
+                console.log("🚀 ~ delNbsp ~ matches:", matches)
+                let count = 0; // 用于计数替换次数
+                const modifiedString = htmlContent.replace(pattern, (match) => {
+                    count++;
+                    return (count > matches.length - 2) ? '&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp; ' : match;
+                });
+                html_doc = modifiedString
+                handleOutput()
+            }
+            // 删除414媒体查询
+            function del414Media() {
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                let regex = /@media\s*screen\s*and\s*\(\s*max-device-width\s*:\s*414px\s*\)\s*{\s*u\s*~\s*div\s*{\s*min-width:\s*375px\s*;\s*}\s*body\s*,\s*u\s*\+\s*div\s*{\s*min-width\s*:\s*375px\s*;\s*}\s*}/;
+                let replacement = `@media screen and (max-device-width:414px) {
+          u ~ div { min-width: 100%;}
+          body,u+div { min-width: 100%;}
+        }`;
+                html_doc = htmlContent.replace(regex, replacement);
+                console.log("🚀 ~ 替换414")
+                handleOutput()
+            }
+        });
+    </script>
+</body>
+
+</html>

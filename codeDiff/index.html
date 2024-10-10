@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文本对比工具</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../common/layui/css/layui.css"/>
+    <script src="../common/layui/layui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/elegant.min.css">
     <style>
@@ -69,9 +72,11 @@
         </div>
     </div>
 
-    <button onclick="compare()" style="margin-top: 20px;cursor: pointer;">对比</button>
-    <button onclick="wordWrap()" style="margin: 20px 0 0 12px;cursor: pointer;">text是否折行显示</button>
-    <button onclick="clearText()" style="margin: 20px 0 0 12px;cursor: pointer;">Clear</button>
+    <div class="layui-btn-container" style="padding: 12px 0;">
+        <button onclick="compare()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">对比</button>
+        <button onclick="wordWrap()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">text是否折行显示</button>
+        <button onclick="clearText()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">Clear</button>
+    </div>
 
     <h3>对比结果</h3>
     <div class="diffBox">

@@ -5,8 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>格式化url</title>
-  <style>
-  </style>
+  <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../common/layui/css/layui.css"/>
+    <script src="../common/layui/layui.js"></script>
 </head>
 
 <body>
@@ -15,8 +16,8 @@
 
     <p style="font-size: 14px;color: #999;">说明：将clicks.txt文件中的内容复制过来，点击格式化后获取到干净的纯URL地址</p>
     <div id="output" contenteditable style="width: 400px;height: 200px;border: 1px solid #ccc;margin:0 0 20px;overflow: auto;"></div>
-    <button id="yemian">点击格式化url</button>
-    <button id="clear">清空</button>
+    <button id="yemian" class="layui-btn layui-btn-sm layui-btn-primary layui-border">点击格式化url</button>
+    <button id="clear" class="layui-btn layui-btn-sm layui-btn-primary layui-border">清空</button>
     <span style="display: none;font-size: 12px;color: #259e3f;margin-top: 6px;"
       id="textHidden">文本已成功复制到剪贴板</span>
   </div>

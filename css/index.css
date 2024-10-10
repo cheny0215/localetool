@@ -23,3 +23,12 @@ table {
     border-collapse: collapse;
     border-spacing: 0;
 }
+  /* 使用 CSS 变量定义主题颜色 */
+  :root {
+    --main-color: #F5F7F8; /* 默认主色 */
+    --accent-color: #16baaa; /* 默认辅助色 */
+    --text-color: rgba(255,255,255,.7); /* 默认字体色 */
+    --strong-text-color: #fff; /* 强调字体色 */
+    --sidebar-color: #20222A; /* 默认侧边栏色 */
+    --main-gradient: linear-gradient(to right,#20222A,#e74d3c1c,#e74d3c3d,#e74d3c90, #e74c3c, #f1c40f, #3498db,#3498db86,#3498db3c,#3498db19,#20222A); /* 主体渐变色 */
+}
