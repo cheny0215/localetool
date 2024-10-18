@@ -10,6 +10,9 @@
     <script src="../common/layui/layui.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/elegant.min.css">
+    <script src="../common/components/ShowMessage.js" defer></script>
+    <script src="../common/components/Loading.js" defer></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -104,17 +107,25 @@
 
 <body>
 
-    <h3 id="compareResult">文本对比工具</h3>
+    <h3 id="compareTool">文本对比工具</h3>
 
     <div class="container">
         <div style="border-top:1px solid #ffacba;">
             <span style="color: #fa4f6b;line-height: 40px;">文本1</span>
-            <span class="layui-badge" id="text_icon1">--</span>
+            <span class="layui-badge" id="text_icon1">--</span>&nbsp;&nbsp;
+            <i class="layui-icon layui-icon-delete"
+                style="vertical-align: middle;font-size: 26px;cursor: pointer;color: #666;" onclick="delText(1)"></i>
+            <i class="layui-icon layui-icon-file"
+                style="vertical-align: middle;font-size: 20px;cursor: pointer;color: #666;" onclick="copyText(1)"></i>
             <textarea id="code1" wrap="hard"></textarea>
         </div>
         <div style="border-top:1px solid #c9ffa9;">
             <span style="color: #58c31a;line-height: 40px;">文本2</span>
-            <span class="layui-badge" style="background:#16b777" id="text_icon2">--</span>
+            <span class="layui-badge" style="background:#16b777" id="text_icon2">--</span>&nbsp;&nbsp;
+            <i class="layui-icon layui-icon-delete"
+                style="vertical-align: middle;font-size: 26px;cursor: pointer;color: #666;" onclick="delText(2)"></i>
+            <i class="layui-icon layui-icon-file"
+                style="vertical-align: middle;font-size: 20px;cursor: pointer;color: #666;" onclick="copyText(2)"></i>
             <textarea id="code2" wrap="hard"></textarea>
         </div>
     </div>
@@ -123,13 +134,15 @@
         <button onclick="compare()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">对比</button>
         <button onclick="wordWrap()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">text是否折行显示</button>
         <button onclick="clearText()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">Clear</button>
+        <button onclick="readSessionText()"
+            class="layui-btn layui-btn-sm layui-btn-primary layui-border">读取session数据</button>
         <button type="button" class="layui-btn layui-btn-sm layui-btn-primary layui-border"
             lay-on="page">查看差异列表</button>
     </div>
 
-    <h3>对比结果</h3>
+    <h3 id="compareResult">对比结果</h3>
     <div class="diffBox">
-        <a href="#compareResult" style="display: none;"><span class="layui-icon layui-icon-up"
+        <a href="#compareTool" style="display: none;"><span class="layui-icon layui-icon-up"
                 style="color:#fa4f6b;font-size: 40px;padding:1px 6px;background-color: rgba(0, 0, 0, 0.05);font-weight: 700;border-radius: 6px;position: fixed;bottom:20px;right:40px;cursor: pointer;"></span></a>
         <div id="diff-output" class="diff-output"></div>
     </div>
@@ -138,9 +151,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
     <script>
-        const diffOutput = document.querySelector('.diff-output')
+        const diffOutput = document.querySelector('#diff-output')
         const text_icon1 = document.querySelector('#text_icon1')
         const text_icon2 = document.querySelector('#text_icon2')
+        const compareResult = document.querySelector('#compareResult')
 
         let diffArr = []
         // 初始化CodeMirror编辑器
@@ -167,21 +181,61 @@
         function clearText() {
             editor1.setValue('')
             editor2.setValue('')
-            document.getElementById('diff-output').innerHTML = '';
+            text_icon1.textContent = '--'
+            text_icon2.textContent = '--'
+            diffOutput.innerHTML = '';
+        }
+        function delText(num) {
+            if (num == 1) {
+                text_icon1.textContent = '--'
+                editor1.setValue('')
+            }
+            if (num == 2) {
+                text_icon2.textContent = '--'
+                editor2.setValue('')
+            }
+            diffOutput.innerHTML = '';
+            showMessage({ msg: '已删除', type: 'error', delay: 500, isTransition: false })
+        }
+        function copyText(num) {
+            if (num == 1) {
+                navigator.clipboard.writeText(editor1.getValue())
+            }
+            if (num == 2) {
+                navigator.clipboard.writeText(editor2.getValue())
+            }
+            showMessage({ msg: '已复制', type: 'info', delay: 500, isTransition: false })
+        }
+        function readSessionText(num) {
+            const json_compareObj = sessionStorage.getItem('cy_outputButton_current_html')
+            const compareObj = JSON.parse(json_compareObj)
+            editor1.setValue(compareObj.oldHtml)
+            editor2.setValue(compareObj.newHtml)
+            compare()
+            showMessage({ msg: '读取session数据成功', type: 'success' })
         }
 
+
         // 对比文本的函数
-        function compare() {
+        async function compare() {
+            LoadingModule.show()
             console.log('compare');
             diffArr = []
-
+            diffOutput.innerHTML = ''
             let text1 = escapeHtml(editor1.getValue());
             let text2 = escapeHtml(editor2.getValue());
 
-            // 使用jsdiff库进行文本对比
-            // let diff = Diff.diffLines(text1, text2);
-            let diff = Diff.diffWords(text1, text2);
+            let diff = await new Promise((resolve) => {
+                setTimeout(() => {
+                    // 使用jsdiff库进行文本对比
+                    // let diff = Diff.diffLines(text1, text2);
+                    const diffs = Diff.diffWords(text1, text2);
+                    resolve(diffs)
+                    LoadingModule.hide()
+                }, 0)
+            })
             console.log('diff', diff);
+
 
             let diffHtml = diff.map(function (part, index, arr) {
                 let color = part.added ? 'diff-added' : part.removed ? 'diff-removed' : '';
@@ -205,12 +259,12 @@
                 text_icon2.innerText = addedCount
                 return diffElement;
             }).join('');
-            if (diff.length === 1) {
+            if (diff.length === 1 && !diff[0].removed && !diff[0].added) {
                 diffHtml = '<h1>文本无差异</h1>'
             }
             console.log('diffArr', diffArr);
-
-            document.getElementById('diff-output').innerHTML = diffHtml;
+            showMessage({ msg: '对比完成！', type: 'success' })
+            diffOutput.innerHTML = diffHtml;
         }
 
         function wordWrap() {
@@ -266,7 +320,7 @@
 
         window.addEventListener('scroll', function () {
             const myDiv = document.querySelector('.diffBox a');
-            if (window.scrollY >= 3000) {
+            if (window.scrollY >= 2000) {
                 myDiv.style.display = 'block'; // 显示div
             } else {
                 myDiv.style.display = 'none'; // 隐藏div

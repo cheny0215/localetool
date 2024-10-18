@@ -9,9 +9,15 @@
     <link rel="stylesheet" href="../common/layui/css/layui.css"/>
     <script src="../common/layui/layui.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
+    <script src="../common/components/ShowMessage.js" defer></script>
+    <script src="../common/components/Loading.js" defer></script>
     <style>
         .diff-added {
             background-color: #d4fcbc;
+            border: 1px solid #ffffff00;
+        }
+        .diff-added:hover {
+            border: 1px solid #f44336;
             cursor: pointer;
         }
 
@@ -22,6 +28,9 @@
         #diffBox {
             font-size: 13px;
             color: #6f7184;
+            margin: 10px 10px 0 0;
+            padding: 12px;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -31,16 +40,16 @@
         style="width: 400px;height: 200px;border: 1px solid #ccc;margin:0 0 20px;overflow: auto; text-wrap: wrap;">
     </div>
     <button id="btnToNbsp" class="layui-btn layui-btn-sm layui-btn-primary layui-border">转换&amp;nbsp;并复制</button>
-    <button id="btnToNbsp2" class="layui-btn layui-btn-sm layui-btn-primary layui-border">转换:nbsp:并复制</button>
+    <button id="btnToNbspMcfly" class="layui-btn layui-btn-sm layui-btn-primary layui-border">转换:nbsp:并复制</button>
     <button id="btnToClear" class="layui-btn layui-btn-sm layui-btn-primary layui-border">清除内容</button>
     <span style="visibility: hidden;font-size: 12px;color: #259e3f;margin-top: 6px;"
-        id="textHidden">转换后的文本已成功复制到剪贴板，前后文本差异已显示在下方，<span class="diff-removed">红色</span>代表原始文本被替换掉的内容，<span
-            class="diff-added">绿色</span>代表新的内容，点击不需要替换的地方可以恢复到原来的空格</span>
+        id="textHidden">转换后的文本已成功复制到剪贴板，<span class="diff-removed">红色</span>为删除的内容，<span
+            class="diff-added">绿色</span>及添加的新的内容，点击绿色方块可以恢复原文本</span>
     <div id="diffBox"></div>
 </body>
 <script>
     let btnToNbsp = document.getElementById('btnToNbsp')
-    let btnToNbsp2 = document.getElementById('btnToNbsp2')
+    let btnToNbspMcfly = document.getElementById('btnToNbspMcfly')
     let btnToClear = document.getElementById('btnToClear')
     let output = document.getElementById('output')
     let diffBox = document.getElementById('diffBox')
@@ -71,7 +80,7 @@
             return placeholder;
         });
         console.log("🚀 ~ ~ placeholderMap:", placeholderMap)
-        const newText = tempOutput.replace(/\b\s+\b/g, '&nbsp;');
+        const newText = tempOutput.replace(/\b\s+\b/g, replacer);
         // 恢复原来的 HTML 标签
         const finalText = newText.replace(/@__HTML_TAG_\d+__@/g, (match) => placeholderMap[match]);
 
@@ -87,6 +96,7 @@
         }).join('');
 
         diffBox.innerHTML = diffHtml;
+        diffBox.style.border = '1px solid rgb(184 184 184)'
         const addSpans = diffBox.querySelectorAll('.diff-added')
         const delSpans = diffBox.querySelectorAll('.diff-removed')
         document.querySelectorAll('.diff-added').forEach((o, i) => {
@@ -100,21 +110,24 @@
                     new_element.removeChild(o)
                 })
                 upDateClipboard(new_element.innerText)  //更新剪贴板
+                showMessage({msg:'剪贴板已更新', type:'success',delay:1000})
             }
         })
+        showMessage({msg:'转换成功,剪贴板已更新', type:'info'})
     }
 
     function clearTheTextValue() {
         textHidden.style.visibility = "hidden"
         output.innerText = ''
         diffBox.innerHTML = ''
+        diffBox.style.border = '1px solid rgba(0,0,0,0)'
     }
 
     btnToNbsp.addEventListener('click', function () {
         replaceSpacesWithNbsp('&nbsp;')
     });
 
-    btnToNbsp2.addEventListener('click', function () {
+    btnToNbspMcfly.addEventListener('click', function () {
         replaceSpacesWithNbsp(':nbsp:')
     });
 

@@ -5,9 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>一键QA</title>
-    <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../common/layui/css/layui.css" />
+    <link rel="stylesheet" href="../css/index.css">
     <script src="../common/layui/layui.js"></script>
+    <script src="../common/components/ShowMessage.js" defer></script>
+    <script src="../common/components/Loading.js" defer></script>
     <style>
         .alpineData {
             font-size: 14px;
@@ -88,10 +90,13 @@
                     checked>
                 <input type="checkbox" id="tableFontFamilyCheckbox" name="tableFontFamily" title="第一个table添加font-family"
                     checked>
+                <input type="checkbox" id="replacePreNbspCheckbox" name="replacePreNbsp" title="替换preview-copy中的nbsp"
+                    checked>
                 <input type="checkbox" id="delNbspCheckbox" name="delNbsp" title="替换footer的最后两个nbsp" checked>
                 <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked>
                 <input type="checkbox" id="legalPackageCheckbox" name="legalPackage" title="包裹legal末尾防止单字" checked>
-                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器" checked>
+                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
+                    checked>
                 <hr>
                 <div>
                     <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
@@ -101,11 +106,9 @@
             </div>
             <div class="layui-btn-container">
                 <button id="submitButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-component"
-                    lay-on="QA">一键添加QA</button>
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-component">一键添加QA</button>
                 <button id="outputButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-fonts-code"
-                    lay-on="code">生成code</button>
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-fonts-code">生成Code</button>
             </div>
         </div>
         <div class="rightAlpineBox layui-panel">
@@ -115,10 +118,9 @@
             <hr>
             <div class="layui-btn-container">
                 <button id="copyButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-file-b"
-                    lay-on="msg">复制代码</button>
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-file-b">复制代码</button>
                 <button id="resetButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-green layui-icon layui-icon-refresh">重置所有数据</button>
+                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-refresh">重置所有数据</button>
             </div>
         </div>
     </div>
@@ -131,6 +133,12 @@
             { lang: 'en-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'SF Pro Icons'!important;" },
         ]
 
+        // #region
+        const preCopyNbsp = `
+        &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp;‌‌‌
+        `
+        // #endregion
+
         document.addEventListener('DOMContentLoaded', function () {
             const dataInput = document.getElementById('dataInput');
             const dataOutput = document.getElementById('dataOutput');
@@ -141,6 +149,7 @@
             const delUnderlineCheckbox = document.getElementById('delUnderlineCheckbox');
             const replaceFontFamilyCheckbox = document.getElementById('replaceFontFamilyCheckbox');
             const tableFontFamilyCheckbox = document.getElementById('tableFontFamilyCheckbox');
+            const replacePreNbspCheckbox = document.getElementById('replacePreNbspCheckbox');
             const delNbspCheckbox = document.getElementById('delNbspCheckbox');
             const del414MediaCheckbox = document.getElementById('del414MediaCheckbox');
             const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
@@ -153,31 +162,21 @@
             const resetButton = document.getElementById('resetButton');
 
             let html_doc = '';
-            let hiddenContent = [];
+            let hiddenPreContent = '';
+            let hiddenFontContent = '';
             let hexColorObj = {
                 addMargin: [],
                 delUnderline: [],
             };
-            const pre_placeholder = '[[PRE_PLACEHOLDER]]';
-            const zwnj_placeholder = '[[ZWNJ_PLACEHOLDER]]';
+            const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
+            const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
+            const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
 
             // layui的一些方法
             layui.use(function () {
                 let form = layui.form;
                 let layer = layui.layer;
                 let util = layui.util;
-
-                util.on('lay-on', {
-                    msg: function () {
-                        layer.msg('复制成功');
-                    },
-                    QA: function () {
-                        layer.msg('一键添加QA成功');
-                    },
-                    code: function () {
-                        layer.msg('已生成code');
-                    },
-                })
                 // 全选
                 form.on('checkbox(checkbox-allSelect)', function (data) {
                     const elem = data.elem; // 获得 checkbox 原始 DOM 对象
@@ -187,6 +186,7 @@
                     delUnderlineCheckbox.checked = elem.checked
                     replaceFontFamilyCheckbox.checked = elem.checked
                     tableFontFamilyCheckbox.checked = elem.checked
+                    replacePreNbspCheckbox.checked = elem.checked
                     delNbspCheckbox.checked = elem.checked
                     del414MediaCheckbox.checked = elem.checked
                     replacepSelectorCheckbox.checked = elem.checked
@@ -205,19 +205,22 @@
             function toPlaceholder() {
                 html_doc = html_doc.replace(/<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/, (match, content) => {
                     console.log("🚀 ~ html_doc=html_doc.replace ~ match:", match)
-                    hiddenContent.push(match); // 存储内容
+                    hiddenPreContent = match; // 存储内容
                     return pre_placeholder; // 替换为占位符
+                });
+                html_doc = html_doc.replace(/\<!--\[if gte mso 9\]\>([\s\S]*)\<!\[endif\]--\>/, (match, content) => {
+                    hiddenFontContent = match; // 存储内容
+                    return font_placeholder; // 替换为占位符
                 });
                 html_doc = html_doc.replace(/&zwnj;/g, zwnj_placeholder)
             }
             function delPlaceholder(iframehtml) {
-                hiddenContent.forEach((content, index) => {
-                    iframehtml = iframehtml.replace(pre_placeholder, content); // 替换占位符为原内容
-                });
+                iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent); // 替换占位符为原内容
+                iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent)
                 console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
                 let count1 = 0
                 let count2 = 0
-                iframehtml = iframehtml.replace(/lightgoldenrodyellow/g, () => {
+                iframehtml = iframehtml.replace(/cornflowerblue/g, () => {
                     const formatColor = hexColorObj.addMargin[count1]
                     count1++
                     return formatColor
@@ -247,40 +250,50 @@
             }
 
             // 按钮点击事件
-            submitButton.onclick = () => {
+            submitButton.onclick = async () => {
+                LoadingModule.show()
                 html_doc = dataInput.value;
                 toPlaceholder()
                 handleOutput()
-                iframe.onload = function () {
-                    console.log('iframe加载完成');
-                    if (addMarginCheckbox.checked) {
-                        addMargin();
-                    }
-                    if (delUnderlineCheckbox.checked) {
-                        delUnderline();
-                    }
-                    if (replaceFontFamilyCheckbox.checked) {
-                        replaceFontFamily();
-                    }
-                    if (tableFontFamilyCheckbox.checked) {
-                        tableFontFamily();
-                    }
-                    if (delNbspCheckbox.checked) {
-                        delNbsp();
-                    }
-                    if (del414MediaCheckbox.checked) {
-                        del414Media();
-                    }
-                    if (legalPackageCheckbox.checked) {
-                        legalPackage();
-                    }
-                    if (replacepSelectorCheckbox.checked) {
-                        replacepSelector();
-                    }
-                    if (supNormalSizeCheckbox.checked) {
-                        supNormalSize();
-                    }
-                };
+                const html_doc_promise = await new Promise((resolve) => {
+                    setTimeout(() => {
+                        console.log('iframe加载完成');
+                        if (addMarginCheckbox.checked) {
+                            addMargin();
+                        }
+                        if (delUnderlineCheckbox.checked) {
+                            delUnderline();
+                        }
+                        if (replaceFontFamilyCheckbox.checked) {
+                            replaceFontFamily();
+                        }
+                        if (tableFontFamilyCheckbox.checked) {
+                            tableFontFamily();
+                        }
+                        if (replacePreNbspCheckbox.checked) {
+                            replacePreNbsp();
+                        }
+                        if (delNbspCheckbox.checked) {
+                            delNbsp();
+                        }
+                        if (del414MediaCheckbox.checked) {
+                            del414Media();
+                        }
+                        if (legalPackageCheckbox.checked) {
+                            legalPackage();
+                        }
+                        if (replacepSelectorCheckbox.checked) {
+                            replacepSelector();
+                        }
+                        if (supNormalSizeCheckbox.checked) {
+                            supNormalSize();
+                        }
+                        showMessage({ msg: 'QA添加完成！', type: 'success' })
+                        LoadingModule.hide()
+                        resolve(html_doc)
+                    }, 0)
+                })
+                html_doc = html_doc_promise
             }
             outputButton.onclick = () => {
                 // 去除tbody
@@ -296,11 +309,17 @@
                 iframeOutHtml = delPlaceholder(iframeOutHtml)
                 dataOutput.value = '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
+                // 存储到会话存储
+                const compareObj = {
+                    oldHtml: dataInput.value,
+                    newHtml: dataOutput.value
+                }
+                sessionStorage.setItem('cy_outputButton_current_html', JSON.stringify(compareObj))
             }
             copyButton.onclick = async () => {
                 try {
                     await navigator.clipboard.writeText(dataOutput.value);
-                    console.log('已复制');
+                    showMessage({ msg: '复制成功！', type: 'success' })
                 } catch (err) {
                     console.error(err);
                 }
@@ -332,7 +351,7 @@
                         dom.style.margin = '0';
                         if (dom.style.color) {
                             const hexColor = rgbToHex(dom.style.color)
-                            dom.style.color = 'lightgoldenrodyellow'
+                            dom.style.color = 'cornflowerblue'
                             hexColorObj.addMargin.push(hexColor)
                         }
                     }
@@ -344,8 +363,9 @@
                 console.log("🚀 ~ delUnderline ~ elements:", elements)
                 elements.forEach(a => {
                     if (!a.style.textDecoration) {
-                        console.log('从a标签中删除下划线');
-                        a.style.textDecoration = 'none';
+                        const computedTextDecoration = window.getComputedStyle(a).textDecorationLine
+                        console.log('a标签计算样式', computedTextDecoration, 'a标签行内样式', a.style.textDecoration);
+                        a.style.textDecoration = computedTextDecoration
                         if (a.style.color) {
                             const hexColor = rgbToHex(a.style.color)
                             a.style.color = 'mediumspringgreen'
@@ -384,6 +404,16 @@
                     elements.style.fontFamily = newFontFamily
                 }
             }
+            // 替换preview-copy中的nbsp
+            function replacePreNbsp() {
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                const preCopyString = htmlContent.replace(/<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/, (match, content) => {
+                    match = match.replace(content, preCopyNbsp)
+                    return match; // 替换为占位符
+                });
+                html_doc = preCopyString
+                handleOutput()
+            }
             // 删除末尾footer部分nbsp
             function delNbsp() {
                 let htmlContent = iframeDoc.documentElement.outerHTML
@@ -414,7 +444,7 @@
             function legalPackage() {
                 // 获取sfcopy所有的 p 标签
                 const sfcopy = iframeDoc.querySelectorAll('.sfcopy');
-                const paragraphs = sfcopy[0].querySelectorAll('p');
+                const paragraphs = sfcopy[0] ? sfcopy[0].querySelectorAll('p') : [];
                 console.log("🚀 ~ legalPackage ~ paragraphs:", paragraphs)
                 paragraphs.forEach(p => {
                     // 获取 p 标签的内容
@@ -432,11 +462,11 @@
                     }
                 });
             }
-               // 替换css中>p选择器
-               function replacepSelector() {
+            // 替换css中>p选择器
+            function replacepSelector() {
                 let htmlContent = iframeDoc.documentElement.outerHTML
                 const regex = /\.m-.+?(>)p/g;
-                html_doc = htmlContent.replace(regex, (match,content)=>{
+                html_doc = htmlContent.replace(regex, (match, content) => {
                     return match.replace(content, ' ');
                 });
                 console.log("🚀 ~ 替换>p选择器")

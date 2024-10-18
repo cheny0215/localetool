@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>兔子加载动画</title>
+    <style>
+        /* styles.css */
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #f0f8ff; /* 浅蓝色背景 */
+}
+
+.loader {
+    position: absolute;
+    bottom: 50px; /* 兔子在底部 */
+}
+
+#rabbit {
+    width: 100px; /* 兔子宽度 */
+    animation: hop 0.5s ease-in-out infinite alternate; /* 兔子跳跃动画 */
+}
+
+@keyframes hop {
+    0% {
+        transform: translateY(0),translateX(0); /* 初始位置 */
+    }
+    100% {
+        transform: translateY(-30px),translateX(200px); /* 跳跃高度 */
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="loader">
+        <img src="rabbit.png" alt="兔子" id="rabbit">
+    </div>
+    <script>
+        // script.js
+const rabbit = document.getElementById('rabbit');
+const loader = document.querySelector('.loader');
+
+let position = 0; // 兔子的初始位置
+const speed = 2; // 兔子移动速度
+
+function moveRabbit() {
+    position += speed; // 更新位置
+    rabbit.style.transform = `translateX(${position}px)`; // 移动兔子
+
+    // 当兔子移动出屏幕时，重置位置
+    if (position > window.innerWidth) {
+        position = -100; // 重置到左侧
+    }
+
+    requestAnimationFrame(moveRabbit); // 继续动画
+}
+
+// 启动动画
+moveRabbit();
+
+    </script>
+</body>
+</html>
