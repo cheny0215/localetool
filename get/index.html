@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GET</title>
+</head>
+
+<body>
+    <iframe src="https://webedit.preview.apple.com/hk/dm/?id=67BA30E3"></iframe>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // let datas = ""
+        // async function fetchData() {
+        //     try {
+        //         let response = await axios.get("https://webedit.preview.apple.com/hk/dm/?id=67BA30E3");
+        //         let datas = response.data;
+        //         console.log("请求成功", datas);
+        //     } catch (error) {
+        //         console.error("Error fetching data:", error);
+        //     }
+        // }
+        // fetchData()
+
+
+
+
+
+        function handleResponse(data) {
+            console.log('请求成功data',data); // 处理返回的数据
+        }
+
+        // 创建 JSONP 请求
+        const script = document.createElement('script');
+        script.src = 'https://webedit.preview.apple.com/hk/dm/?id=67BA30E3?callback=handleResponse';
+        document.body.appendChild(script);
+    </script>
+</body>
+
+</html>
