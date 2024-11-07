@@ -396,12 +396,13 @@
                 const curlang = iframeDoc.documentElement.lang;
                 langArr.forEach(o => {
                     if (o.lang == curlang) {
-                        newFontFamily = o.font
+                        newFontFamily = o.font.replace(/.*?:/, '').replace(/!important;/,'')
                     }
                 })
                 const elements = iframeDoc.querySelector('table');
                 if (elements) {
                     elements.style.fontFamily = newFontFamily
+                    console.log("🚀 ~ elements.style.fontFamily:", elements.style.fontFamily)
                 }
             }
             // 替换preview-copy中的nbsp
@@ -420,13 +421,15 @@
                 const pattern = /(&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp;&nbsp;)/g;
                 let matches = htmlContent.match(pattern);
                 console.log("🚀 ~ delNbsp ~ matches:", matches)
-                let count = 0; // 用于计数替换次数
-                const modifiedString = htmlContent.replace(pattern, (match) => {
-                    count++;
-                    return (count > matches.length - 2) ? '&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp; ' : match;
-                });
-                html_doc = modifiedString
-                handleOutput()
+                if(matches.length == 4){
+                    let count = 0; // 用于计数替换次数
+                    const modifiedString = htmlContent.replace(pattern, (match) => {
+                        count++;
+                        return (count > 2) ? '&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp; ' : match;
+                    });
+                    html_doc = modifiedString
+                    handleOutput()
+                }
             }
             // 删除414媒体查询
             function del414Media() {
