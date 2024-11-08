@@ -144,6 +144,8 @@
             const dataOutput = document.getElementById('dataOutput');
             const iframe = document.getElementById('myIframe');
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+            // Checkbox element
             const allSelectCheckbox = document.getElementById('allSelectCheckbox');
             const addMarginCheckbox = document.getElementById('addMarginCheckbox');
             const delUnderlineCheckbox = document.getElementById('delUnderlineCheckbox');
@@ -155,6 +157,7 @@
             const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
             const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
+            // Checkbox element
 
             const submitButton = document.getElementById('submitButton');
             const outputButton = document.getElementById('outputButton');
@@ -171,7 +174,7 @@
             const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
             const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
             const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
-
+            
             // layui的一些方法
             layui.use(function () {
                 let form = layui.form;
@@ -215,8 +218,9 @@
                 html_doc = html_doc.replace(/&zwnj;/g, zwnj_placeholder)
             }
             function delPlaceholder(iframehtml) {
-                iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent); // 替换占位符为原内容
+                iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
                 iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent)
+
                 console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
                 let count1 = 0
                 let count2 = 0
@@ -251,6 +255,7 @@
 
             // 按钮点击事件
             submitButton.onclick = async () => {
+                // localStorage.setItem('cy_outputButton_current_html', '')
                 LoadingModule.show()
                 html_doc = dataInput.value;
                 toPlaceholder()
@@ -309,12 +314,14 @@
                 iframeOutHtml = delPlaceholder(iframeOutHtml)
                 dataOutput.value = '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
+
                 // 存储到会话存储
                 const compareObj = {
                     oldHtml: dataInput.value,
                     newHtml: dataOutput.value
                 }
-                sessionStorage.setItem('cy_outputButton_current_html', JSON.stringify(compareObj))
+                localStorage.setItem('cy_outputButton_current_html', JSON.stringify(compareObj))
+                showMessage({ msg: '已生成！', type: 'success' })
             }
             copyButton.onclick = async () => {
                 try {
@@ -396,14 +403,17 @@
                 const curlang = iframeDoc.documentElement.lang;
                 langArr.forEach(o => {
                     if (o.lang == curlang) {
-                        newFontFamily = o.font.replace(/.*?:/, '').replace(/!important;/,'')
+                        newFontFamily = o.font
                     }
                 })
                 const elements = iframeDoc.querySelector('table');
-                if (elements) {
-                    elements.style.fontFamily = newFontFamily
-                    console.log("🚀 ~ elements.style.fontFamily:", elements.style.fontFamily)
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                if (elements && !elements.style.fontFamily) {
+                    console.log('替换第一个fontfamily');
+                    htmlContent = htmlContent.replace(/\<table/, `<table style="${newFontFamily}"`)
+                    html_doc = htmlContent
                 }
+                handleOutput()
             }
             // 替换preview-copy中的nbsp
             function replacePreNbsp() {

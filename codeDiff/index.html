@@ -207,7 +207,7 @@
             showMessage({ msg: '已复制', type: 'info', delay: 500, isTransition: false })
         }
         function readSessionText(num) {
-            const json_compareObj = sessionStorage.getItem('cy_outputButton_current_html')
+            const json_compareObj = localStorage.getItem('cy_outputButton_current_html')
             const compareObj = JSON.parse(json_compareObj)
             editor1.setValue(compareObj.oldHtml)
             editor2.setValue(compareObj.newHtml)
