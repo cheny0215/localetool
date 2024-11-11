@@ -95,8 +95,8 @@
                 <input type="checkbox" id="delNbspCheckbox" name="delNbsp" title="替换footer的最后两个nbsp" checked>
                 <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked>
                 <input type="checkbox" id="legalPackageCheckbox" name="legalPackage" title="包裹legal末尾防止单字" checked>
-                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
-                    checked>
+                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器" checked>
+                <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
                 <hr>
                 <div>
                     <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
@@ -156,6 +156,7 @@
             const del414MediaCheckbox = document.getElementById('del414MediaCheckbox');
             const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
             const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
+            const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
             // Checkbox element
 
@@ -194,6 +195,7 @@
                     del414MediaCheckbox.checked = elem.checked
                     replacepSelectorCheckbox.checked = elem.checked
                     legalPackageCheckbox.checked = elem.checked
+                    imgToCenterCheckbox.checked = elem.checked
                 });
             })
 
@@ -289,6 +291,9 @@
                         }
                         if (replacepSelectorCheckbox.checked) {
                             replacepSelector();
+                        }
+                        if (imgToCenterCheckbox.checked) {
+                            imgToCenter();
                         }
                         if (supNormalSizeCheckbox.checked) {
                             supNormalSize();
@@ -484,6 +489,20 @@
                 });
                 console.log("🚀 ~ 替换>p选择器")
                 handleOutput()
+            }
+            // img图片设置居中
+            function imgToCenter() {
+                const imgElement = iframeDoc.querySelectorAll('img');
+                imgElement.forEach(o => {
+                    const computedImgDisplay = window.getComputedStyle(o).display
+                    const computedImgMarginLeft = window.getComputedStyle(o).marginLeft
+                    const computedImgMarginRight = window.getComputedStyle(o).marginRight
+                    // console.log("🚀 ~ imgToCenter ~ computedImg:", computedImgDisplay)
+                    if(computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginRight != '0px'){
+                        o.style.margin = '0 auto'
+                        o.style.display = 'block'
+                    }
+                })
             }
             // mobile的sup标签设置行内样式（sina邮箱）
             function supNormalSize() {
