@@ -5,36 +5,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GET</title>
+    <link rel="stylesheet" href="../common/layui/css/layui.css" />
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../common/layui/layui.js"></script>
+    <script src="../common/components/ShowMessage.js" defer></script>
+    <script src="../common/components/Loading.js" defer></script>
+    <style>
+        .layui-elem-quote:hover {
+            color: #999
+        }
+    </style>
 </head>
 
 <body>
-    <!-- <iframe src="https://baidu.com/"></iframe> -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <fieldset class="layui-elem-field">
+        <legend>账号</legend>
+        <div class="layui-field-box">
+            <blockquote class="layui-elem-quote">
+                Lvan.Chen@mullenlowe.com
+            </blockquote>
+            <blockquote class="layui-elem-quote">
+                ivanyang_chen@apple.com
+            </blockquote>
+        </div>
+    </fieldset>
+
+    <fieldset class="layui-elem-field">
+        <legend>我的邮箱</legend>
+        <div class="layui-field-box">
+            <blockquote class="layui-elem-quote">
+                <div>ivanyang_chen@apple.com,</div>
+                <div>ivanchenyang99@outlook.com,</div>
+                <div>ivanchenyang@gmail.com,</div>
+                <div>1354749315@qq.com,</div>
+                <div>ivanchenyang@sina.com,</div>
+                <div>17506120452@163.com,</div>
+            </blockquote>
+        </div>
+    </fieldset>
+
+    <fieldset class="layui-elem-field">
+        <legend>小组成员邮箱</legend>
+        <div class="layui-field-box">
+            <blockquote class="layui-elem-quote">
+                <div>chester_haisheng_zhao@apple.com,</div>
+                <div>efforthongfei_zheng@apple.com,</div>
+                <div>nicoleshutun_li@apple.com,</div>
+            </blockquote>
+        </div>
+    </fieldset>
+
+    <fieldset class="layui-elem-field">
+        <legend>QA邮箱</legend>
+        <div class="layui-field-box">
+            <b>QQ</b>
+            <blockquote class="layui-elem-quote">
+                <div></div>
+                <div>1416413774@qq.com,</div>
+                <div>2099096391@qq.com,</div>
+                <div>gc_qatest@qq.com,</div>
+            </blockquote>
+        </div>
+        <div class="layui-field-box">
+            <b>163</b>
+            <blockquote class="layui-elem-quote">
+                <div>apple_gc_qatest@163.com,</div>
+                <div>apple_gc_testing@163.com,</div>
+                <div>apple_gc_testing2@163.com,</div>
+            </blockquote>
+        </div>
+        <div class="layui-field-box">
+            <b>新浪sina</b>
+            <blockquote class="layui-elem-quote">
+                <div>apple_gc_testing@sina.com,</div>
+            </blockquote>
+        </div>
+        <div class="layui-field-box">
+            <b>Outlook</b>
+            <blockquote class="layui-elem-quote">
+                <div>apple_gc_qatest1@outlook.com,</div>
+                <div>apple_gc_qatest3@outlook.com,</div>
+            </blockquote>
+        </div>
+        <div class="layui-field-box">
+            <b>Gmail</b>
+            <blockquote class="layui-elem-quote">
+                <div>apple.gc.testing@gmail.com,</div>
+                <div>apple.gc.qatest@gmail.com,</div>
+            </blockquote>
+        </div>
+        <div class="layui-field-box">
+            <b>Yahoo</b>
+            <blockquote class="layui-elem-quote">
+                <div>apple_gc_qatest@yahoo.com,</div>
+            </blockquote>
+        </div>
+        <div class="layui-field-box">
+            <b>Apple/Icloud</b>
+            <blockquote class="layui-elem-quote">
+                <div>apple_gc_testing4@icloud.com,</div>
+                <div>joe_le_jiang@apple.com,</div>
+                <div>blitzshaoming_zheng@apple.com,</div>
+                <div>cassie_wenjun_he@apple.com,</div>
+                <div>cw_chen@apple.com,</div>
+                <div>nicholaszhen_li@apple.com,</div>
+                <div>sophia_xiaoyun_shi@apple.com,</div>
+                <div>sherlockxiaoxin_zheng@apple.com,</div>
+            </blockquote>
+        </div>
+    </fieldset>
+
     <script>
-        // let datas = ""
-        // async function fetchData() {
-        //     try {
-        //         let response = await axios.get("https://webedit.preview.apple.com/hk/dm/?id=67BA30E3");
-        //         let datas = response.data;
-        //         console.log("请求成功", datas);
-        //     } catch (error) {
-        //         console.error("Error fetching data:", error);
-        //     }
-        // }
-        // fetchData()
-
-
-
-
-
-        function handleResponse(data) {
-            console.log('请求成功data',data); // 处理返回的数据
+        const quote = document.querySelectorAll('.layui-elem-quote')
+        function upDateClipboard(finalText) {
+            navigator.clipboard.writeText(finalText).then(function () {
+                showMessage({ msg: '复制成功', type: 'success' })
+            }).catch(function (err) {
+                alert('复制失败: ' + err);
+            });
         }
-
-        // 创建 JSONP 请求
-        const script = document.createElement('script');
-        script.src = 'https://baidu.com/?callback=handleResponse';
-        document.body.appendChild(script);
+        quote.forEach(o => {
+            o.onclick = () => {
+                upDateClipboard(o.textContent.replace(/\s+/g, ''))
+            }
+        })
     </script>
 </body>
 
