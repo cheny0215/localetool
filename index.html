@@ -18,66 +18,67 @@
 
         #sidebar {
             width: 200px;
-            background-color: var(--sidebar-color);   /* 侧边栏背景色 */
-            color:var(--text-color);
-            padding: 0 15px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            transition: width 0.3s;
+            background-color: #20222A;
+            color: rgba(255,255,255,.8);
+            padding: 0;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
 
         #sidebar-box {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.1);
+            height: 60px;
+            box-sizing: border-box;
+        }
+
+        #toggleSidebar {
+            padding: 4px 8px;
+            margin-right: 8px;
+            background: transparent;
+            border: none;
+            color: inherit;
+            font-size: 20px;
             cursor: pointer;
-            padding: 5px 0;
+            transition: transform 0.3s ease;
         }
 
         #sidebar.collapsed {
             width: 60px;
         }
 
-        #sidebar.collapsed b {
-            display: none;
-            /* 收缩时隐藏标题 */
-        }
-
-        #sidebar.collapsed #toggleBtn {
-            display: none;
-            /* 收缩时隐藏菜单 */
+        #sidebar.collapsed #toggleSidebar {
+            transform: rotate(-180deg);
         }
 
         #sidebar ul {
-            list-style-type: none;
-            padding: 0;
+            padding: 8px;
         }
 
         #sidebar ul li {
-            margin: 6px 0;
-        }
-
-        #sidebar ul li:hover a{
-            color:var(--strong-text-color);
+            margin: 4px 0;
+            border-radius: 4px;
         }
 
         #sidebar ul li a {
-            display: block;
-            padding: 8px 10px;
-            width: 100%;
-            height: 100%;
-            color:var(--text-color);
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: inherit;
             text-decoration: none;
             cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
         }
 
-        #toggleSidebar {
-            height: 100%;
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-bottom: 4px;
-            background: none;
-            border: none;
-            color:var(--text-color);
-            font-size: 24px;
-            cursor: pointer;
+        #sidebar ul li:hover a {
+            color: #fff;
+            background: rgba(255,255,255,.1);
+            transform: translateX(4px);
+            border-radius: 4px;
         }
 
         #main {
@@ -120,10 +121,153 @@
         }
 
         .activeButton {
-            background: var(--main-gradient);
+            background: #1E9FFF !important;
         }
-        .activeButton a{
-        color: #fff !important;
+
+        .activeButton a {
+            color: #fff !important;
+            transform: none !important;
+        }
+
+        /* 更新主题配色变量 */
+        :root {
+            /* 默认主题 - 清新蓝调 */
+            --sidebar-bg: linear-gradient(120deg, #1565C0, #64B5F6);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #2196F3;
+            --header-bg: #E3F2FD;
+            --header-text: #0D47A1;
+            --accent-color: #FF4081;
+        }
+
+        /* 深邃星空 - 深蓝渐变 */
+        [data-theme="dark"] {
+            --sidebar-bg: linear-gradient(120deg, #0F2027, #203A43);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #4FC3F7;
+            --header-bg: #E0F7FA;
+            --header-text: #006064;
+            --accent-color: #FF5252;
+        }
+
+        /* 清新森林 - 保持不变 */
+        [data-theme="green"] {
+            --sidebar-bg: linear-gradient(120deg, #134e5e, #71b280);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #4CAF50;
+            --header-bg: #f1f8e9;
+            --header-text: #2c4a3c;
+            --accent-color: #ff9800;
+        }
+
+        /* 紫罗兰 - 柔和紫调 */
+        [data-theme="purple"] {
+            --sidebar-bg: linear-gradient(120deg, #5B247A, #9B6B9D);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #7B1FA2;
+            --header-bg: #F3E5F5;
+            --header-text: #4A148C;
+            --accent-color: #FFC107;
+        }
+
+        /* 海洋之心 - 清新蓝绿 */
+        [data-theme="ocean"] {
+            --sidebar-bg: linear-gradient(120deg, #006064, #00ACC1);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #00BCD4;
+            --header-bg: #E0F7FA;
+            --header-text: #006064;
+            --accent-color: #FF5722;
+        }
+
+        /* 晚霞 - 温暖橙粉 */
+        [data-theme="sunset"] {
+            --sidebar-bg: linear-gradient(120deg, #FF7043, #FFA270);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #FF5722;
+            --header-bg: #FBE9E7;
+            --header-text: #BF360C;
+            --accent-color: #03A9F4;
+        }
+
+        /* 樱花 - 柔和粉紫 */
+        [data-theme="cherry"] {
+            --sidebar-bg: linear-gradient(120deg, #E91E63, #F48FB1);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #EC407A;
+            --header-bg: #FCE4EC;
+            --header-text: #880E4F;
+            --accent-color: #4CAF50;
+        }
+
+        /* 薄荷清晨 - 保持不变 */
+        [data-theme="mint"] {
+            --sidebar-bg: linear-gradient(120deg, #43c6ac, #191654);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #26a69a;
+            --header-bg: #e0f2f1;
+            --header-text: #004d40;
+            --accent-color: #ff4081;
+        }
+
+        /* 科技 - 清新灰调 */
+        [data-theme="tech"] {
+            --sidebar-bg: linear-gradient(120deg, #37474F, #78909C);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #607D8B;
+            --header-bg: #ECEFF1;
+            --header-text: #263238;
+            --accent-color: #00BCD4;
+        }
+
+        /* 咖啡 - 温暖棕调 */
+        [data-theme="coffee"] {
+            --sidebar-bg: linear-gradient(120deg, #5D4037, #8D6E63);
+            --sidebar-text: rgba(255,255,255,.9);
+            --sidebar-hover: rgba(255,255,255,.15);
+            --active-color: #795548;
+            --header-bg: #EFEBE9;
+            --header-text: #3E2723;
+            --accent-color: #26C6DA;
+        }
+
+        /* 更新使用渐变背景的样式 */
+        #sidebar {
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+        }
+
+        /* 添加hover时的光效 */
+        #sidebar ul li a:hover {
+            background: linear-gradient(90deg, 
+                var(--sidebar-hover), 
+                transparent);
+            transform: translateX(4px);
+        }
+
+        /* 活跃按钮样式优化 */
+        .activeButton {
+            background: var(--active-color) !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* 为导航添加accent color */
+        .layui-nav .layui-nav-child dd:hover a {
+            color: var(--accent-color) !important;
+        }
+
+        /* 添加主题切换时的过渡效果 */
+        #sidebar, .nav, .activeButton {
+            transition: all 0.4s ease;
         }
     </style>
 </head>
@@ -145,6 +289,7 @@
                 <li><a class="clickBTN" name="preact">preact</a></li>
                 <li><a class="clickBTN" name="DMcompatible">DMcompatible</a></li>
                 <li><a class="clickBTN" name="GET">GET</a></li>
+                <li><a class="clickBTN" name="压缩js代码为书签">compressCode</a></li>
             </ul>
         </div>
         <div id="main">
@@ -156,11 +301,18 @@
                 </li>
                 <li class="layui-nav-item"><a href="">导航</a></li>
                 <li class="layui-nav-item">
-                  <a href="javascript:;">主题</a>
+                  <a href="javascript:;">主题切换</a>
                   <dl class="layui-nav-child">
-                    <dd><a href="">主题1</a></dd>
-                    <dd><a href="">主题2</a></dd>
-                    <dd><a href="">主题3</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('default')">默认主题</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('dark')">深邃夜空</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('green')">清新森林</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('purple')">优雅紫罗</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('ocean')">海洋之心</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('sunset')">晚霞橘暮</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('cherry')">樱花粉韵</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('mint')">薄荷清晨</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('tech')">科技蓝调</a></dd>
+                    <dd><a href="javascript:;" onclick="switchTheme('coffee')">咖啡时光</a></dd>
                   </dl>
                 </li>
                 <li class="layui-nav-item"><a href="">演示</a></li>
@@ -175,6 +327,7 @@
                 <iframe class="iframeBox hiddenIframe" src="./preact/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./DMcompatible/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./get/index.html"></iframe>
+                <iframe class="iframeBox hiddenIframe" src="./compressCode/index.html"></iframe>
             </div>
         </div>
     </div>
@@ -225,8 +378,48 @@
 
         }
 
+        // 主题切换函数
+        function switchTheme(themeName) {
+            // 保存主题选择到本地存储
+            localStorage.setItem('preferred-theme', themeName);
+            // 设置主题
+            document.documentElement.setAttribute('data-theme', themeName);
+            
+            // 触发过渡动画
+            document.body.style.transition = 'background-color 0.3s ease';
+            document.querySelector('#sidebar').style.transition = 'background-color 0.3s ease';
+            
+            // 通知用户
+            layer.msg('主题切换成功：' + getThemeName(themeName), {
+                offset: 't',
+                anim: 6
+            });
+        }
 
+        // 获取主题名称
+        function getThemeName(theme) {
+            const themeNames = {
+                'default': '默认主题',
+                'dark': '深邃夜空',
+                'green': '清新森林',
+                'purple': '优雅紫罗',
+                'ocean': '海洋之心',
+                'sunset': '晚霞橘暮',
+                'cherry': '樱花粉韵',
+                'mint': '薄荷清晨',
+                'tech': '科技蓝调',
+                'coffee': '咖啡时光'
+            };
+            return themeNames[theme] || theme;
+        }
 
+        // 页面加载时恢复上次的主题设置
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('preferred-theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+        });
 
     </script>
 </body>

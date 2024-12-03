@@ -1,49 +1,107 @@
 // 全局message组件
-const showMessage = ({msg, type , delay=2000 ,isTransition=true}) => {
+const showMessage = ({msg, type, delay = 2000, isTransition = true}) => {
     const messageBox = document.createElement('div');
     messageBox.className = 'custom-alert';
     messageBox.textContent = msg;
     document.body.appendChild(messageBox);
 
-    // 样式
-    messageBox.style.position = 'fixed';
-    messageBox.style.top = '20px'; /* 顶部距离 */
-    messageBox.style.left = '50%'; /* 居中定位 */
-    messageBox.style.width = '300px'; /* 固定宽度 */
-    messageBox.style.padding = '15px';
-    messageBox.style.backgroundColor = '#888888';
-    messageBox.style.color = 'white';
-    messageBox.style.borderRadius = '5px';
-    messageBox.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
-    messageBox.style.display = 'none'; /* 默认隐藏 */
-    messageBox.style.zIndex = '1000';
-    messageBox.style.transition = isTransition ? 'opacity 0.3s, transform 0.3s' : '';
-    messageBox.style.opacity = '0'; /* 初始透明度 */
-    messageBox.style.transform = 'translateX(-50%) translateY(-20px)'; /* 向左移动50%宽度以实现居中 */
+    // 定义主题色变量
+    const themes = {
+        success: {
+            background: 'linear-gradient(145deg, #28a745, #20c997)',
+            boxShadow: '0 4px 12px rgba(40, 167, 69, 0.15)',
+            border: '1px solid rgba(40, 167, 69, 0.1)'
+        },
+        warning: {
+            background: 'linear-gradient(145deg, #ffc107, #fd7e14)',
+            boxShadow: '0 4px 12px rgba(255, 193, 7, 0.15)',
+            border: '1px solid rgba(255, 193, 7, 0.1)'
+        },
+        error: {
+            background: 'linear-gradient(145deg, #dc3545, #e83e8c)',
+            boxShadow: '0 4px 12px rgba(220, 53, 69, 0.15)',
+            border: '1px solid rgba(220, 53, 69, 0.1)'
+        },
+        info: {
+            background: 'linear-gradient(145deg, #17a2b8, #007bff)',
+            boxShadow: '0 4px 12px rgba(23, 162, 184, 0.15)',
+            border: '1px solid rgba(23, 162, 184, 0.1)'
+        }
+    };
 
-    if (type === 'success') {
-        messageBox.style.backgroundColor = '#4caf50'; // 绿色
-    } else if (type === 'warning') {
-        messageBox.style.backgroundColor = '#ff9800'; // 橙色
-    } else if (type === 'error') {
-        messageBox.style.backgroundColor = '#f44336'; // 红色
-    } else if (type === 'info') {
-        messageBox.style.backgroundColor = '#1e9fff'; // 蓝色
-    }
-    messageBox.textContent = msg;   // 设置消息文本
-    messageBox.style.display = 'block';   // 显示消息框
+    // 基础样式
+    const baseStyles = {
+        position: 'fixed',
+        top: '20px',
+        left: '50%',
+        minWidth: '320px',
+        maxWidth: '480px',
+        padding: '12px 24px',
+        color: '#ffffff',
+        borderRadius: '8px',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+        fontSize: '14px',
+        fontWeight: '500',
+        lineHeight: '1.5',
+        display: 'none',
+        zIndex: '10000',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        transform: 'translateX(-50%) translateY(-20px)',
+        opacity: '0',
+        transition: isTransition ? 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' : '',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word'
+    };
+
+    // 应用基础样式
+    Object.assign(messageBox.style, baseStyles);
+
+    // 应用主题样式
+    const theme = themes[type] || themes.info;
+    Object.assign(messageBox.style, {
+        background: theme.background,
+        boxShadow: theme.boxShadow,
+        border: theme.border
+    });
+
+    // 显示消息框
+    messageBox.style.display = 'flex';
+    
+    // 使用requestAnimationFrame确保动画流畅
     requestAnimationFrame(() => {
         messageBox.style.opacity = '1';
         messageBox.style.transform = 'translateX(-50%) translateY(0)';
     });
+
     // 自动隐藏消息框
-    setTimeout(() => {
+    const hideTimeout = setTimeout(() => {
         messageBox.style.opacity = '0';
         messageBox.style.transform = 'translateX(-50%) translateY(-20px)';
-        // 等待动画结束后隐藏元素
+        
+        // 等待动画结束后移除元素
         setTimeout(() => {
-            messageBox.style.display = 'none';
-            document.body.removeChild(messageBox)
-        }, 300); // 与 CSS 中的过渡时间保持一致
-    }, delay); // delay秒后隐藏
-}
+            document.body.removeChild(messageBox);
+        }, 300);
+    }, delay);
+
+    // 鼠标悬停时暂停计时器
+    messageBox.addEventListener('mouseenter', () => {
+        clearTimeout(hideTimeout);
+    });
+
+    // 鼠标离开时重新开始计时
+    messageBox.addEventListener('mouseleave', () => {
+        setTimeout(() => {
+            messageBox.style.opacity = '0';
+            messageBox.style.transform = 'translateX(-50%) translateY(-20px)';
+            setTimeout(() => {
+                document.body.removeChild(messageBox);
+            }, 300);
+        }, delay / 2);
+    });
+};

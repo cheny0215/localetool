@@ -4,37 +4,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>index.txt文本去除换行符</title>
+    <title>文本格式化工具</title>
     <link rel="stylesheet" href="../css/index.css">
     <link rel="stylesheet" href="../common/layui/css/layui.css"/>
     <script src="../common/layui/layui.js"></script>
+    <style>
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 16px;
+            background-color: #f7f7f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 20px;
+            color: #333;
+            margin: 0 0 20px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .description {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #fcfcfc;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        #nowrapTxt {
+            width: 100%;
+            min-height: 180px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 0 0 16px 0;
+            background: #fcfcfc;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            font-size: 14px;
+            overflow: auto;
+            max-height: 500px;
+            text-wrap: nowrap;
+        }
+
+        #nowrapTxt:focus {
+            outline: none;
+            border-color: #1E9FFF;
+            box-shadow: 0 2px 12px rgba(30,159,255,0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin: 16px 0;
+            align-items: center;
+        }
+
+        .layui-btn {
+            height: 36px;
+            line-height: 36px;
+            padding: 0 16px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .layui-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stats {
+            color: #999;
+            font-size: 13px;
+            margin-left: auto;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 20px;
+            padding: 10px 0;
+        }
+
+        #nowrapTxt::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        #nowrapTxt::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #nowrapTxt::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        #nowrapTxt::-webkit-scrollbar-thumb:hover {
+            background: #999;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 12px;
+            }
+            .main-container {
+                padding: 16px;
+            }
+            .button-group {
+                gap: 6px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <p style="font-size: 14px;color: #999;padding:10px 0;">说明：将导出的txt文本内容粘贴到文本框，然后点击下方按钮将转换好的文本内容粘贴回txt内</p>
-    <div id="nowrapTxt" contenteditable="true"
-        style="width: 800px;height: 250px;overflow: auto;text-wrap: nowrap;border-radius: 4px;margin-bottom: 20px;border: 1px solid #d3d2d2;">
-    </div>
-    <button id="noWrapBtn" class="layui-btn layui-btn-sm layui-btn-primary layui-border">&gt;&gt;点击清除换行符&lt;&lt;</button>&nbsp;&nbsp;
-    <button id="clearBtn" class="layui-btn layui-btn-sm layui-btn-primary layui-border">&gt;&gt;清空内容&lt;&lt;</button>
+    <div class="main-container">
+        <h1 class="page-title">文本格式化工具</h1>
+        
+        <div class="description">
+            将导出的txt文本内容粘贴到文本框，点击按钮处理后自动复制到剪贴板
+        </div>
 
+        <div id="nowrapTxt" contenteditable="true"></div>
+
+        <div class="button-group">
+            <button id="noWrapBtn" class="layui-btn layui-btn-normal">
+                清除换行符
+            </button>
+            <button id="clearBtn" class="layui-btn layui-btn-danger">
+                清空内容
+            </button>
+            <span class="stats">
+                字数：<span id="charCount">0</span>
+            </span>
+        </div>
+    </div>
+
+    <div class="footer">
+        文本格式化工具 © 2024
+    </div>
 
     <script>
+        const noWrapBtn = document.getElementById('noWrapBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const nowrapTxt = document.getElementById('nowrapTxt');
+        const charCount = document.getElementById('charCount');
 
-        const noWrapBtn = document.getElementById('noWrapBtn')
-        const clearBtn = document.getElementById('clearBtn')
-        const nowrapTxt = document.getElementById('nowrapTxt')
+        // 更新字数统计
+        nowrapTxt.addEventListener('input', () => {
+            charCount.textContent = nowrapTxt.innerText.length;
+        });
 
         noWrapBtn.addEventListener('click', function () {
-            processText(nowrapTxt.innerText)
-        })
+            processText(nowrapTxt.innerText);
+        });
 
         clearBtn.addEventListener('click', function () {
-            nowrapTxt.innerText = ''
-        })
+            nowrapTxt.innerText = '';
+            charCount.textContent = '0';
+        });
 
         function processText(input) {
-            // console.log("🚀 ~ nowrapTxt:", input)
             // 第一步：用特殊标记替换所有空行
             let textWithMarkers = input.replace(/\n\s*\n/g, '\n<<EMPTY_LINE>>\n');
 
@@ -44,42 +192,23 @@
             // 第三步：将特殊标记转换为空行
             let finalText = textWithoutNewlines.replace(/<<EMPTY_LINE>>/g, '\n\n');
 
-            // 第四步：在所有 `${clicks.get` 前添加一个换行符
+            // 第四步：在所有模板语法前添加换行符
             finalText = finalText.replace(/(\${clicks\.get[^\}]+\})/g, '\n$1');
             finalText = finalText.replace(/(\${global[^\}]+\})/g, '\n$1');
 
-            // // 第五步：复制内容到剪贴板
-            // navigator.clipboard.writeText(finalText.trim())
-            //     .then(() => {
-            //         console.log('文本已成功复制到剪贴板');
-            //     })
-            //     .catch(err => {
-            //         console.error('复制到剪贴板失败: ', err);
-            //     });
-
-
-            // 创建一个临时的文本区域
+            // 复制到剪贴板
             const textArea = document.createElement('textarea');
             textArea.value = finalText.trim();
-
-            // 将文本区域添加到文档中
             document.body.appendChild(textArea);
-
-            // 选择文本区域的内容
             textArea.select();
-            textArea.setSelectionRange(0, 99999); // 对于移动设备的兼容
-
-            // 执行复制命令
             document.execCommand('copy');
-
-            // 移除临时文本区域
             document.body.removeChild(textArea);
-            alert('文本已成功复制到剪贴板')
 
+            layui.use('layer', function(){
+                var layer = layui.layer;
+                layer.msg('已复制到剪贴板', {time: 1000});
+            });
         }
-
-
-
     </script>
 </body>
 
