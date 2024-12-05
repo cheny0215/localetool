@@ -60,6 +60,8 @@
             line-height: 1.6;
             overflow: auto;
             max-height: 500px;
+            white-space: nowrap;
+            overflow-x: auto;
         }
 
         #output:focus {
@@ -201,7 +203,6 @@
             <h3><i class="layui-icon layui-icon-help"></i> 使用说明</h3>
             <ul class="guide-list">
                 <li>支持提取以http://或https://开头的标准URL链接</li>
-                <li>自动去除重复URL和多余空格</li>
                 <li>示例：</li>
                 <div class="example-text">
                     这是一个链接 https://www.example.com 
@@ -225,8 +226,7 @@
             document.getElementById("format").onclick = function() {
                 const text = output.innerText;
                 const urls = extractUrls(text);
-                const uniqueUrls = [...new Set(urls)];
-                output.innerText = uniqueUrls.join('\n');
+                output.innerText = urls.join('\n');
             }
 
             // 复制按钮

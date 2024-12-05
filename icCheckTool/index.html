@@ -78,6 +78,13 @@
             Url Cid Check</a>
         </div>
         <hr>
+        <div class="a-box">
+            <a class="layui-btn layui-btn-primary layui-border-green layui-btn-radius"
+            href="javascript:(function(){let url_cur = window.location.href; let is_cn = false; if (url_cur.includes('.com/cn') || url_cur.includes('.com.cn')) { is_cn = true; } let reg = /\.com(\/hk\/en|\/hk|\/tw|\/mo|\/cn|\.cn)?/; url_cur = reg.test(url_cur) ? url_cur.replace(reg, '.com/cn') : url_cur.replace(/\.com(\/.*)?/, '.com/cn'); let new_Window = ''; if (is_cn) { changeImgSrc(window); } else { new_Window = window.open(url_cur, '_blank'); } function changeImgSrc(newWindow) { let iframewindow_des = newWindow.document.getElementById('iframe_0').contentWindow; let iframewindow_mob = newWindow.document.getElementById('iframe_1').contentWindow; const images_des = iframewindow_des.document.getElementsByTagName('img'); const images_mob = iframewindow_mob.document.getElementsByTagName('img'); function changeImgEach(images) { for (let img of images) { img.src = img.src ? img.src.replace(/\.com\.cn/g, '.com/cn') : ''; } } changeImgEach(images_des); changeImgEach(images_mob); } new_Window.onload = function () { changeImgSrc(new_Window); };})()
+">
+            To /CN Url</a>
+        </div>
+        <hr>
     <script>
     </script>
 
