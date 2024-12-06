@@ -17,51 +17,64 @@
             display: flex;
             padding: 8px;
         }
-
+    
         .leftAlpineBox {
             flex: 3;
             padding: 8px;
             border-radius: 6px;
         }
-
+    
         .centerAlpineBox {
             padding: 8px;
             flex: 3;
             margin: 0 12px;
             border-radius: 6px;
         }
-
+    
         .centerAlpineBox .layui-form-checkbox {
             margin-bottom: 4px;
         }
-
+    
         .rightAlpineBox {
             padding: 8px;
             flex: 3;
             border-radius: 6px;
         }
-
+    
         .data_textarea {
             resize: both;
             border: 1px solid #c2c2c2;
             border-radius: 4px;
         }
-
+    
         .data_textarea::placeholder {
             color: #ccc;
         }
-
-        button {
-            width: 120px;
-            margin: 4px 0;
-            font-weight: 700;
+    
+        .layui-btn {
+            height: 36px;
+            line-height: 36px;
+            padding: 0 16px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: perspective(800px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
+    
+        .layui-btn-sm {
+            margin: 6px 0;
+            font-weight: 700;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(24, 144, 255, 0.3);
+        }
+    
         .laybox {
             display: flex;
             flex-direction: column;
         }
-
     </style>
 </head>
 
@@ -105,9 +118,9 @@
             </div>
             <div class="layui-btn-container">
                 <button id="submitButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-component">一键添加QA</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-component">一键添加QA</button>
                 <button id="outputButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-fonts-code">生成Code</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-fonts-code">生成Code</button>
             </div>
         </div>
         <div class="rightAlpineBox layui-panel">
@@ -117,9 +130,9 @@
             <hr>
             <div class="layui-btn-container">
                 <button id="copyButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-file-b">复制代码</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-file-b">复制代码</button>
                 <button id="resetButton"
-                    class="layui-btn layui-btn-sm layui-btn-primary layui-border-blue layui-icon layui-icon-refresh">重置所有数据</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-refresh">重置所有数据</button>
             </div>
         </div>
     </div>
@@ -336,6 +349,7 @@
                 }
             }
             resetButton.onclick = () => {
+                localStorage.setItem('cy_outputButton_current_html', '')
                 dataInput.value = dataOutput.value = ''
                 html_doc = ''
                 handleOutput()

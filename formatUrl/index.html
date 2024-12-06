@@ -72,9 +72,10 @@
 
         .button-group {
             display: flex;
-            gap: 8px;
-            margin: 16px 0;
+            gap: 12px;
+            margin: 20px 0;
             align-items: center;
+            perspective: 1000px;
         }
 
         .layui-btn {
@@ -82,13 +83,136 @@
             line-height: 36px;
             padding: 0 16px;
             font-size: 14px;
-            transition: all 0.3s ease;
-            border-radius: 4px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: perspective(800px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1), 
+                       0 4px 15px rgba(0,0,0,0.1);
         }
 
+        /* 3D悬浮效果 */
         .layui-btn:hover {
-            transform: translateY(-1px);
+            transform: perspective(800px) translateY(-4px) rotateX(5deg);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15), 
+                       0 12px 28px rgba(0,0,0,0.12);
+        }
+
+        .layui-btn:active {
+            transform: perspective(800px) translateY(0) rotateX(0);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 流光效果 */
+        .layui-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent,
+                rgba(255,255,255,0.1),
+                transparent
+            );
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) rotate(45deg);
+            }
+        }
+
+        /* 按钮点击波纹效果 */
+        .layui-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(
+                circle,
+                rgba(255,255,255,0.3) 0%,
+                transparent 70%
+            );
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease-out, height 0.6s ease-out;
+        }
+
+        .layui-btn:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+        }
+
+        /* 按钮类型样式 */
+        .layui-btn-normal {
+            background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(24,144,255,0.3);
+        }
+
+        .layui-btn-primary {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .layui-btn-primary:hover {
+            border-color: #1890ff;
+            color: #1890ff;
+            background: linear-gradient(135deg, #ffffff 0%, #e6f7ff 100%);
+        }
+
+        .layui-btn-danger {
+            background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+            border: none;
+            box-shadow: 0 4px 15px rgba(255,77,79,0.3);
+        }
+
+        /* 图标动画效果 */
+        .layui-btn i {
+            margin-right: 6px;
+            font-size: 16px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .layui-btn:hover i {
+            transform: translateY(-2px) scale(1.1);
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 按钮组样式 */
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .layui-btn {
+                padding: 0 12px;
+                font-size: 13px;
+            }
+            .button-group {
+                gap: 8px;
+            }
         }
 
         .copy-tip {
@@ -157,18 +281,6 @@
 
         #output::-webkit-scrollbar-thumb:hover {
             background: #999;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 12px;
-            }
-            .main-container {
-                padding: 16px;
-            }
-            .button-group {
-                gap: 6px;
-            }
         }
     </style>
 </head>

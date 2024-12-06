@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工具使用演示</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../common/layui/css/layui.css"/>
+    <style>
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f7f7f7;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .demo-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tool-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .tool-name {
+            font-size: 18px;
+            color: #1E9FFF;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .tool-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .usage-steps {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .usage-steps li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .note {
+            color: #ff6b6b;
+            font-size: 14px;
+            margin-top: 12px;
+            padding: 8px;
+            background: #fff5f5;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-section">
+        <h1 class="demo-title">工具使用说明</h1>
+        
+        <div class="tool-card">
+            <h2 class="tool-name">icCheckTool - IC平台书签检查工具</h2>
+            <div class="tool-desc">用于检查和验证IC平台相关的链接和内容。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>拖动IC书签检查按钮到浏览器书签栏</li>
+                    <li>进入到ic平台，点击对应的IC书签</li>
+                    <li>查看检查结果并进行相应修正</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tool-card">
+            <h2 class="tool-name">txtnowrap - 文本去除换行</h2>
+            <div class="tool-desc">将多行文本合并为单行，去除多余的换行符。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>将多行文本粘贴到输入框</li>
+                    <li>点击转换按钮</li>
+                    <li>获取转换后的无换行文本</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tool-card">
+            <h2 class="tool-name">formatUrl - URL格式化工具</h2>
+            <div class="tool-desc">格式化和提取文本中的URL链接。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>将包含URL的文本粘贴到输入框</li>
+                    <li>点击格式化按钮</li>
+                    <li>获取格式化后的URL列表</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tool-card">
+            <h2 class="tool-name">nbspAdd - 英文前后添加空格</h2>
+            <div class="tool-desc">在英文单词前后自动添加HTML空格标记。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>输入包含英文的文本</li>
+                    <li>选择转换类型（&amp;nbsp;或:nbsp:）</li>
+                    <li>点击转换按钮获取结果</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tool-card">
+            <h2 class="tool-name">codeDiff - 文本对比工具</h2>
+            <div class="tool-desc">对比两段文本的差异，高亮显示变更部分。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>在左右两个输入框分别粘贴要对比的文本</li>
+                    <li>点击对比按钮</li>
+                    <li>查看高亮显示的文本差异</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="tool-card">
+            <h2 class="tool-name">DMcompatible - 一键QA工具</h2>
+            <div class="tool-desc">自动处理HTML代码的兼容性问题。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>粘贴需要处理的HTML代码</li>
+                    <li>选择需要应用的兼容性选项</li>
+                    <li>点击一键添加QA按钮</li>
+                    <li>获取处理后的代码</li>
+                </ol>
+            </div>
+            <div class="note">注意：请确保输入的HTML代码格式正确</div>
+        </div>
+
+        <div class="tool-card">
+            <h2 class="tool-name">compressCode - 压缩JS代码为书签</h2>
+            <div class="tool-desc">将JavaScript代码压缩并转换为书签格式。</div>
+            <div class="usage-steps">
+                <ol>
+                    <li>粘贴JavaScript代码</li>
+                    <li>点击压缩代码按钮</li>
+                    <li>复制生成的书签代码</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
