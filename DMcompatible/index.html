@@ -17,40 +17,40 @@
             display: flex;
             padding: 8px;
         }
-    
+
         .leftAlpineBox {
             flex: 3;
             padding: 8px;
             border-radius: 6px;
         }
-    
+
         .centerAlpineBox {
             padding: 8px;
             flex: 3;
             margin: 0 12px;
             border-radius: 6px;
         }
-    
+
         .centerAlpineBox .layui-form-checkbox {
             margin-bottom: 4px;
         }
-    
+
         .rightAlpineBox {
             padding: 8px;
             flex: 3;
             border-radius: 6px;
         }
-    
+
         .data_textarea {
             resize: both;
             border: 1px solid #c2c2c2;
             border-radius: 4px;
         }
-    
+
         .data_textarea::placeholder {
             color: #ccc;
         }
-    
+
         .layui-btn {
             height: 36px;
             line-height: 36px;
@@ -61,7 +61,7 @@
             transform: perspective(800px);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-    
+
         .layui-btn-sm {
             margin: 6px 0;
             font-weight: 700;
@@ -70,7 +70,7 @@
             border: none;
             box-shadow: 0 4px 15px rgba(24, 144, 255, 0.3);
         }
-    
+
         .laybox {
             display: flex;
             flex-direction: column;
@@ -107,7 +107,8 @@
                 <input type="checkbox" id="delNbspCheckbox" name="delNbsp" title="替换footer的最后两个nbsp" checked>
                 <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked>
                 <input type="checkbox" id="legalPackageCheckbox" name="legalPackage" title="包裹legal末尾防止单字" checked>
-                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器" checked>
+                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
+                    checked>
                 <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
                 <hr>
                 <div>
@@ -187,7 +188,7 @@
             const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
             const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
             const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
-            
+
             // layui的一些方法
             layui.use(function () {
                 let form = layui.form;
@@ -350,6 +351,12 @@
             }
             resetButton.onclick = () => {
                 localStorage.setItem('cy_outputButton_current_html', '')
+                hiddenPreContent = '';
+                hiddenFontContent = '';
+                hexColorObj = {
+                    addMargin: [],
+                    delUnderline: [],
+                };
                 dataInput.value = dataOutput.value = ''
                 html_doc = ''
                 handleOutput()
@@ -449,7 +456,7 @@
                 const pattern = /(&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp;&nbsp;)/g;
                 let matches = htmlContent.match(pattern);
                 console.log("🚀 ~ delNbsp ~ matches:", matches)
-                if(matches.length == 4){
+                if (matches.length == 4) {
                     let count = 0; // 用于计数替换次数
                     const modifiedString = htmlContent.replace(pattern, (match) => {
                         count++;
@@ -511,7 +518,7 @@
                     const computedImgMarginLeft = window.getComputedStyle(o).marginLeft
                     const computedImgMarginRight = window.getComputedStyle(o).marginRight
                     // console.log("🚀 ~ imgToCenter ~ computedImg:", computedImgDisplay)
-                    if(computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginRight != '0px'){
+                    if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginRight != '0px') {
                         o.style.margin = '0 auto'
                         o.style.display = 'block'
                     }
