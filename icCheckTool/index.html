@@ -386,6 +386,13 @@
             To /CN Url</a>
         </div>
         <hr>
+        <div class="a-box">
+            <a class="layui-btn layui-btn-primary layui-border-green layui-btn-radius"
+            href="javascript:(function(){if(window.syncScrollEnabled)return;window.syncScrollEnabled=true;let s=document.createElement('script');s.textContent=`(function(){let c=new BroadcastChannel('scroll-sync');let i=false;window.addEventListener('scroll',()=>{if(!i){c.postMessage({scrollTop:window.scrollY,timestamp:Date.now()})}});c.addEventListener('message',e=>{i=true;window.scrollTo({top:e.data.scrollTop,behavior:'auto'});setTimeout(()=>{i=false},0)})})()`;document.head.appendChild(s);})();
+">
+            Scroll Sync</a>
+        </div>
+        <hr>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const aBoxes = document.querySelectorAll('.a-box');
