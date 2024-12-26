@@ -220,6 +220,18 @@
             border-radius: 6px;
             padding: 15px !important;
         }
+
+        /* 添加当前选中差异的样式 */
+        .diff-current {
+            border: 2px solid #ff4444;
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        /* 优化差异样式，添加过渡效果 */
+        .diff-added, .diff-removed {
+            transition: all 0.2s ease;
+        }
     </style>
 </head>
 
@@ -383,6 +395,8 @@
             console.log('diffArr', diffArr);
             showMessage({ msg: '对比完成！', type: 'success' })
             diffOutput.innerHTML = diffHtml;
+            // 初始化差异导航
+            initDiffNavigation();
         }
 
         function wordWrap() {
@@ -445,7 +459,54 @@
             }
         });
 
+        let currentDiffIndex = -1;
+        let diffElements = [];
 
+        function initDiffNavigation() {
+            // 获取所有差异元素
+            diffElements = document.querySelectorAll('.diff-added, .diff-removed');
+            currentDiffIndex = -1;
+            
+            // 移除所有当前高亮
+            diffElements.forEach(el => el.classList.remove('diff-current'));
+        }
+
+        function navigateDiff(direction) {
+            if (diffElements.length === 0) return;
+
+            // 移除当前高亮
+            if (currentDiffIndex >= 0) {
+                diffElements[currentDiffIndex].classList.remove('diff-current');
+            }
+
+            // 计算新的索引
+            if (direction === 'next') {
+                currentDiffIndex = (currentDiffIndex + 1) % diffElements.length;
+            } else {
+                currentDiffIndex = currentDiffIndex <= 0 ? diffElements.length - 1 : currentDiffIndex - 1;
+            }
+
+            // 添加新的高亮
+            const currentElement = diffElements[currentDiffIndex];
+            currentElement.classList.add('diff-current');
+
+            // 滚动到当前元素
+            currentElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+
+        // 添加键盘事件监听
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                navigateDiff('next');
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                navigateDiff('prev');
+            }
+        });
     </script>
 
 </body>

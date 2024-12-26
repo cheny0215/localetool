@@ -113,7 +113,11 @@
                 <hr>
                 <div>
                     <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
-                        title="sina邮箱移动端添加sup样式"><span class="layui-badge-rim">Sina邮箱</span>
+                        title="sina邮箱移动端添加sup样式"><span class="layui-badge-rim layui-border-blue">sina邮箱</span>
+                </div>
+                <div>
+                    <input type="checkbox" id="setNowrapSpanCheckbox" name="setNowrapSpan"
+                        title="mobile网易span设置nowrap属性"><span class="layui-badge-rim layui-border-blue">163邮箱</span>
                 </div>
                 <hr>
             </div>
@@ -171,6 +175,7 @@
             const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
             const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
+            const setNowrapSpanCheckbox = document.getElementById('setNowrapSpanCheckbox');
             // Checkbox element
 
             const submitButton = document.getElementById('submitButton');
@@ -310,6 +315,9 @@
                         }
                         if (supNormalSizeCheckbox.checked) {
                             supNormalSize();
+                        }
+                        if (setNowrapSpanCheckbox.checked) {
+                            setNowrapSpan();
                         }
                         showMessage({ msg: 'QA添加完成！', type: 'success' })
                         LoadingModule.hide()
@@ -494,7 +502,7 @@
                         // 如果匹配，进行替换
                         if (regex.test(lastThreeChars)) {
                             // 用 <span> 包裹最后三个字符
-                            const wrappedText = text.slice(0, -3) + '<span style="white-space: nowrap;">' + lastThreeChars + '</span>';
+                            const wrappedText = text.slice(0, -3) + '<span class="nowrap" style="white-space: nowrap !important;">' + lastThreeChars + '</span>';
                             p.innerHTML = wrappedText;
                         }
                     }
@@ -517,10 +525,14 @@
                     const computedImgDisplay = window.getComputedStyle(o).display
                     const computedImgMarginLeft = window.getComputedStyle(o).marginLeft
                     const computedImgMarginRight = window.getComputedStyle(o).marginRight
-                    // console.log("🚀 ~ imgToCenter ~ computedImg:", computedImgDisplay)
-                    if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginRight != '0px') {
+                    const computedImgTextAlign = window.getComputedStyle(o).textAlign
+                    console.log("🚀 ~ imgToCenter ~ 图片display:", computedImgDisplay)
+                    if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginLeft != '0' && computedImgMarginRight != '0px' && computedImgMarginRight != '0') {
                         o.style.margin = '0 auto'
                         o.style.display = 'block'
+                    } else if (computedImgDisplay == 'inline-block' && computedImgTextAlign == 'center') {
+                        o.style.display = 'inline-block'
+                        o.style.textAlign = 'center'
                     }
                 })
             }
@@ -534,6 +546,26 @@
                     o.style.verticalAlign = 'super'
                 })
             }
+            // mobile的span标签如果设置了white-space:nowrap,设置class类名nowrap，并且nowarp加important（163邮箱）
+            function setNowrapSpan() {
+
+                const mobileContainer = iframeDoc.querySelectorAll('.mobile-container');
+                const sfcopy = iframeDoc.querySelectorAll('.sfcopy span');
+                const spans = mobileContainer[0].querySelectorAll('span');
+                [...spans, ...sfcopy].forEach(o => {
+                    if (o.style.whiteSpace == 'nowrap') {
+                        o.style.setProperty('white-space', 'nowrap', 'important')
+                        o.classList.add('nowrap')
+                    }
+                })
+
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                // 添加正则匹配和替换逻辑
+                const regex = /\.eyebrow-text\s*,\s*\.nowrap\s*\{\s*white-space\s*:\s*nowrap\s*;\s*\}/g;
+                html_doc = htmlContent.replace(regex, '.eyebrow-text, .nowrap { white-space: nowrap !important; }');
+                handleOutput();
+            }
+
         });
     </script>
 </body>
