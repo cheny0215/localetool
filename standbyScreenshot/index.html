@@ -6,10 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apple 邮件预览</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
+    <div class="top-container">
+        <div class="drop-zones-container">
+            <div class="drop-zone" id="dropZoneTxt">
+                <div class="drop-zone-text">Subject Line：拖入 subject.txt文件到这里自动读取</div>
+            </div>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-text">Preview Text：拖入 index.html 文件到这里自动读取</div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button class="edit-button">编辑</button>
+            <button class="device-switch-button">切换为移动端</button>
+        </div>
+    </div>
+
     <div class="email-box">
         <div class="email-preview">
             <div class="email-field">
@@ -26,18 +40,8 @@
                 <span class="field-value" contenteditable="false">重重好礼任你选，还有 Apple Trade In 换购计划帮你省一笔。</span>
             </div>
         </div>
-    </div>
-    <div class="edit-button-container">
-        <button class="edit-button">编辑</button>
-        <button class="screenshot-button">生成截图</button>
-    </div>
-
-    <div class="drop-zones-container">
-        <div class="drop-zone" id="dropZoneTxt">
-            <div class="drop-zone-text">Subject Line：拖入 subject.txt文件到这里自动读取</div>
-        </div>
-        <div class="drop-zone" id="dropZone">
-            <div class="drop-zone-text">Preview Text：拖入 index.html 文件到这里自动读取</div>
+        <div id="htmlPreview" class="html-preview">
+            <iframe id="previewFrame" frameborder="0" width="100%" style="border: none;"></iframe>
         </div>
     </div>
 
@@ -54,7 +58,9 @@
                 previewText: document.querySelectorAll('.field-value')[3],
                 subjectLine: document.querySelectorAll('.field-value')[2]
             },
-            screenshotButton: document.querySelector('.screenshot-button')
+            deviceSwitchButton: document.querySelector('.device-switch-button'),
+            emailBox: document.querySelector('.email-box'),
+            htmlPreview: document.getElementById('htmlPreview')
         };
 
         // 编辑功能
@@ -72,36 +78,6 @@
                 e.preventDefault();
                 document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
             });
-        });
-
-        // 截图功能
-        elements.screenshotButton.addEventListener('click', async () => {
-            try {
-                if (elements.editButton.textContent === '完成') {
-                    elements.editButton.click();
-                }
-
-                const emailBox = document.querySelector('.email-box');
-                emailBox.style.transition = 'none';
-
-                const canvas = await html2canvas(emailBox, {
-                    backgroundColor: '#ffffff',
-                    scale: 2,
-                    logging: false,
-                    useCORS: true
-                });
-
-                emailBox.style.transition = '';
-                
-                // 下载截图
-                const link = document.createElement('a');
-                link.download = `email-preview-${Date.now()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            } catch (error) {
-                console.error('Screenshot failed:', error);
-                alert('截图生成失败');
-            }
         });
 
         // 文件拖拽处理
@@ -154,6 +130,31 @@
                     
                     if (hiddenDiv) {
                         this.options.targetField.textContent = hiddenDiv.textContent.trim();
+                        
+                        // 获取 iframe 元素
+                        const iframe = document.getElementById('previewFrame');
+                        
+                        // 写入 HTML 内容到 iframe
+                        iframe.srcdoc = content;
+                        
+                        // 等待 iframe 加载完成后调整高度
+                        iframe.onload = () => {
+                            // 调整 iframe 高度以适应内容
+                            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+                            
+                            // 移除 iframe 中的脚本标签
+                            const scripts = iframe.contentWindow.document.querySelectorAll('script');
+                            scripts.forEach(script => script.remove());
+                            
+                            // 根据当前视图模式设置内容宽度
+                            const container = isMobileView ? 
+                                iframe.contentWindow.document.querySelector('.mobile-container') :
+                                iframe.contentWindow.document.querySelector('.desktop-container');
+                                
+                            if (container) {
+                                container.style.display = 'block';
+                            }
+                        };
                     } else {
                         alert('未找到符合条件的隐藏 div 元素');
                     }
@@ -173,7 +174,72 @@
             fileType: '.txt',
             targetField: elements.targetFields.subjectLine
         });
+
+        // 添加设备切换功能
+        let isMobileView = false;
+        elements.deviceSwitchButton.addEventListener('click', () => {
+            isMobileView = !isMobileView;
+            
+            // 更新按钮文本
+            elements.deviceSwitchButton.textContent = isMobileView ? '切换为桌面端' : '切换为移动端';
+            elements.deviceSwitchButton.classList.toggle('active', isMobileView);
+
+            // 更新容器宽度
+            const newWidth = isMobileView ? '414px' : '712px';
+            document.querySelectorAll('.email-box, .email-preview, .html-preview, .top-container')
+                .forEach(el => el.style.maxWidth = newWidth);
+
+            // 切换 iframe 中的视图
+            const iframe = document.getElementById('previewFrame');
+            if (iframe && iframe.contentWindow) {
+                const doc = iframe.contentWindow.document;
+                const desktopContainer = doc.querySelector('.desktop-container');
+                const mobileContainer = doc.querySelector('.mobile-container');
+                const footerContent = doc.querySelector('.shared-footer');
+                
+                if (desktopContainer && mobileContainer) {
+                    desktopContainer.setAttribute('style', `display: ${isMobileView ? 'none' : 'block'}`);
+                    mobileContainer.setAttribute('style', `display: ${isMobileView ? 'block' : 'none'}`);
+                    
+                    // 等待 DOM 更新后重新计算高度
+                    setTimeout(() => {
+                        iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+                    }, 300); // 等待过渡动画完成
+                    
+                    // 调整页脚宽度
+                    if (footerContent) {
+                        // 获取页脚中的所有表格
+                        const footerTables = footerContent.querySelectorAll('table');
+                        footerTables.forEach(table => {
+                            if (isMobileView) {
+                                table.style.width = '100%';
+                                table.removeAttribute('width');
+                            } else {
+                                table.style.width = '';
+                                table.setAttribute('width', '660');
+                            }
+                        });
+
+                        // 修改内容容器的宽度
+                        const contentContainer = footerContent.querySelector('.sf-content-container');
+                        if (contentContainer) {
+                            contentContainer.style.width = isMobileView ? '100%' : '660px';
+                            contentContainer.style.maxWidth = isMobileView ? '100%' : '660px';
+                            contentContainer.style.padding = isMobileView ? '0' : '0px 20px';
+                        }
+
+                        // 修改内容区域的宽度
+                        const contentInner = footerContent.querySelector('.sf-content-inner');
+                        if (contentInner) {
+                            contentInner.style.width = isMobileView ? '100%' : '660px';
+                            contentInner.style.maxWidth = isMobileView ? '100%' : '660px';
+                        }
+                    }
+                }
+            }
+        });
     </script>
+
 </body>
 
 </html>
