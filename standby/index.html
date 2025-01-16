@@ -6,181 +6,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apple 邮件预览</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
-    <div class="email-box">
-        <div class="email-preview">
-            <div class="email-field">
-                <span class="field-name">Sender Name :</span>
-                <span class="field-value" contenteditable="false">Apple (News@InsideApple.Apple.com)</span>
-            </div>
-            <div class="email-field">
-                <span class="field-name">Subject Line :</span>
-                <span class="field-value" contenteditable="false">＜广告＞</span>
-                <span class="field-value" contenteditable="false">上 Apple 选新品，好好犒赏自己。🥰</span>
-            </div>
-            <div class="email-field">
-                <span class="field-name">Preview Text :</span>
-                <span class="field-value" contenteditable="false">重重好礼任你选，还有 Apple Trade In 换购计划帮你省一笔。</span>
-            </div>
-        </div>
-    </div>
+    <div class="copy-tip" id="copyTip">已复制到剪贴板</div>
     <div class="edit-button-container">
-        <button class="edit-button">编辑</button>
-        <button class="screenshot-button">生成截图</button>
-        <button class="open-button">打开直接生成截图的窗口进行操作</button>
+        <button class="open-button">🧩 打开生成截图窗口进行拼图操作</button>
+        <div style="margin: 10px;text-align: center;color: #999;font-size: 12px;">打开新窗口的工具可以直接进行截图的拼接，控制台中直接截图</div>
     </div>
-    <div style="margin: 10px auto; width: 700px;text-align: right;color: #cccc;font-size: 12px;">打开新窗口的工具可以直接进行截图的拼接，控制台中直接截图</div>
 
-    <div class="drop-zones-container">
-        <div class="drop-zone" id="dropZoneTxt">
-            <div class="drop-zone-text">Subject Line：拖入 subject.txt文件到这里自动读取</div>
+    <!-- 添加项目信息表单 -->
+    <div class="project-form">
+        <div class="form-group">
+            <label>项目名称：</label>
+            <input type="text" id="projectName" value="Holiday 2024 Still Time">
         </div>
-        <div class="drop-zone" id="dropZone">
-            <div class="drop-zone-text">Preview Text：拖入 index.html 文件到这里自动读取</div>
+        <div class="form-group">
+            <label>项目年份编号：</label>
+            <input type="text" id="projectYear" value="FY24 Q1">
+        </div>
+        <div class="form-group">
+            <label>项目日期：</label>
+            <input type="text" id="projectDate" value="20241212">
+        </div>
+        <div class="form-group">
+            <label>项目负责人：</label>
+            <input type="text" id="projectManager" value="Ivan">
+        </div>
+        <div class="form-group">
+            <label>项目语言：</label>
+            <div class="checkbox-group">
+                <label><input type="checkbox" value="HKEN"> HKEN</label>
+                <label><input type="checkbox" value="HKTC"> HKTC</label>
+                <label><input type="checkbox" value="MOTC"> MOTC</label>
+                <label><input type="checkbox" value="CNSC"> CNSC</label>
+                <label><input type="checkbox" value="TWTC"> TWTC</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加生成的名称显示区域 -->
+    <div class="generated-names">
+        <div class="name-group">
+            <h3>备份文件项目名称(点击复制)：</h3>
+            <div class="copyable" id="backupFileName"></div>
+        </div>
+        <div class="name-group">
+            <h3>备份截图项目名称(点击复制)：</h3>
+            <div class="copyable" id="backupScreenshotName"></div>
+        </div>
+        <div class="name-group">
+            <h3>截图名称(点击复制)：</h3>
+            <div id="screenshotNames"></div>
         </div>
     </div>
 
     <script>
-        // 获取所有需要的 DOM 元素
+        // 只保留必要的 DOM 元素
         const elements = {
-            editButton: document.querySelector('.edit-button'),
-            editableFields: document.querySelectorAll('.field-value'),
-            dropZones: {
-                html: document.getElementById('dropZone'),
-                txt: document.getElementById('dropZoneTxt')
-            },
-            targetFields: {
-                previewText: document.querySelectorAll('.field-value')[3],
-                subjectLine: document.querySelectorAll('.field-value')[2]
-            },
-            screenshotButton: document.querySelector('.screenshot-button'),
             openButton: document.querySelector('.open-button')
         };
 
-        // 编辑功能
-        elements.editButton.addEventListener('click', () => {
-            const isEditing = elements.editButton.textContent === '编辑';
-            elements.editableFields.forEach(field => field.contentEditable = isEditing);
-            elements.editButton.textContent = isEditing ? '完成' : '编辑';
-            elements.editButton.classList.toggle('done', isEditing);
-            if (isEditing) elements.editableFields[2].focus();
-        });
-
-        // 粘贴纯文本处理
-        document.querySelectorAll('[contenteditable]').forEach(element => {
-            element.addEventListener('paste', (e) => {
-                e.preventDefault();
-                document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
-            });
-        });
-
-        // 截图功能
-        elements.screenshotButton.addEventListener('click', async () => {
-            try {
-                if (elements.editButton.textContent === '完成') {
-                    elements.editButton.click();
-                }
-
-                const emailBox = document.querySelector('.email-box');
-                emailBox.style.transition = 'none';
-
-                const canvas = await html2canvas(emailBox, {
-                    backgroundColor: '#ffffff',
-                    scale: 2,
-                    logging: false,
-                    useCORS: true
-                });
-
-                emailBox.style.transition = '';
-                
-                // 下载截图
-                const link = document.createElement('a');
-                link.download = `email-preview-${Date.now()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            } catch (error) {
-                console.error('Screenshot failed:', error);
-                alert('截图生成失败');
-            }
-        });
-
-        // 添加打开新标签页的功能
+        // 只保留打开新标签页的功能
         elements.openButton.addEventListener('click', () => {
             window.open('../standbyScreenshot/index.html', '_blank');
         });
 
-        // 文件拖拽处理
-        class DropZoneHandler {
-            constructor(zone, options) {
-                this.zone = zone;
-                this.options = options;
-                this.initializeEventListeners();
-            }
+        function updateNames() {
+            const projectName = document.getElementById('projectName').value;
+            const projectYear = document.getElementById('projectYear').value;
+            const projectDate = document.getElementById('projectDate').value;
+            const projectManager = document.getElementById('projectManager').value;
+            const selectedLanguages = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
 
-            initializeEventListeners() {
-                const events = {
-                    'dragenter dragover': e => {
-                        e.preventDefault();
-                        this.zone.classList.add('drop-zone-active');
-                    },
-                    'dragleave drop': e => {
-                        e.preventDefault();
-                        this.zone.classList.remove('drop-zone-active');
-                        if (e.type === 'drop') this.handleDrop(e);
-                    }
-                };
+            // 更新备份文件项目名称
+            const backupFileName = `${projectDate}-${projectName}_${projectManager}`;
+            document.getElementById('backupFileName').textContent = backupFileName;
 
-                Object.entries(events).forEach(([eventNames, handler]) => {
-                    eventNames.split(' ').forEach(eventName => {
-                        this.zone.addEventListener(eventName, handler);
-                    });
-                });
-            }
+            // 更新备份截图项目名称
+            const backupScreenshotName = `${projectYear}-${projectName}`;
+            document.getElementById('backupScreenshotName').textContent = backupScreenshotName;
 
-            async handleDrop(e) {
-                const file = e.dataTransfer.files[0];
-                if (!file) return;
+            // 更新截图名称
+            const screenshotNamesContainer = document.getElementById('screenshotNames');
+            screenshotNamesContainer.innerHTML = '';
 
-                if (!file.name.toLowerCase().endsWith(this.options.fileType)) {
-                    alert(`请拖入 ${this.options.fileType.toUpperCase()} 文件`);
-                    return;
-                }
+            selectedLanguages.forEach(lang => {
+                const desktopName = `${projectYear} ${projectName}_Desktop_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}.png`;
+                const mobileName = `${projectYear} ${projectName}_Mobile_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}.png`;
 
-                const reader = new FileReader();
-                reader.onload = () => this.processFileContent(reader.result);
-                reader.readAsText(file);
-            }
-
-            processFileContent(content) {
-                if (this.options.fileType === '.html') {
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(content, 'text/html');
-                    const hiddenDiv = doc.querySelector('div[style*="display: none"][style*="max-height: 0px"][style*="overflow: hidden"]');
-                    
-                    if (hiddenDiv) {
-                        this.options.targetField.textContent = hiddenDiv.textContent.trim();
-                    } else {
-                        alert('未找到符合条件的隐藏 div 元素');
-                    }
-                } else {
-                    this.options.targetField.textContent = content.trim();
-                }
-            }
+                const langGroup = document.createElement('div');
+                langGroup.innerHTML = `
+                    <div class="language-group">
+                        <h4>${lang}:</h4>
+                        <div class="screenshot-name" onclick="copyText('${desktopName}')">${desktopName}</div>
+                        <div class="screenshot-name" onclick="copyText('${mobileName}')">${mobileName}</div>
+                    </div>
+                `;
+                screenshotNamesContainer.appendChild(langGroup);
+            });
         }
 
-        // 初始化拖拽区域
-        new DropZoneHandler(elements.dropZones.html, {
-            fileType: '.html',
-            targetField: elements.targetFields.previewText
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const tip = document.getElementById('copyTip');
+                tip.classList.add('show');
+                setTimeout(() => {
+                    tip.classList.remove('show');
+                }, 1000);
+            }).catch(err => {
+                console.error('复制失败：', err);
+            });
+        }
+
+        // 添加事件监听器
+        document.querySelectorAll('.project-form input').forEach(input => {
+            input.addEventListener('input', updateNames);
         });
 
-        new DropZoneHandler(elements.dropZones.txt, {
-            fileType: '.txt',
-            targetField: elements.targetFields.subjectLine
+        // 为可复制的元素添加点击事件
+        document.querySelectorAll('.copyable').forEach(element => {
+            element.addEventListener('click', function() {
+                copyText(this.textContent);
+            });
         });
+
+        // 初始化显示
+        updateNames();
     </script>
 </body>
 
