@@ -528,8 +528,8 @@
                     const computedImgTextAlign = window.getComputedStyle(o).textAlign
                     console.log("🚀 ~ imgToCenter ~ 图片display:", computedImgDisplay)
                     if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginLeft != '0' && computedImgMarginRight != '0px' && computedImgMarginRight != '0') {
-                        o.style.margin = '0 auto'
-                        o.style.display = 'block'
+                        o.style.display = 'inline-block'
+                        o.style.textAlign = 'center'
                     } else if (computedImgDisplay == 'inline-block' && computedImgTextAlign == 'center') {
                         o.style.display = 'inline-block'
                         o.style.textAlign = 'center'
@@ -546,7 +546,7 @@
                     o.style.verticalAlign = 'super'
                 })
             }
-            // mobile的span标签如果设置了white-space:nowrap,设置class类名nowrap，并且nowarp加important（163邮箱）
+            // mobile的span标签如果设置了white-space:nowrap,设置class类名nowrap，并且nowrap加important（163邮箱）
             function setNowrapSpan() {
 
                 const mobileContainer = iframeDoc.querySelectorAll('.mobile-container');

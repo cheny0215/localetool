@@ -128,8 +128,7 @@
                     const doc = parser.parseFromString(content, 'text/html');
                     const hiddenDiv = doc.querySelector('div[style*="display: none"][style*="max-height: 0px"][style*="overflow: hidden"]');
                     
-                    if (hiddenDiv) {
-                        this.options.targetField.textContent = hiddenDiv.textContent.trim();
+                        this.options.targetField.textContent = hiddenDiv ? hiddenDiv.textContent.trim() : '';
                         
                         // 获取 iframe 元素
                         const iframe = document.getElementById('previewFrame');
@@ -155,9 +154,7 @@
                                 container.style.display = 'block';
                             }
                         };
-                    } else {
-                        alert('未找到符合条件的隐藏 div 元素');
-                    }
+
                 } else {
                     this.options.targetField.textContent = content.trim();
                 }
