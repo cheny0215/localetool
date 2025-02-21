@@ -530,9 +530,11 @@
                     if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginLeft != '0' && computedImgMarginRight != '0px' && computedImgMarginRight != '0') {
                         o.style.display = 'inline-block'
                         o.style.textAlign = 'center'
+                        o.style.verticalAlign = 'middle'
                     } else if (computedImgDisplay == 'inline-block' && computedImgTextAlign == 'center') {
                         o.style.display = 'inline-block'
                         o.style.textAlign = 'center'
+                        o.style.verticalAlign = 'middle'
                     }
                 })
             }
