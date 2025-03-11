@@ -119,6 +119,10 @@
                     <input type="checkbox" id="setNowrapSpanCheckbox" name="setNowrapSpan"
                         title="mobile网易span设置nowrap属性"><span class="layui-badge-rim layui-border-blue">163邮箱</span>
                 </div>
+                <div>
+                    <input type="checkbox" id="delUnderlineImportantCheckbox" name="delUnderlineImportant"
+                        title="desktop去除下划线的!important"><span class="layui-badge-rim layui-border-blue">CN</span>
+                </div>
                 <hr>
             </div>
             <div class="layui-btn-container">
@@ -176,6 +180,7 @@
             const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
             const setNowrapSpanCheckbox = document.getElementById('setNowrapSpanCheckbox');
+            const delUnderlineImportantCheckbox = document.getElementById('delUnderlineImportantCheckbox');
             // Checkbox element
 
             const submitButton = document.getElementById('submitButton');
@@ -189,6 +194,7 @@
             let hexColorObj = {
                 addMargin: [],
                 delUnderline: [],
+                delUnderlineImportant: [],
             };
             const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
             const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
@@ -244,6 +250,7 @@
                 console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
                 let count1 = 0
                 let count2 = 0
+                let count3 = 0
                 iframehtml = iframehtml.replace(/cornflowerblue/g, () => {
                     const formatColor = hexColorObj.addMargin[count1]
                     count1++
@@ -252,6 +259,11 @@
                 iframehtml = iframehtml.replace(/mediumspringgreen/g, () => {
                     const formatColor = hexColorObj.delUnderline[count2]
                     count2++
+                    return formatColor
+                });
+                iframehtml = iframehtml.replace(/lightgoldenrodyellow/g, () => {
+                    const formatColor = hexColorObj.delUnderlineImportant[count3]
+                    count3++
                     return formatColor
                 });
                 iframehtml = iframehtml.replace(new RegExp(escapeRegExp(zwnj_placeholder), 'g'), '&zwnj;')
@@ -319,6 +331,9 @@
                         if (setNowrapSpanCheckbox.checked) {
                             setNowrapSpan();
                         }
+                        if (delUnderlineImportantCheckbox.checked) {
+                            delUnderlineImportant();
+                        }
                         showMessage({ msg: 'QA添加完成！', type: 'success' })
                         LoadingModule.hide()
                         resolve(html_doc)
@@ -364,6 +379,7 @@
                 hexColorObj = {
                     addMargin: [],
                     delUnderline: [],
+                    delUnderlineImportant: [],
                 };
                 dataInput.value = dataOutput.value = ''
                 html_doc = ''
@@ -566,6 +582,22 @@
                 const regex = /\.eyebrow-text\s*,\s*\.nowrap\s*\{\s*white-space\s*:\s*nowrap\s*;\s*\}/g;
                 html_doc = htmlContent.replace(regex, '.eyebrow-text, .nowrap { white-space: nowrap !important; }');
                 handleOutput();
+            }
+            // desktop去除下划线的!important
+            function delUnderlineImportant() {
+
+                const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
+                const a_href = desktopContainer[0].querySelectorAll('a');
+                a_href.forEach(a => {
+                    if (!a.className.includes('btn')) {
+                        a.style.textDecoration = 'none';
+                        if (a.style.color) {
+                            const hexColor = rgbToHex(a.style.color)
+                            a.style.color = 'lightgoldenrodyellow'
+                            hexColorObj.delUnderlineImportant.push(hexColor)
+                        }
+                    }
+                });
             }
 
         });
