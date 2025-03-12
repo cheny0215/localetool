@@ -110,6 +110,7 @@
                 <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
                     checked>
                 <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
+                <input type="checkbox" id="addDateZwnjCheckbox" name="addDateZwnj" title="日期间添加zwnj" checked>
                 <hr>
                 <div>
                     <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
@@ -178,6 +179,8 @@
             const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
             const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
             const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
+            const addDateZwnjCheckbox = document.getElementById('addDateZwnjCheckbox');
+
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
             const setNowrapSpanCheckbox = document.getElementById('setNowrapSpanCheckbox');
             const delUnderlineImportantCheckbox = document.getElementById('delUnderlineImportantCheckbox');
@@ -220,6 +223,7 @@
                     replacepSelectorCheckbox.checked = elem.checked
                     legalPackageCheckbox.checked = elem.checked
                     imgToCenterCheckbox.checked = elem.checked
+                    addDateZwnjCheckbox.checked = elem.checked
                 });
             })
 
@@ -324,6 +328,9 @@
                         }
                         if (imgToCenterCheckbox.checked) {
                             imgToCenter();
+                        }
+                        if (addDateZwnjCheckbox.checked) {
+                            addDateZwnj();
                         }
                         if (supNormalSizeCheckbox.checked) {
                             supNormalSize();
@@ -554,6 +561,30 @@
                     }
                 })
             }
+            // 日期间添加zwnj
+            function addDateZwnj() {
+
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                // 添加正则匹配和替换逻辑
+                const datePatterns = [
+                    /(\d{4})\s年\s(\d{1,2})\s月\s(\d{1,2})\s日/g,
+                    /(\d{4})\s年\s(\d{1,2})\s月/g,
+                    /(\d{1,2})\s月\s(\d{1,2})\s日/g,
+                    /(\d{4})\s年/g,
+                    /(\d{1,2})\s月/g,
+                ];
+
+                datePatterns.forEach(pattern => {
+                    htmlContent = htmlContent.replace(pattern, (match) => {
+                        // 将日期中的每个字符用 &zwnj; 连接
+                        console.log(match,'hh');
+                        
+                        return match.split('').join('&zwnj;');
+                    });
+                });
+                html_doc = htmlContent;
+                handleOutput();
+            }
             // mobile的sup标签设置行内样式（sina邮箱）
             function supNormalSize() {
                 const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
@@ -583,6 +614,7 @@
                 html_doc = htmlContent.replace(regex, '.eyebrow-text, .nowrap { white-space: nowrap !important; }');
                 handleOutput();
             }
+
             // desktop去除下划线的!important
             function delUnderlineImportant() {
 
