@@ -33,11 +33,11 @@
             <div class="email-field">
                 <span class="field-name">Subject Line :</span>
                 <span class="field-value" contenteditable="false">＜广告＞</span>
-                <span class="field-value" contenteditable="false">上 Apple 选新品，好好犒赏自己。🥰</span>
+                <span class="field-value" contenteditable="false">拖入subject.txt文件🦖🦖🦖这里就会自动读取。🥰</span>
             </div>
             <div class="email-field">
                 <span class="field-name">Preview Text :</span>
-                <span class="field-value" contenteditable="false">重重好礼任你选，还有 Apple Trade In 换购计划帮你省一笔。</span>
+                <span class="field-value" contenteditable="false">这里是preview copy内容🦄🦄🦄拖入index.html文件这里就会自动读取~~🐶🐶🐶</span>
             </div>
         </div>
         <div id="htmlPreview" class="html-preview">
@@ -93,11 +93,13 @@
                     'dragenter dragover': e => {
                         e.preventDefault();
                         this.zone.classList.add('drop-zone-active');
+                        
                     },
                     'dragleave drop': e => {
                         e.preventDefault();
                         this.zone.classList.remove('drop-zone-active');
                         if (e.type === 'drop') this.handleDrop(e);
+                        console.log('拖入文件');
                     }
                 };
 
@@ -182,7 +184,7 @@
             elements.deviceSwitchButton.classList.toggle('active', isMobileView);
 
             // 更新容器宽度
-            const newWidth = isMobileView ? '414px' : '712px';
+            const newWidth = isMobileView ? '414px' : '736px';
             document.querySelectorAll('.email-box, .email-preview, .html-preview, .top-container')
                 .forEach(el => el.style.maxWidth = newWidth);
 

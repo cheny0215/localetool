@@ -12,7 +12,7 @@ body {
 .email-preview,
 .html-preview,
 .top-container {
-  max-width: 712px;
+  max-width: 736px;
   margin: 0 auto;
   transition: max-width 0.3s ease;
 }
@@ -75,8 +75,9 @@ body {
 .field-name {
   font-weight: 600;
   color: #181818;
-  min-width: 90px;
   font-size: 12px;
+  margin-right: 10px;
+  transition: font-size 0.3s ease;
 }
 
 .field-value {
@@ -85,6 +86,7 @@ body {
   padding-left: 4px;
   outline: none;
   cursor: pointer;
+  transition: font-size 0.3s ease;
 }
 
 .field-value:focus {
@@ -92,6 +94,13 @@ body {
   box-shadow: 0 0 0 1px #0066cc69;
   border-radius: 3px;
   cursor: text;
+}
+
+/* 添加移动端样式 */
+.email-box[style*="max-width: 414px"] .field-name,
+.email-box[style*="max-width: 414px"] .field-value {
+  font-size: 10px;
+  margin-right: 5px;
 }
 
 /* 按钮样式 */
@@ -169,6 +178,21 @@ body {
 #dropZoneTxt.drop-zone-active {
   border-color: #0071e3;
   background-color: #f5f5f7;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 113, 227, 0.5);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(0, 113, 227, 0.7); 
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(0, 113, 227, 0.2);
+  }
 }
 
 /* iframe 样式 */
