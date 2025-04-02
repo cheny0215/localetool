@@ -8,6 +8,8 @@
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./css/index.css">
     <link rel="stylesheet" href="./common/layui/css/layui.css"/>
+    <link rel="stylesheet" href="./assets/css/theme.css">
+    <link rel="stylesheet" href="./assets/css/countdown.css">
     <script src="./common/layui/layui.js"></script>
     <style>
         /* 基本样式 */
@@ -20,8 +22,8 @@
 
         #sidebar {
             width: 200px;
-            background-color: #20222A;
-            color: rgba(255,255,255,.8);
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
             padding: 0;
             box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -50,14 +52,38 @@
 
         #sidebar.collapsed {
             width: 60px;
+            overflow: hidden;
         }
 
         #sidebar.collapsed #toggleSidebar {
             transform: rotate(-180deg);
         }
 
+        #sidebar.collapsed .menu-header {
+            padding: 12px 0;
+            justify-content: center;
+        }
+
+        #sidebar.collapsed .menu-header:after {
+            display: none;
+        }
+
+        #sidebar.collapsed .menu-item > a.menu-header {
+            font-size: 0;
+        }
+
+        #sidebar.collapsed .menu-item > a.menu-header:before {
+            content: '•';
+            font-size: 16px;
+        }
+
+        #sidebar.collapsed .submenu {
+            display: none !important;
+            max-height: 0 !important;
+        }
+
         #sidebar ul {
-            padding: 8px;
+            padding: 0 8px;
         }
 
         #sidebar ul li {
@@ -78,7 +104,6 @@
 
         #sidebar ul li:hover a {
             color: #fff;
-            background: rgba(255,255,255,.1);
             transform: translateX(4px);
             border-radius: 4px;
         }
@@ -93,11 +118,14 @@
         .nav{
             display: flex;
             border-radius:0%;
-            color: #20222A;
-            background-color: #fff !important;
+            color: var(--header-text) !important;
+            background: var(--header-bg) !important;
         }
         .layui-nav-item a{
-            color: #20222A;
+            color: var(--header-text);
+        }
+        .layui-nav-child a{
+            color: #333 !important;
         }
 
         #content {
@@ -122,144 +150,15 @@
             display: none;
         }
 
+        /* 活跃按钮样式优化 */
         .activeButton {
-            background: #1E9FFF !important;
+            background: var(--active-color) !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .activeButton a {
             color: #fff !important;
             transform: none !important;
-        }
-
-        /* 更新主题配色变量 */
-        :root {
-            /* 默认主题 - 清新蓝调 */
-            --sidebar-bg: linear-gradient(120deg, #1565C0, #64B5F6);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #2196F3;
-            --header-bg: #E3F2FD;
-            --header-text: #0D47A1;
-            --accent-color: #FF4081;
-        }
-
-        /* 深邃星空 - 深蓝渐变 */
-        [data-theme="dark"] {
-            --sidebar-bg: linear-gradient(120deg, #0F2027, #203A43);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #4FC3F7;
-            --header-bg: #E0F7FA;
-            --header-text: #006064;
-            --accent-color: #FF5252;
-        }
-
-        /* 清新森林 - 保持不变 */
-        [data-theme="green"] {
-            --sidebar-bg: linear-gradient(120deg, #134e5e, #71b280);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #4CAF50;
-            --header-bg: #f1f8e9;
-            --header-text: #2c4a3c;
-            --accent-color: #ff9800;
-        }
-
-        /* 紫罗兰 - 柔和紫调 */
-        [data-theme="purple"] {
-            --sidebar-bg: linear-gradient(120deg, #5B247A, #9B6B9D);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #7B1FA2;
-            --header-bg: #F3E5F5;
-            --header-text: #4A148C;
-            --accent-color: #FFC107;
-        }
-
-        /* 海洋之心 - 清新蓝绿 */
-        [data-theme="ocean"] {
-            --sidebar-bg: linear-gradient(120deg, #006064, #00ACC1);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #00BCD4;
-            --header-bg: #E0F7FA;
-            --header-text: #006064;
-            --accent-color: #FF5722;
-        }
-
-        /* 晚霞 - 温暖橙粉 */
-        [data-theme="sunset"] {
-            --sidebar-bg: linear-gradient(120deg, #FF7043, #FFA270);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #FF5722;
-            --header-bg: #FBE9E7;
-            --header-text: #BF360C;
-            --accent-color: #03A9F4;
-        }
-
-        /* 樱花 - 柔和粉紫 */
-        [data-theme="cherry"] {
-            --sidebar-bg: linear-gradient(120deg, #E91E63, #F48FB1);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #EC407A;
-            --header-bg: #FCE4EC;
-            --header-text: #880E4F;
-            --accent-color: #4CAF50;
-        }
-
-        /* 薄荷清晨 - 保持不变 */
-        [data-theme="mint"] {
-            --sidebar-bg: linear-gradient(120deg, #43c6ac, #191654);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #26a69a;
-            --header-bg: #e0f2f1;
-            --header-text: #004d40;
-            --accent-color: #ff4081;
-        }
-
-        /* 科技 - 清新灰调 */
-        [data-theme="tech"] {
-            --sidebar-bg: linear-gradient(120deg, #37474F, #78909C);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #607D8B;
-            --header-bg: #ECEFF1;
-            --header-text: #263238;
-            --accent-color: #00BCD4;
-        }
-
-        /* 咖啡 - 温暖棕调 */
-        [data-theme="coffee"] {
-            --sidebar-bg: linear-gradient(120deg, #5D4037, #8D6E63);
-            --sidebar-text: rgba(255,255,255,.9);
-            --sidebar-hover: rgba(255,255,255,.15);
-            --active-color: #795548;
-            --header-bg: #EFEBE9;
-            --header-text: #3E2723;
-            --accent-color: #26C6DA;
-        }
-
-        /* 更新使用渐变背景的样式 */
-        #sidebar {
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-        }
-
-        /* 添加hover时的光效 */
-        #sidebar ul li a:hover {
-            background: linear-gradient(90deg, 
-                var(--sidebar-hover), 
-                transparent);
-            transform: translateX(4px);
-        }
-
-        /* 活跃按钮样式优化 */
-        .activeButton {
-            background: var(--active-color) !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         /* 为导航添加accent color */
@@ -272,274 +171,65 @@
             transition: all 0.4s ease;
         }
 
-        /* 倒计时卡片样式 - 添加隐藏状态 */
-        .countdown-card {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            width: 208px;
-            padding: 15px;
-            border-radius: 16px;
-            background: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
-            display: flex;
-            flex-direction: column;
-            /* 初始状态为隐藏 */
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(60px);
+        /* 添加子菜单样式 */
+        #sidebar ul.submenu {
+            padding-left: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
         }
 
-        /* 显示状态 */
-        .countdown-card.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+        #sidebar .menu-item.active > ul.submenu {
+            max-height: 500px; /* 足够大的高度以容纳所有子菜单项 */
         }
 
-        .countdown-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            filter: brightness(1.1); /* 悬停时稍微变亮 */
-        }
-
-        .countdown-card:hover .edit-icon {
-            opacity: 1;
-        }
-
-        .countdown-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .countdown-title {
-            font-weight: 500;
-            font-size: 15px;
+        #sidebar .menu-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: rgba(255, 255, 255, 0.95);
-        }
-
-        .countdown-icon {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-        }
-
-        .edit-icon {
-            width: 24px;
-            height: 24px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .countdown-desc {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .countdown-time {
-            font-size: 24px;
-            font-weight: 500;
-            letter-spacing: 1px;
-            margin-top: auto;
-            text-align: center;
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: rgba(255, 255, 255, 0.95);
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* 设置面板样式 */
-        .settings-panel {
-            position: fixed;
-            right: 20px;
-            bottom: 80px;
-            width: 300px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            padding: 20px;
-            z-index: 1001;
-            display: none;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .settings-title {
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
-        }
-
-        .close-settings {
+            padding: 12px 16px;
+            color: inherit;
+            text-decoration: none;
             cursor: pointer;
-            font-size: 18px;
-            color: #999;
-            transition: color 0.2s ease;
-        }
-
-        .close-settings:hover {
-            color: #333;
-        }
-
-        .time-input-group {
-            margin-bottom: 12px;
-        }
-
-        .time-input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .time-input {
-            width: 100%;
-            padding: 8px 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .time-input:focus {
-            outline: none;
-            border-color: var(--active-color);
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-        }
-
-        .settings-footer {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-            gap: 10px;
-        }
-
-        .settings-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .cancel-btn {
-            background: #f5f5f5;
-            color: #666;
-        }
-
-        .cancel-btn:hover {
-            background: #eee;
-        }
-
-        .save-btn {
-            background: var(--active-color);
-            color: white;
-        }
-
-        .save-btn:hover {
-            background: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .current-schedule {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-        }
-
-        .current-schedule h4 {
-            margin: 0 0 8px 0;
-            font-size: 14px;
-            color: #444;
-        }
-
-        .schedule-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        /* 添加不再显示按钮的样式 */
-        .hide-btn {
-            background: #f5f5f5;
-            color: #666;
+            transition: all 0.25s ease;
+            white-space: nowrap;
             position: relative;
         }
 
-        .hide-btn:hover {
-            background: #e0e0e0;
+        #sidebar .menu-header:after {
+            content: '▸';
+            position: absolute;
+            right: 16px;
+            transition: transform 0.3s ease;
         }
 
-        /* 添加悬浮提示样式 */
-        .settings-btn[title]:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 5px 10px;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
+        #sidebar .menu-item.active > .menu-header:after {
+            transform: rotate(90deg);
+        }
+
+        #sidebar .menu-item.active > .menu-header {
+            color: #fff;
+            background: rgba(255,255,255,.1);
+        }
+
+        /* 添加子菜单悬停渐变效果 */
+        #sidebar ul.submenu li:hover a {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            color: #fff;
+            transform: translateX(4px);
             border-radius: 4px;
-            font-size: 12px;
-            white-space: nowrap;
-            margin-bottom: 5px;
-            z-index: 10;
-            pointer-events: none;
+            transition: all 0.3s ease;
         }
 
-        /* 添加小三角形 */
-        .settings-btn[title]:hover::before {
-            content: '';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
-            margin-bottom: -5px;
-            z-index: 10;
-            pointer-events: none;
+        /* 修改子菜单项样式 */
+        #sidebar ul.submenu li a {
+            padding: 8px 16px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        /* 确保子菜单项的背景色在悬停前是透明的 */
+        #sidebar ul.submenu li a {
+            background: transparent;
         }
     </style>
 </head>
@@ -553,15 +243,36 @@
             </div>
             <hr style="border:none;height: 1px;">
             <ul id="toggleBtn">
-                <li><a class="clickBTN" name="ic平台书签检查工具">icCheckTool</a></li>
-                <li><a class="clickBTN" name="txt文本去除换行">txtnowrap</a></li>
-                <li><a class="clickBTN" name="格式化Url">formatUrl</a></li>
-                <li><a class="clickBTN" name="英文前后添加空格nbsp">nbspAdd</a></li>
-                <li><a class="clickBTN" name="文本对比工具">codeDiff</a></li>
-                <li><a class="clickBTN" name="备份starling截图生成">standby</a></li>
-                <li><a class="clickBTN" name="DM-QA">DM-QA</a></li>
-                <li><a class="clickBTN" name="GET">GET</a></li>
-                <li><a class="clickBTN" name="压缩js代码为书签">compressCode</a></li>
+                <li class="menu-item">
+                    <a class="menu-header">检查工具</a>
+                    <ul class="submenu">
+                        <li><a class="clickBTN" name="ic平台书签检查工具">icCheckTool</a></li>
+                        <li><a class="clickBTN" name="文本对比工具">codeDiff</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-header">常用工具</a>
+                    <ul class="submenu">
+                        <li><a class="clickBTN" name="txt文本去除换行">txtnowrap</a></li>
+                        <li><a class="clickBTN" name="格式化Url">formatUrl</a></li>
+                        <li><a class="clickBTN" name="英文前后添加空格nbsp">nbspAdd</a></li>
+                        <li><a class="clickBTN" name="压缩js代码为书签">compressCode</a></li>
+                        <li><a class="clickBTN" name="GET">GET</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-header">后期开发工具</a>
+                    <ul class="submenu">
+                        <li><a class="clickBTN" name="备份starling截图生成">standby</a></li>
+                        <li><a class="clickBTN" name="DM-QA">DM-QA</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
+                    <a class="menu-header">其他</a>
+                    <ul class="submenu">
+                        <li><a class="clickBTN" name="贪吃蛇">Snake Game</a></li>
+                    </ul>
+                </li>
             </ul>
         </div>
         <div id="main">
@@ -597,14 +308,15 @@
             <div id="content">
                 <!-- <p>这里是内容区域。</p> -->
                 <iframe class="iframeBox hiddenIframe" src="./icCheckTool/index.html"></iframe>
+                <iframe class="iframeBox hiddenIframe" src="./codeDiff/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./txtnowrap/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./formatUrl/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./nbspAdd/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./codeDiff/index.html"></iframe>
+                <iframe class="iframeBox hiddenIframe" src="./compressCode/index.html"></iframe>
+                <iframe class="iframeBox hiddenIframe" src="./get/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./standby/index.html"></iframe>
                 <iframe class="iframeBox hiddenIframe" src="./DM-QA/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./get/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./compressCode/index.html"></iframe>
+                <iframe class="iframeBox hiddenIframe" src="./game/snake/index.html"></iframe>
                 <iframe name="demoFrame" class="iframeBox hiddenIframe" src="./demo/index.html"></iframe>
             </div>
         </div>
@@ -680,6 +392,8 @@
         const sidebar = document.getElementById('sidebar');
         const toggleSidebarButton = document.getElementById('sidebar-box');
         const toggleBtn = document.querySelectorAll('#toggleBtn li')
+        const clickBTN = document.querySelectorAll('.clickBTN')
+        const iframeBox = document.querySelectorAll('.iframeBox')
         
         // 初始化状态
         let isCollapsed = false;
@@ -695,301 +409,74 @@
             }
         });
 
-
-        // ifarme
-        const clickBTN = document.querySelectorAll('.clickBTN')
-        const iframeBox = document.querySelectorAll('.iframeBox')
-
-        activeButton(sessionStorage.getItem('cy_activeButton_current_index') || 0)
-        function activeButton(index) {
-             header.innerText = clickBTN[index].name
-                iframeBox[index].className = 'iframeBox showIframe'
-                toggleBtn[index].className = 'activeButton'
-        }
-
-        for (let index = 0; index < clickBTN.length; index++) {
-            clickBTN[index].onclick = function () {
-                for (let i = 0; i < clickBTN.length; i++) {
-                    iframeBox[i].className = 'iframeBox hiddenIframe'
-                    toggleBtn[i].className = ''
+        // 获取所有菜单头部
+        const menuHeaders = document.querySelectorAll('.menu-header');
+        
+        // 为每个菜单头部添加点击事件
+        menuHeaders.forEach(header => {
+            header.addEventListener('click', function(e) {
+                // 阻止事件冒泡，避免触发父元素的点击事件
+                e.stopPropagation();
+                
+                const menuItem = this.parentElement;
+                
+                // 切换当前菜单项的活动状态
+                menuItem.classList.toggle('active');
+                
+                // 如果侧边栏处于折叠状态，展开它
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                    isCollapsed = false;
                 }
-                activeButton(index)
-                sessionStorage.setItem('cy_activeButton_current_index',index)
-            }
-
-        }
-
-        // 主题切换函数
-        function switchTheme(themeName) {
-            // 保存主题选择到本地存储
-            localStorage.setItem('preferred-theme', themeName);
-            // 设置主题
-            document.documentElement.setAttribute('data-theme', themeName);
-            
-            // 触发过渡动画
-            document.body.style.transition = 'background-color 0.3s ease';
-            document.querySelector('#sidebar').style.transition = 'background-color 0.3s ease';
-            
-            // 通知用户
-            layer.msg('主题切换成功：' + getThemeName(themeName), {
-                offset: 't',
-                anim: 6
             });
-        }
-
-        // 获取主题名称
-        function getThemeName(theme) {
-            const themeNames = {
-                'default': '默认主题',
-                'dark': '深邃夜空',
-                'green': '清新森林',
-                'purple': '优雅紫罗',
-                'ocean': '海洋之心',
-                'sunset': '晚霞橘暮',
-                'cherry': '樱花粉韵',
-                'mint': '薄荷清晨',
-                'tech': '科技蓝调',
-                'coffee': '咖啡时光'
-            };
-            return themeNames[theme] || theme;
-        }
-
-        // 页面加载时恢复上次的主题设置
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('preferred-theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            }
-            
-            // 初始化倒计时功能
-            initCountdown();
         });
 
-        // 倒计时功能
-        function initCountdown() {
-            // 获取DOM元素
-            const countdownCard = document.getElementById('countdownCard');
-            const settingsPanel = document.getElementById('settingsPanel');
-            const closeSettings = document.getElementById('closeSettings');
-            const cancelSettings = document.getElementById('cancelSettings');
-            const saveSettings = document.getElementById('saveSettings');
-            const toggleCountdown = document.getElementById('toggleCountdown');
+        // 激活按钮和显示对应的iframe
+        function activeButton(index) {
+            header.innerText = clickBTN[index].name
+            iframeBox[index].className = 'iframeBox showIframe'
             
-            // 初始化倒计时显示状态
-            let isCountdownVisible = localStorage.getItem('countdownVisible') === 'true';
+            // 移除所有菜单项的活动状态
+            document.querySelectorAll('.activeButton').forEach(item => {
+                item.classList.remove('activeButton');
+            });
             
-            // 设置初始状态
-            if (isCountdownVisible) {
-                countdownCard.classList.add('visible');
-                toggleCountdown.textContent = '隐藏下班倒计时';
-            } else {
-                countdownCard.classList.remove('visible');
-                toggleCountdown.textContent = '显示下班倒计时';
+            // 为当前点击的菜单项添加活动状态
+            clickBTN[index].parentElement.classList.add('activeButton');
+            
+            // 展开包含当前菜单项的父菜单
+            const parentMenuItem = clickBTN[index].closest('.menu-item');
+            if (parentMenuItem) {
+                parentMenuItem.classList.add('active');
             }
-            
-            // 切换倒计时显示/隐藏
-            toggleCountdown.addEventListener('click', function() {
-                isCountdownVisible = !isCountdownVisible;
-                localStorage.setItem('countdownVisible', isCountdownVisible);
-                
-                if (isCountdownVisible) {
-                    countdownCard.classList.add('visible');
-                    toggleCountdown.textContent = '隐藏下班倒计时';
-                    layer.msg('已显示下班倒计时', {
-                        offset: 'b',
-                        anim: 1
-                    });
-                } else {
-                    countdownCard.classList.remove('visible');
-                    toggleCountdown.textContent = '显示下班倒计时';
-                    layer.msg('已隐藏下班倒计时', {
-                        offset: 'b',
-                        anim: 1
-                    });
-                }
-            });
-            
-            // 时间输入框
-            const workStartTime = document.getElementById('workStartTime');
-            const lunchStartTime = document.getElementById('lunchStartTime');
-            const lunchEndTime = document.getElementById('lunchEndTime');
-            const workEndTime = document.getElementById('workEndTime');
-            
-            // 当前时间表显示
-            const currentWorkStart = document.getElementById('currentWorkStart');
-            const currentLunch = document.getElementById('currentLunch');
-            const currentWorkEnd = document.getElementById('currentWorkEnd');
-            
-            // 倒计时显示元素
-            const countdownTitle = document.getElementById('countdownTitle');
-            const countdownTime = document.getElementById('countdownTime');
-            const countdownDesc = document.getElementById('countdownDesc');
-            const countdownIcon = document.getElementById('countdownIcon');
-            
-            // 默认时间设置
-            let timeSettings = {
-                workStart: '09:30',
-                lunchStart: '12:00',
-                lunchEnd: '14:00',
-                workEnd: '18:30'
-            };
-            
-            // 从本地存储加载时间设置
-            const savedSettings = localStorage.getItem('workTimeSettings');
-            if (savedSettings) {
-                timeSettings = JSON.parse(savedSettings);
-            }
-            
-            // 更新设置面板中的时间
-            function updateSettingsDisplay() {
-                workStartTime.value = timeSettings.workStart;
-                lunchStartTime.value = timeSettings.lunchStart;
-                lunchEndTime.value = timeSettings.lunchEnd;
-                workEndTime.value = timeSettings.workEnd;
-                
-                currentWorkStart.textContent = timeSettings.workStart;
-                currentLunch.textContent = `${timeSettings.lunchStart} - ${timeSettings.lunchEnd}`;
-                currentWorkEnd.textContent = timeSettings.workEnd;
-            }
-            
-            // 初始化设置面板
-            updateSettingsDisplay();
-            
-            // 打开设置面板
-            countdownCard.addEventListener('click', function() {
-                settingsPanel.style.display = 'block';
-            });
-            
-            // 关闭设置面板
-            closeSettings.addEventListener('click', function() {
-                settingsPanel.style.display = 'none';
-            });
-            
-            cancelSettings.addEventListener('click', function() {
-                settingsPanel.style.display = 'none';
-                updateSettingsDisplay(); // 恢复原始设置
-            });
-            
-            // 保存设置
-            saveSettings.addEventListener('click', function() {
-                timeSettings = {
-                    workStart: workStartTime.value,
-                    lunchStart: lunchStartTime.value,
-                    lunchEnd: lunchEndTime.value,
-                    workEnd: workEndTime.value
-                };
-                
-                localStorage.setItem('workTimeSettings', JSON.stringify(timeSettings));
-                updateSettingsDisplay();
-                settingsPanel.style.display = 'none';
-                
-                // 显示保存成功消息
-                layer.msg('工作时间设置已保存', {
-                    offset: 'b',
-                    anim: 1
-                });
-            });
-            
-            // 计算倒计时
-            function updateCountdown() {
-                const now = new Date();
-                // const now = new Date(2024, 5, 10, 19, 30, 0); // 测试用例: 设置为2024年6月10日 19:30:00
-                
-                // 解析时间设置
-                const parseTime = (timeStr) => {
-                    const [hours, minutes] = timeStr.split(':').map(Number);
-                    const date = new Date(now);
-                    date.setHours(hours, minutes, 0, 0);
-                    return date;
-                };
-                
-                const workStartDate = parseTime(timeSettings.workStart);
-                const lunchStartDate = parseTime(timeSettings.lunchStart);
-                const lunchEndDate = parseTime(timeSettings.lunchEnd);
-                const workEndDate = parseTime(timeSettings.workEnd);
-                
-                // 计算当前时间段（转换为分钟便于比较）
-                const nowTime = now.getHours() * 60 + now.getMinutes();
-                const workStartTime = parseInt(timeSettings.workStart.split(':')[0]) * 60 + parseInt(timeSettings.workStart.split(':')[1]);
-                const lunchStartTime = parseInt(timeSettings.lunchStart.split(':')[0]) * 60 + parseInt(timeSettings.lunchStart.split(':')[1]);
-                const lunchEndTime = parseInt(timeSettings.lunchEnd.split(':')[0]) * 60 + parseInt(timeSettings.lunchEnd.split(':')[1]);
-                const workEndTime = parseInt(timeSettings.workEnd.split(':')[0]) * 60 + parseInt(timeSettings.workEnd.split(':')[1]);
-                
-                // 格式化时间差的通用函数
-                const formatTimeDiff = (timeDiff) => {
-                    // 计算小时、分钟和秒
-                    const hours = Math.floor(Math.abs(timeDiff) / (1000 * 60 * 60));
-                    const minutes = Math.floor((Math.abs(timeDiff) % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((Math.abs(timeDiff) % (1000 * 60)) / 1000);
-                    
-                    // 返回格式化的时间字符串
-                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                };
-                
-                let timeDiff;
-                
-                // 上班前
-                if (nowTime < workStartTime) {
-                    countdownDesc.innerHTML = '可恶！快<span style="color:#fff;font-size:16px;">上班</span>了💼<br>只有';
-                    countdownIcon.src = './assets/icons/coffee.png';
-                    timeDiff = workStartDate - now;
-                } 
-                // 上午工作时间
-                else if (nowTime >= workStartTime && nowTime < lunchStartTime) {
-                    countdownDesc.innerHTML = '距离<span style="color:#fff;font-size:16px;">干饭</span>时间<br>竟然还有';
-                    countdownIcon.src = './assets/icons/work.png';
-                    timeDiff = lunchStartDate - now;
-                }
-                // 午休时间
-                else if (nowTime >= lunchStartTime && nowTime < lunchEndTime) {
-                    countdownDesc.innerHTML = '<span style="color:#fff;font-size:16px;">午休</span>时间告急～<br>仅剩';
-                    countdownIcon.src = './assets/icons/lunch.png';
-                    timeDiff = lunchEndDate - now;
-                }
-                // 下午工作时间
-                else if (nowTime >= lunchEndTime && nowTime < workEndTime) {
-                    countdownDesc.innerHTML = '坚持就是胜利✌️<br>距离<span style="color:#fff;font-size:16px;">下班</span>还有';
-                    countdownIcon.src = './assets/icons/run.png';
-                    timeDiff = workEndDate - now;
-                }
-                // 下班后
-                else {
-                    countdownDesc.innerHTML = '晚上好，加班🐶<br>你已经<span style="color:#fff;font-size:16px;">加班</span>';
-                    countdownIcon.src = './assets/icons/moon.png';
-                    timeDiff = now - workEndDate; // 注意这里是计算已经加班的时间
-                }
-                
-                // 更新倒计时显示
-                countdownTime.textContent = formatTimeDiff(timeDiff);
-            }
-            
-            // 立即更新一次倒计时
-            updateCountdown();
-            
-            // 每秒更新一次倒计时
-            setInterval(updateCountdown, 1000);
+        }
 
-            // 获取不再显示按钮
-            const hideCountdown = document.getElementById('hideCountdown');
+        // 初始化激活保存的菜单项
+        const savedIndex = sessionStorage.getItem('cy_activeButton_current_index') || 0;
+        activeButton(parseInt(savedIndex));
 
-            // 添加不再显示按钮的点击事件
-            hideCountdown.addEventListener('click', function() {
-                isCountdownVisible = false;
-                localStorage.setItem('countdownVisible', 'false');
-                countdownCard.classList.remove('visible');
-                toggleCountdown.textContent = '显示下班倒计时';
-                settingsPanel.style.display = 'none';
+        // 为每个菜单项添加点击事件
+        for (let index = 0; index < clickBTN.length; index++) {
+            clickBTN[index].onclick = function(e) {
+                // 阻止事件冒泡
+                e.stopPropagation();
                 
-                // 显示提示消息
-                layer.msg('已隐藏下班倒计时，可在导航栏设置中重新开启', {
-                    offset: 'b',
-                    anim: 1,
-                    time: 3000
-                });
-            });
+                // 隐藏所有iframe
+                for (let i = 0; i < iframeBox.length; i++) {
+                    iframeBox[i].className = 'iframeBox hiddenIframe'
+                }
+                
+                // 激活当前点击的菜单项
+                activeButton(index);
+                sessionStorage.setItem('cy_activeButton_current_index', index);
+            }
         }
 
     </script>
+    
+    <!-- 添加主题和倒计时脚本引用 -->
+    <script src="./assets/js/theme.js"></script>
+    <script src="./assets/js/countdown.js"></script>
 </body>
 
 </html>

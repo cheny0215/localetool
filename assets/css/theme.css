@@ -1,0 +1,114 @@
+/* 主题配色变量 */
+:root {
+    /* 默认主题 - 清新蓝调 */
+    --sidebar-bg: linear-gradient(190deg, #4c585e, #304357);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #2196F3;
+    --header-bg: #edf2f6;
+    --header-text: #2f5c9f;
+    --accent-color: #FF4081;
+    --content-bg: #f5f5f5;
+    --card-bg: #ffffff;
+}
+
+/* 深邃夜空 - 深蓝渐变 */
+[data-theme="dark"] {
+    --sidebar-bg: linear-gradient(120deg, #2a5c72, #203A43);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #4FC3F7;
+    --header-bg: linear-gradient(to top,#5a7a84, #203A43);
+    --header-text: #ceebec;
+    --accent-color: #FF5252;
+    --content-bg: #f5f5f5;
+    --card-bg: #ffffff;
+}
+
+/* 清新森林 - 保持不变 */
+[data-theme="green"] {
+    --sidebar-bg: linear-gradient(60deg, #134e5e, #71b280);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #4caf4fe2;
+    --header-bg: linear-gradient(60deg,#2a8f72, #134e5e);
+    --header-text: #d9ebe3;
+    --accent-color: #ff9800;
+}
+
+/* 紫罗兰 - 柔和紫调 */
+[data-theme="purple"] {
+    --sidebar-bg: linear-gradient(60deg, #5B247A, #a288a2);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #7B1FA2;
+    --header-bg: linear-gradient(120deg,#a288a2, #5B247A);
+    --header-text: #ebdcfe;
+    --accent-color: #FFC107;
+}
+
+/* 海洋之心 - 清新蓝绿 */
+[data-theme="ocean"] {
+    --sidebar-bg: linear-gradient(120deg, #006064, #00ACC1);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #00BCD4;
+    --header-bg: linear-gradient(to top,#e6f0f1, #6bcad7);
+    --header-text: #006064;
+    --accent-color: #FF5722;
+}
+
+/* 晚霞橘暮 - 温暖橙红 */
+[data-theme="sunset"] {
+    --sidebar-bg: linear-gradient(60deg, #b44500, #ffa537);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #ff7300;
+    --header-bg: #FFF3E0;
+    --header-text: #E65100;
+    --accent-color: #607D8B;
+}
+
+/* 樱花粉韵 - 柔和粉色 */
+[data-theme="cherry"] {
+    --sidebar-bg: linear-gradient(120deg, #FF5F6D, #FFC371);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #F06292;
+    --header-bg: linear-gradient(to top,#fff,#f6d2d5, #f77983);
+    --header-text: #AD1457;
+    --accent-color: #4CAF50;
+}
+
+/* 薄荷清晨 - 清新薄荷绿 */
+[data-theme="mint"] {
+    --sidebar-bg: linear-gradient(120deg, #11998e, #38ef7d);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #00BFA5;
+    --header-bg: linear-gradient(to top,#edf8f6, #c8f8f2);
+    --header-text: #004D40;
+    --accent-color: #FF5722;
+}
+
+/* 科技蓝调 - 深邃科技感 */
+[data-theme="tech"] {
+    --sidebar-bg: linear-gradient(120deg, #0B486B, #3B8CB5);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #0288D1;
+    --header-bg:  #fefefe;
+    --header-text: #01579B;
+    --accent-color: #FF4081;
+}
+
+/* 咖啡时光 - 温暖棕色 */
+[data-theme="coffee"] {
+    --sidebar-bg: linear-gradient(120deg, #603813, #b29f94);
+    --sidebar-text: rgba(255,255,255,.9);
+    --sidebar-hover: rgba(255,255,255,.15);
+    --active-color: #795548;
+    --header-bg: linear-gradient(to top,#f6f3f0, #e4cec3);
+    --header-text: #3E2723;
+    --accent-color: #8BC34A;
+} 

@@ -1,0 +1,269 @@
+/* 倒计时卡片样式 */
+.countdown-card {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 208px;
+    padding: 15px;
+    border-radius: 16px;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    /* 初始状态为隐藏 */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(60px);
+}
+
+/* 显示状态 */
+.countdown-card.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.countdown-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    filter: brightness(1.1); /* 悬停时稍微变亮 */
+}
+
+.countdown-card:hover .edit-icon {
+    opacity: 1;
+}
+
+.countdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.countdown-title {
+    font-weight: 500;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.countdown-icon {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.edit-icon {
+    width: 24px;
+    height: 24px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.countdown-desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.countdown-time {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin-top: auto;
+    text-align: center;
+    font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: rgba(255, 255, 255, 0.95);
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 设置面板样式 */
+.settings-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 80px;
+    width: 300px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    padding: 20px;
+    z-index: 1001;
+    display: none;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.settings-title {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+.close-settings {
+    cursor: pointer;
+    font-size: 18px;
+    color: #999;
+    transition: color 0.2s ease;
+}
+
+.close-settings:hover {
+    color: #333;
+}
+
+.time-input-group {
+    margin-bottom: 12px;
+}
+
+.time-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+    color: #666;
+}
+
+.time-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+}
+
+.time-input:focus {
+    outline: none;
+    border-color: var(--active-color);
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+}
+
+.settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.settings-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.cancel-btn:hover {
+    background: #eee;
+}
+
+.save-btn {
+    background: var(--active-color);
+    color: white;
+}
+
+.save-btn:hover {
+    background: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.current-schedule {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+.current-schedule h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #444;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+/* 添加不再显示按钮的样式 */
+.hide-btn {
+    background: #f5f5f5;
+    color: #666;
+    position: relative;
+}
+
+.hide-btn:hover {
+    background: #e0e0e0;
+}
+
+/* 添加悬浮提示样式 */
+.settings-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    margin-bottom: 5px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* 添加小三角形 */
+.settings-btn[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
+    margin-bottom: -5px;
+    z-index: 10;
+    pointer-events: none;
+} 

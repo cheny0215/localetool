@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇游戏</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyber-bg: #0a0f1a;
+            --cyber-primary: #00ffff;
+            --cyber-secondary: #ff00ff;
+            --cyber-accent: #fcee0a;
+            --cyber-glow: 0 0 5px var(--cyber-primary), 0 0 10px var(--cyber-primary), 0 0 15px var(--cyber-primary);
+            --cyber-glow-secondary: 0 0 5px var(--cyber-secondary), 0 0 10px var(--cyber-secondary), 0 0 15px var(--cyber-secondary);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--cyber-bg);
+            font-family: 'Noto Sans SC', sans-serif;
+            color: #e0e0e0;
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 255, 0.05) 3px,
+                rgba(0, 255, 255, 0.05) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .game-container {
+            background-color: rgba(15, 23, 42, 0.85);
+            padding: 35px;
+            border-radius: 10px;
+            border: 1px solid var(--cyber-primary);
+            box-shadow: var(--cyber-glow), inset 0 0 10px rgba(0, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--cyber-primary);
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-shadow: var(--cyber-glow);
+            letter-spacing: 2px;
+        }
+
+        canvas {
+            border: 1px solid var(--cyber-secondary);
+            box-shadow: 0 0 8px var(--cyber-secondary);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .game-info {
+            font-size: 20px;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.2);
+        }
+
+        #score {
+            font-weight: bold;
+            color: var(--cyber-accent);
+            text-shadow: 0 0 5px var(--cyber-accent);
+        }
+
+        .settings {
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            color: #94a3b8;
+        }
+
+        .settings > label {
+             color: var(--cyber-primary);
+             font-weight: bold;
+        }
+
+        .speed-options label {
+            margin-right: 10px;
+            cursor: pointer;
+            color: #e0e0e0;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .speed-options input[type="radio"]:checked + label {
+            color: var(--cyber-accent);
+            text-shadow: 0 0 5px var(--cyber-accent);
+        }
+
+        .speed-options input[type="radio"] {
+            margin-right: 5px;
+            cursor: pointer;
+            accent-color: var(--cyber-primary);
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--cyber-primary);
+            border-radius: 50%;
+            position: relative;
+            top: 2px;
+        }
+
+        .speed-options input[type="radio"]::before {
+            content: "";
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--cyber-primary);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.2s ease-in-out;
+            box-shadow: var(--cyber-glow);
+        }
+
+        .speed-options input[type="radio"]:checked::before {
+             transform: translate(-50%, -50%) scale(1);
+        }
+
+        .button-container {
+            display: flex;
+            gap: 20px;
+        }
+
+        button {
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--cyber-bg);
+            background-color: var(--cyber-primary);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+            box-shadow: var(--cyber-glow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: var(--cyber-accent);
+            color: var(--cyber-bg);
+            box-shadow: 0 0 8px var(--cyber-accent), 0 0 15px var(--cyber-accent);
+            transform: translateY(-2px);
+        }
+
+        #restartBtn {
+             background-color: var(--cyber-secondary);
+             box-shadow: var(--cyber-glow-secondary);
+        }
+
+        #restartBtn:hover {
+            background-color: var(--cyber-accent);
+            color: var(--cyber-bg);
+             box-shadow: 0 0 8px var(--cyber-accent), 0 0 15px var(--cyber-accent);
+        }
+
+        #restartBtn[style*="display: none"],
+        #startBtn[style*="display: none"] {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>贪吃蛇游戏</h1>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="game-info">
+            <p>分数: <span id="score">0</span></p>
+        </div>
+        <div class="settings">
+            <label>速度:</label>
+            <div class="speed-options">
+                <input type="radio" id="speedSlow" name="speed" value="200" checked>
+                <label for="speedSlow">慢</label>
+                <input type="radio" id="speedMedium" name="speed" value="150">
+                <label for="speedMedium">中</label>
+                <input type="radio" id="speedFast" name="speed" value="100">
+                <label for="speedFast">快</label>
+            </div>
+        </div>
+        <div class="button-container">
+            <button id="startBtn">开始游戏</button>
+            <button id="restartBtn" style="display: none;">重新开始</button>
+        </div>
+    </div>
+    <script src="snake.js"></script>
+</body>
+</html> 
