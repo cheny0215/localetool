@@ -15,6 +15,7 @@
             display: flex;
             height: 100vh;
             transition: margin-left 0.3s;
+            position: relative;
         }
 
         #sidebar {
@@ -270,6 +271,276 @@
         #sidebar, .nav, .activeButton {
             transition: all 0.4s ease;
         }
+
+        /* 倒计时卡片样式 - 添加隐藏状态 */
+        .countdown-card {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 208px;
+            padding: 15px;
+            border-radius: 16px;
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            /* 初始状态为隐藏 */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(60px);
+        }
+
+        /* 显示状态 */
+        .countdown-card.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .countdown-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            filter: brightness(1.1); /* 悬停时稍微变亮 */
+        }
+
+        .countdown-card:hover .edit-icon {
+            opacity: 1;
+        }
+
+        .countdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .countdown-title {
+            font-weight: 500;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .countdown-icon {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .edit-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .countdown-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .countdown-time {
+            font-size: 24px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            margin-top: auto;
+            text-align: center;
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: rgba(255, 255, 255, 0.95);
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 设置面板样式 */
+        .settings-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 80px;
+            width: 300px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            padding: 20px;
+            z-index: 1001;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .settings-title {
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .close-settings {
+            cursor: pointer;
+            font-size: 18px;
+            color: #999;
+            transition: color 0.2s ease;
+        }
+
+        .close-settings:hover {
+            color: #333;
+        }
+
+        .time-input-group {
+            margin-bottom: 12px;
+        }
+
+        .time-input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .time-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: var(--active-color);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+        }
+
+        .settings-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            gap: 10px;
+        }
+
+        .settings-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .cancel-btn {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .cancel-btn:hover {
+            background: #eee;
+        }
+
+        .save-btn {
+            background: var(--active-color);
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .current-schedule {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .current-schedule h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        /* 添加不再显示按钮的样式 */
+        .hide-btn {
+            background: #f5f5f5;
+            color: #666;
+            position: relative;
+        }
+
+        .hide-btn:hover {
+            background: #e0e0e0;
+        }
+
+        /* 添加悬浮提示样式 */
+        .settings-btn[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 5px 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            margin-bottom: 5px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 添加小三角形 */
+        .settings-btn[title]:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
+            margin-bottom: -5px;
+            z-index: 10;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -296,11 +567,14 @@
         <div id="main">
             <ul class="layui-nav nav layui-bg-gray">
                 <li id="header" style="flex: 1;line-height: 60px;">标题</li>
-                <li class="layui-nav-item layui-this"><a href="">选中</a></li>
+                <li class="layui-nav-item layui-this"><a href="">暂无</a></li>
+                <li class="layui-nav-item"><a href="">暂无</a></li>
                 <li class="layui-nav-item">
-                  <a href="javascript:;">常规</a>
+                  <a href="javascript:;">设置</a>
+                  <dl class="layui-nav-child">
+                    <dd><a href="javascript:;" id="toggleCountdown">显示下班倒计时</a></dd>
+                  </dl>
                 </li>
-                <li class="layui-nav-item"><a href="">导航</a></li>
                 <li class="layui-nav-item">
                   <a href="javascript:;">主题切换</a>
                   <dl class="layui-nav-child">
@@ -335,6 +609,69 @@
             </div>
         </div>
     </div>
+
+    <!-- 倒计时卡片 -->
+    <div class="countdown-card" id="countdownCard">
+        <div class="countdown-header">
+            <div class="countdown-title">
+                <img src="./assets/icons/clock.png" class="countdown-icon" id="countdownIcon" alt="倒计时图标">
+            </div>
+            <div class="countdown-desc" id="countdownDesc">距离下班还有</div>
+            <img class="edit-icon" src="./assets/icons/set.png" alt="倒计时图标"></img>
+        </div>
+        <div class="countdown-time" id="countdownTime">00:00:00</div>
+    </div>
+
+    <!-- 设置面板 -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <div class="settings-title">工作时间设置</div>
+            <div class="close-settings" id="closeSettings">×</div>
+        </div>
+        
+        <div class="time-input-group">
+            <label for="workStartTime">上班时间</label>
+            <input type="time" id="workStartTime" class="time-input">
+        </div>
+        
+        <div class="time-input-group">
+            <label for="lunchStartTime">午休开始时间</label>
+            <input type="time" id="lunchStartTime" class="time-input">
+        </div>
+        
+        <div class="time-input-group">
+            <label for="lunchEndTime">午休结束时间</label>
+            <input type="time" id="lunchEndTime" class="time-input">
+        </div>
+        
+        <div class="time-input-group">
+            <label for="workEndTime">下班时间</label>
+            <input type="time" id="workEndTime" class="time-input">
+        </div>
+        
+        <div class="current-schedule">
+            <h4>当前时间表</h4>
+            <div class="schedule-item">
+                <span>上班时间:</span>
+                <span id="currentWorkStart">09:30</span>
+            </div>
+            <div class="schedule-item">
+                <span>午休时间:</span>
+                <span id="currentLunch">12:00 - 14:00</span>
+            </div>
+            <div class="schedule-item">
+                <span>下班时间:</span>
+                <span id="currentWorkEnd">18:30</span>
+            </div>
+        </div>
+        
+        <div class="settings-footer">
+            <button class="settings-btn hide-btn" id="hideCountdown" title="不再显示下班倒计时，可在导航栏设置中开启">不再显示</button>
+            <button class="settings-btn cancel-btn" id="cancelSettings">取消</button>
+            <button class="settings-btn save-btn" id="saveSettings">保存设置</button>
+        </div>
+    </div>
+
     <script>
 
         
@@ -423,7 +760,234 @@
             if (savedTheme) {
                 document.documentElement.setAttribute('data-theme', savedTheme);
             }
+            
+            // 初始化倒计时功能
+            initCountdown();
         });
+
+        // 倒计时功能
+        function initCountdown() {
+            // 获取DOM元素
+            const countdownCard = document.getElementById('countdownCard');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const closeSettings = document.getElementById('closeSettings');
+            const cancelSettings = document.getElementById('cancelSettings');
+            const saveSettings = document.getElementById('saveSettings');
+            const toggleCountdown = document.getElementById('toggleCountdown');
+            
+            // 初始化倒计时显示状态
+            let isCountdownVisible = localStorage.getItem('countdownVisible') === 'true';
+            
+            // 设置初始状态
+            if (isCountdownVisible) {
+                countdownCard.classList.add('visible');
+                toggleCountdown.textContent = '隐藏下班倒计时';
+            } else {
+                countdownCard.classList.remove('visible');
+                toggleCountdown.textContent = '显示下班倒计时';
+            }
+            
+            // 切换倒计时显示/隐藏
+            toggleCountdown.addEventListener('click', function() {
+                isCountdownVisible = !isCountdownVisible;
+                localStorage.setItem('countdownVisible', isCountdownVisible);
+                
+                if (isCountdownVisible) {
+                    countdownCard.classList.add('visible');
+                    toggleCountdown.textContent = '隐藏下班倒计时';
+                    layer.msg('已显示下班倒计时', {
+                        offset: 'b',
+                        anim: 1
+                    });
+                } else {
+                    countdownCard.classList.remove('visible');
+                    toggleCountdown.textContent = '显示下班倒计时';
+                    layer.msg('已隐藏下班倒计时', {
+                        offset: 'b',
+                        anim: 1
+                    });
+                }
+            });
+            
+            // 时间输入框
+            const workStartTime = document.getElementById('workStartTime');
+            const lunchStartTime = document.getElementById('lunchStartTime');
+            const lunchEndTime = document.getElementById('lunchEndTime');
+            const workEndTime = document.getElementById('workEndTime');
+            
+            // 当前时间表显示
+            const currentWorkStart = document.getElementById('currentWorkStart');
+            const currentLunch = document.getElementById('currentLunch');
+            const currentWorkEnd = document.getElementById('currentWorkEnd');
+            
+            // 倒计时显示元素
+            const countdownTitle = document.getElementById('countdownTitle');
+            const countdownTime = document.getElementById('countdownTime');
+            const countdownDesc = document.getElementById('countdownDesc');
+            const countdownIcon = document.getElementById('countdownIcon');
+            
+            // 默认时间设置
+            let timeSettings = {
+                workStart: '09:30',
+                lunchStart: '12:00',
+                lunchEnd: '14:00',
+                workEnd: '18:30'
+            };
+            
+            // 从本地存储加载时间设置
+            const savedSettings = localStorage.getItem('workTimeSettings');
+            if (savedSettings) {
+                timeSettings = JSON.parse(savedSettings);
+            }
+            
+            // 更新设置面板中的时间
+            function updateSettingsDisplay() {
+                workStartTime.value = timeSettings.workStart;
+                lunchStartTime.value = timeSettings.lunchStart;
+                lunchEndTime.value = timeSettings.lunchEnd;
+                workEndTime.value = timeSettings.workEnd;
+                
+                currentWorkStart.textContent = timeSettings.workStart;
+                currentLunch.textContent = `${timeSettings.lunchStart} - ${timeSettings.lunchEnd}`;
+                currentWorkEnd.textContent = timeSettings.workEnd;
+            }
+            
+            // 初始化设置面板
+            updateSettingsDisplay();
+            
+            // 打开设置面板
+            countdownCard.addEventListener('click', function() {
+                settingsPanel.style.display = 'block';
+            });
+            
+            // 关闭设置面板
+            closeSettings.addEventListener('click', function() {
+                settingsPanel.style.display = 'none';
+            });
+            
+            cancelSettings.addEventListener('click', function() {
+                settingsPanel.style.display = 'none';
+                updateSettingsDisplay(); // 恢复原始设置
+            });
+            
+            // 保存设置
+            saveSettings.addEventListener('click', function() {
+                timeSettings = {
+                    workStart: workStartTime.value,
+                    lunchStart: lunchStartTime.value,
+                    lunchEnd: lunchEndTime.value,
+                    workEnd: workEndTime.value
+                };
+                
+                localStorage.setItem('workTimeSettings', JSON.stringify(timeSettings));
+                updateSettingsDisplay();
+                settingsPanel.style.display = 'none';
+                
+                // 显示保存成功消息
+                layer.msg('工作时间设置已保存', {
+                    offset: 'b',
+                    anim: 1
+                });
+            });
+            
+            // 计算倒计时
+            function updateCountdown() {
+                const now = new Date();
+                // const now = new Date(2024, 5, 10, 19, 30, 0); // 测试用例: 设置为2024年6月10日 19:30:00
+                
+                // 解析时间设置
+                const parseTime = (timeStr) => {
+                    const [hours, minutes] = timeStr.split(':').map(Number);
+                    const date = new Date(now);
+                    date.setHours(hours, minutes, 0, 0);
+                    return date;
+                };
+                
+                const workStartDate = parseTime(timeSettings.workStart);
+                const lunchStartDate = parseTime(timeSettings.lunchStart);
+                const lunchEndDate = parseTime(timeSettings.lunchEnd);
+                const workEndDate = parseTime(timeSettings.workEnd);
+                
+                // 计算当前时间段（转换为分钟便于比较）
+                const nowTime = now.getHours() * 60 + now.getMinutes();
+                const workStartTime = parseInt(timeSettings.workStart.split(':')[0]) * 60 + parseInt(timeSettings.workStart.split(':')[1]);
+                const lunchStartTime = parseInt(timeSettings.lunchStart.split(':')[0]) * 60 + parseInt(timeSettings.lunchStart.split(':')[1]);
+                const lunchEndTime = parseInt(timeSettings.lunchEnd.split(':')[0]) * 60 + parseInt(timeSettings.lunchEnd.split(':')[1]);
+                const workEndTime = parseInt(timeSettings.workEnd.split(':')[0]) * 60 + parseInt(timeSettings.workEnd.split(':')[1]);
+                
+                // 格式化时间差的通用函数
+                const formatTimeDiff = (timeDiff) => {
+                    // 计算小时、分钟和秒
+                    const hours = Math.floor(Math.abs(timeDiff) / (1000 * 60 * 60));
+                    const minutes = Math.floor((Math.abs(timeDiff) % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((Math.abs(timeDiff) % (1000 * 60)) / 1000);
+                    
+                    // 返回格式化的时间字符串
+                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                };
+                
+                let timeDiff;
+                
+                // 上班前
+                if (nowTime < workStartTime) {
+                    countdownDesc.innerHTML = '可恶！快<span style="color:#fff;font-size:16px;">上班</span>了💼<br>只有';
+                    countdownIcon.src = './assets/icons/coffee.png';
+                    timeDiff = workStartDate - now;
+                } 
+                // 上午工作时间
+                else if (nowTime >= workStartTime && nowTime < lunchStartTime) {
+                    countdownDesc.innerHTML = '距离<span style="color:#fff;font-size:16px;">干饭</span>时间<br>竟然还有';
+                    countdownIcon.src = './assets/icons/work.png';
+                    timeDiff = lunchStartDate - now;
+                }
+                // 午休时间
+                else if (nowTime >= lunchStartTime && nowTime < lunchEndTime) {
+                    countdownDesc.innerHTML = '<span style="color:#fff;font-size:16px;">午休</span>时间告急～<br>仅剩';
+                    countdownIcon.src = './assets/icons/lunch.png';
+                    timeDiff = lunchEndDate - now;
+                }
+                // 下午工作时间
+                else if (nowTime >= lunchEndTime && nowTime < workEndTime) {
+                    countdownDesc.innerHTML = '坚持就是胜利✌️<br>距离<span style="color:#fff;font-size:16px;">下班</span>还有';
+                    countdownIcon.src = './assets/icons/run.png';
+                    timeDiff = workEndDate - now;
+                }
+                // 下班后
+                else {
+                    countdownDesc.innerHTML = '晚上好，加班🐶<br>你已经<span style="color:#fff;font-size:16px;">加班</span>';
+                    countdownIcon.src = './assets/icons/moon.png';
+                    timeDiff = now - workEndDate; // 注意这里是计算已经加班的时间
+                }
+                
+                // 更新倒计时显示
+                countdownTime.textContent = formatTimeDiff(timeDiff);
+            }
+            
+            // 立即更新一次倒计时
+            updateCountdown();
+            
+            // 每秒更新一次倒计时
+            setInterval(updateCountdown, 1000);
+
+            // 获取不再显示按钮
+            const hideCountdown = document.getElementById('hideCountdown');
+
+            // 添加不再显示按钮的点击事件
+            hideCountdown.addEventListener('click', function() {
+                isCountdownVisible = false;
+                localStorage.setItem('countdownVisible', 'false');
+                countdownCard.classList.remove('visible');
+                toggleCountdown.textContent = '显示下班倒计时';
+                settingsPanel.style.display = 'none';
+                
+                // 显示提示消息
+                layer.msg('已隐藏下班倒计时，可在导航栏设置中重新开启', {
+                    offset: 'b',
+                    anim: 1,
+                    time: 3000
+                });
+            });
+        }
 
     </script>
 </body>
