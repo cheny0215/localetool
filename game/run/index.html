@@ -681,19 +681,18 @@
 
             // 处理键盘输入
             if (keys['w'] || keys['arrowup']) {
-                movementState.speed += movementState.acceleration;
+                movementState.speed = movementState.maxSpeed; // 直接设置为最大速度
+            } else if (keys['s'] || keys['arrowdown']) {
+                movementState.speed = -movementState.maxSpeed / 2; // 直接设置为最大速度的一半（后退）
+            } else {
+                movementState.speed = 0; // 没有按键时立即停止
             }
-            if (keys['s'] || keys['arrowdown']) {
-                movementState.speed -= movementState.acceleration;
-            }
-            
-            // 修改左右移动逻辑，使其独立于前进速度
+
+            // 修改左右移动逻辑
             let sideMovement = 0;
             if (keys['d'] || keys['arrowleft']) {
-                // 直接使用固定值或最大速度的一部分，不依赖当前速度
-                sideMovement = -movementState.maxSpeed * 0.3;
-            }
-            if (keys['a'] || keys['arrowright']) {
+                sideMovement = -movementState.maxSpeed * 0.3; // 直接设置侧向移动速度
+            } else if (keys['a'] || keys['arrowright']) {
                 sideMovement = movementState.maxSpeed * 0.3;
             }
             
@@ -712,15 +711,6 @@
             // 限制速度
             movementState.speed = Math.min(movementState.speed, movementState.maxSpeed);
             movementState.speed = Math.max(movementState.speed, -movementState.maxSpeed / 2);
-
-            // 自然减速
-            if (movementState.speed > 0) {
-                movementState.speed -= movementState.deceleration;
-                if (movementState.speed < 0) movementState.speed = 0;
-            } else if (movementState.speed < 0) {
-                movementState.speed += movementState.deceleration;
-                if (movementState.speed > 0) movementState.speed = 0;
-            }
 
             // 计算前进方向
             const forwardDirection = new THREE.Vector3(0, 0, -1);
