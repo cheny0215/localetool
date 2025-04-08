@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js GLTF模型展示</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.175.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        // 导入所需的模块
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+        import { FXAAShader } from 'three/addons/shaders/FXAAShader.js';
+
+        // 初始化场景、相机和渲染器
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true // 启用透明背景
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        // 启用物理正确的光照模型
+        renderer.physicallyCorrectLights = true;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        // 启用阴影
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        document.body.appendChild(renderer.domElement);
+
+        // 创建后期处理效果
+        const composer = new EffectComposer(renderer);
+        const renderPass = new RenderPass(scene, camera);
+        composer.addPass(renderPass);
+
+        // 添加抗锯齿效果
+        const fxaaPass = new ShaderPass(FXAAShader);
+        fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * renderer.getPixelRatio());
+        fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * renderer.getPixelRatio());
+        composer.addPass(fxaaPass);
+
+        // 添加辉光效果 - 降低默认强度
+        const bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            0.0,  // 强度设为0，由用户手动开启
+            0.4,  // 半径
+            0.85  // 阈值
+        );
+        composer.addPass(bloomPass);
+
+        // 创建加载管理器和加载进度显示
+        const loadingManager = new THREE.LoadingManager();
+        const progressBar = document.createElement('div');
+        progressBar.style.position = 'absolute';
+        progressBar.style.top = '50%';
+        progressBar.style.left = '50%';
+        progressBar.style.transform = 'translate(-50%, -50%)';
+        progressBar.style.width = '200px';
+        progressBar.style.height = '20px';
+        progressBar.style.backgroundColor = '#333';
+        progressBar.style.borderRadius = '10px';
+        progressBar.style.overflow = 'hidden';
+        document.body.appendChild(progressBar);
+
+        const progressBarFill = document.createElement('div');
+        progressBarFill.style.width = '0%';
+        progressBarFill.style.height = '100%';
+        progressBarFill.style.backgroundColor = '#4CAF50';
+        progressBar.appendChild(progressBarFill);
+
+        loadingManager.onProgress = function(url, loaded, total) {
+            progressBarFill.style.width = (loaded / total * 100) + '%';
+        };
+
+        loadingManager.onLoad = function() {
+            progressBar.style.display = 'none';
+        };
+
+        // 加载环境贴图
+        new RGBELoader(loadingManager)
+            .setPath('https://threejs.org/examples/textures/equirectangular/')
+            .load('spruit_sunrise_1k.hdr', function(texture) {
+                texture.mapping = THREE.EquirectangularReflectionMapping;
+                
+                // 降低HDR贴图的强度
+                renderer.toneMappingExposure = 0.6; // 降低曝光度
+                
+                scene.background = texture;
+                scene.environment = texture;
+                
+                // 继续加载模型
+                loadModel();
+            });
+
+        // 添加基础光源
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+        scene.add(ambientLight);
+
+        // 添加主要方向光（模拟太阳光）
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(5, 5, 5);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.5;
+        mainLight.shadow.camera.far = 50;
+        mainLight.shadow.bias = -0.0001;
+        scene.add(mainLight);
+
+        // 添加补光
+        const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        fillLight.position.set(-5, 0, 5);
+        scene.add(fillLight);
+
+        // 添加背光
+        const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        backLight.position.set(0, 5, -5);
+        scene.add(backLight);
+
+        // 添加点光源，增强反射效果
+        const pointLight1 = new THREE.PointLight(0xffffff, 1, 20);
+        pointLight1.position.set(2, 2, 2);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0xffffff, 1, 20);
+        pointLight2.position.set(-2, 2, -2);
+        scene.add(pointLight2);
+
+        // 设置相机位置
+        camera.position.z = 5;
+
+        // 添加轨道控制器
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        
+        // 改善视角控制 - 移除限制
+        controls.enablePan = true;
+        controls.minDistance = 0.5; // 减小最小距离，允许更近的观察
+        controls.maxDistance = 100; // 增加最大距离，允许更远的观察
+        controls.maxPolarAngle = Math.PI; // 允许完全旋转到底部
+        controls.minPolarAngle = 0; // 允许完全旋转到顶部
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.2; // 增加缩放速度
+        controls.rotateSpeed = 1.2; // 增加旋转速度
+        controls.minAzimuthAngle = -Infinity; // 允许水平方向完全旋转
+        controls.maxAzimuthAngle = Infinity; // 允许水平方向完全旋转
+
+        // 加载模型函数
+        function loadModel() {
+            // 创建GLTF加载器
+            const loader = new GLTFLoader(loadingManager);
+
+            // 加载GLTF模型
+            loader.load(
+                './sacred/scene.gltf',
+                // './sad_snail/scene.gltf',
+                // './magical_find/scene.gltf',
+                function (gltf) {
+                    // 模型加载成功后的处理
+                    const model = gltf.scene;
+                    
+                    // 自动调整模型大小和位置
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+                    
+                    // 将模型居中
+                    model.position.x -= center.x;
+                    model.position.y -= center.y;
+                    model.position.z -= center.z;
+                    
+                    // 调整模型大小
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const scale = 8 / maxDim;
+                    model.scale.set(scale, scale, scale);
+                    
+                    // 增强模型材质效果
+                    model.traverse(function(node) {
+                        if (node.isMesh) {
+                            node.castShadow = true;
+                            node.receiveShadow = true;
+                            
+                            // 增强材质的环境贴图反应
+                            if (node.material) {
+                                // 提高反射度
+                                node.material.envMapIntensity = 1.5;
+                                
+                                // 如果是金属材质，增强金属感
+                                if (node.material.metalness !== undefined) {
+                                    node.material.metalness = Math.min(node.material.metalness + 0.2, 1.0);
+                                    node.material.roughness = Math.max(node.material.roughness - 0.2, 0.1);
+                                }
+                                
+                                // 启用清晰的反射
+                                node.material.envMap = scene.environment;
+                                
+                                // 确保材质更新
+                                node.material.needsUpdate = true;
+                            }
+                        }
+                    });
+                    
+                    // 修改：调整相机位置，使视角更近
+                    const distance = Math.max(size.x, size.y, size.z) * 0.2; // 大幅减小距离系数
+                    camera.position.set(distance, distance/2, distance); // 调整初始高度
+                    camera.lookAt(0, 0, 0);
+                    
+                    controls.update();
+                    
+                    // 添加模型到场景
+                    scene.add(model);
+                    
+                    // 设置控制器的目标点，确保旋转中心正确
+                    controls.target.set(0, 0, 0);
+                    controls.update();
+                    
+                    console.log('模型加载成功');
+
+                    // 添加视角控制面板
+                    const controlPanel = document.createElement('div');
+                    controlPanel.style.position = 'absolute';
+                    controlPanel.style.bottom = '20px';
+                    controlPanel.style.left = '20px';
+                    controlPanel.style.zIndex = '100';
+                    controlPanel.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                    controlPanel.style.padding = '10px';
+                    controlPanel.style.borderRadius = '5px';
+                    controlPanel.style.color = 'white';
+                    document.body.appendChild(controlPanel);
+
+                    // 添加重置视角按钮 - 更新重置位置
+                    const resetButton = document.createElement('button');
+                    resetButton.textContent = '重置视角';
+                    resetButton.style.marginRight = '10px';
+                    resetButton.onclick = function() {
+                        camera.position.set(distance, distance/9, distance); // 使用新的初始位置
+                        camera.lookAt(0, 0, 0);
+                        controls.target.set(0, 0, 0);
+                        controls.update();
+                    };
+                    controlPanel.appendChild(resetButton);
+
+                    // 添加视角高度调整滑块 - 扩大范围
+                    const heightLabel = document.createElement('label');
+                    heightLabel.textContent = '视角高度: ';
+                    heightLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(heightLabel);
+
+                    const heightSlider = document.createElement('input');
+                    heightSlider.type = 'range';
+                    heightSlider.min = '-10'; // 允许更低的视角
+                    heightSlider.max = '10'; // 允许更高的视角
+                    heightSlider.step = '0.1';
+                    heightSlider.value = (distance/4).toString(); // 设置为初始高度
+                    heightSlider.style.width = '100px';
+                    heightSlider.oninput = function() {
+                        const height = parseFloat(this.value);
+                        camera.position.y = height;
+                        controls.update();
+                    };
+                    controlPanel.appendChild(heightSlider);
+                    controlPanel.appendChild(document.createElement('br'));
+
+                    // 添加视角距离调整滑块 - 扩大范围
+                    const distanceLabel = document.createElement('label');
+                    distanceLabel.textContent = '视角距离: ';
+                    distanceLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(distanceLabel);
+
+                    const distanceSlider = document.createElement('input');
+                    distanceSlider.type = 'range';
+                    distanceSlider.min = '0.5'; // 允许更近的距离
+                    distanceSlider.max = '30'; // 允许更远的距离
+                    distanceSlider.step = '0.5';
+                    distanceSlider.value = distance.toString();
+                    distanceSlider.style.width = '100px';
+                    distanceSlider.oninput = function() {
+                        const newDistance = parseFloat(this.value);
+                        const direction = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+                        camera.position.copy(controls.target).addScaledVector(direction, newDistance);
+                        controls.update();
+                    };
+                    controlPanel.appendChild(distanceSlider);
+                    controlPanel.appendChild(document.createElement('br'));
+
+                    // 添加模型旋转控制
+                    const rotateLabel = document.createElement('label');
+                    rotateLabel.textContent = '模型旋转: ';
+                    rotateLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(rotateLabel);
+
+                    const rotateSlider = document.createElement('input');
+                    rotateSlider.type = 'range';
+                    rotateSlider.min = '0';
+                    rotateSlider.max = '360';
+                    rotateSlider.step = '1';
+                    rotateSlider.value = '0';
+                    rotateSlider.style.width = '100px';
+                    rotateSlider.oninput = function() {
+                        const angle = parseFloat(this.value) * Math.PI / 180;
+                        model.rotation.y = angle;
+                    };
+                    controlPanel.appendChild(rotateSlider);
+
+                    // 添加灯光控制
+                    const lightLabel = document.createElement('label');
+                    lightLabel.textContent = '主光强度: ';
+                    lightLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(lightLabel);
+
+                    const lightSlider = document.createElement('input');
+                    lightSlider.type = 'range';
+                    lightSlider.min = '0';
+                    lightSlider.max = '3';
+                    lightSlider.step = '0.1';
+                    lightSlider.value = '1';
+                    lightSlider.style.width = '100px';
+                    lightSlider.oninput = function() {
+                        const intensity = parseFloat(this.value);
+                        mainLight.intensity = intensity;
+                    };
+                    controlPanel.appendChild(lightSlider);
+                    controlPanel.appendChild(document.createElement('br'));
+
+                    // 添加环境反射强度控制
+                    const envLabel = document.createElement('label');
+                    envLabel.textContent = '环境反射: ';
+                    envLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(envLabel);
+
+                    const envSlider = document.createElement('input');
+                    envSlider.type = 'range';
+                    envSlider.min = '0';
+                    envSlider.max = '3';
+                    envSlider.step = '0.1';
+                    envSlider.value = '1.5';
+                    envSlider.style.width = '100px';
+                    envSlider.oninput = function() {
+                        const intensity = parseFloat(this.value);
+                        model.traverse(function(node) {
+                            if (node.isMesh && node.material) {
+                                node.material.envMapIntensity = intensity;
+                                node.material.needsUpdate = true;
+                            }
+                        });
+                    };
+                    controlPanel.appendChild(envSlider);
+
+                    // 添加背景控制
+                    const bgLabel = document.createElement('label');
+                    bgLabel.textContent = '背景透明度: ';
+                    bgLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(bgLabel);
+
+                    const bgSlider = document.createElement('input');
+                    bgSlider.type = 'range';
+                    bgSlider.min = '0';
+                    bgSlider.max = '1';
+                    bgSlider.step = '0.05';
+                    bgSlider.value = '1';
+                    bgSlider.style.width = '100px';
+                    bgSlider.oninput = function() {
+                        const opacity = parseFloat(this.value);
+                        if (opacity < 0.05) {
+                            // 如果透明度接近0，完全移除背景
+                            scene.background = null;
+                            renderer.setClearColor(0x000000, 0);
+                        } else {
+                            // 否则使用环境贴图作为背景
+                            scene.background = scene.environment;
+                            // 调整背景的不透明度
+                            renderer.setClearAlpha(opacity);
+                        }
+                    };
+                    controlPanel.appendChild(bgSlider);
+                    controlPanel.appendChild(document.createElement('br'));
+                    
+                    // 添加模型旋转动画控制
+                    const animLabel = document.createElement('label');
+                    animLabel.textContent = '自动旋转: ';
+                    animLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(animLabel);
+                    
+                    const animCheckbox = document.createElement('input');
+                    animCheckbox.type = 'checkbox';
+                    animCheckbox.checked = false;
+                    
+                    // 创建自动旋转变量
+                    window.autoRotate = false;
+                    
+                    animCheckbox.onchange = function() {
+                        window.autoRotate = this.checked;
+                        controls.autoRotate = this.checked;
+                        controls.autoRotateSpeed = 2.0;
+                    };
+                    controlPanel.appendChild(animCheckbox);
+                    controlPanel.appendChild(document.createElement('br'));
+                    
+                    // 添加曝光度控制 - 调整默认值和范围
+                    const exposureLabel = document.createElement('label');
+                    exposureLabel.textContent = '曝光度: ';
+                    exposureLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(exposureLabel);
+                    
+                    const exposureSlider = document.createElement('input');
+                    exposureSlider.type = 'range';
+                    exposureSlider.min = '0.1';
+                    exposureSlider.max = '1.5'; // 降低最大值
+                    exposureSlider.step = '0.05';
+                    exposureSlider.value = '0.6'; // 设置默认值为较低的曝光度
+                    exposureSlider.style.width = '100px';
+                    exposureSlider.oninput = function() {
+                        const exposure = parseFloat(this.value);
+                        renderer.toneMappingExposure = exposure;
+                    };
+                    controlPanel.appendChild(exposureSlider);
+
+                    // 添加后期处理控制 - 已经调整为0
+                    const bloomLabel = document.createElement('label');
+                    bloomLabel.textContent = '辉光强度: ';
+                    bloomLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(bloomLabel);
+
+                    const bloomSlider = document.createElement('input');
+                    bloomSlider.type = 'range';
+                    bloomSlider.min = '0';
+                    bloomSlider.max = '1'; // 降低最大值
+                    bloomSlider.step = '0.05';
+                    bloomSlider.value = '0'; // 默认关闭辉光
+                    bloomSlider.style.width = '100px';
+                    bloomSlider.oninput = function() {
+                        const intensity = parseFloat(this.value);
+                        bloomPass.strength = intensity;
+                    };
+                    controlPanel.appendChild(bloomSlider);
+                    controlPanel.appendChild(document.createElement('br'));
+
+                    // 添加材质控制
+                    const metallicLabel = document.createElement('label');
+                    metallicLabel.textContent = '金属感: ';
+                    metallicLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(metallicLabel);
+
+                    const metallicSlider = document.createElement('input');
+                    metallicSlider.type = 'range';
+                    metallicSlider.min = '0';
+                    metallicSlider.max = '1';
+                    metallicSlider.step = '0.05';
+                    metallicSlider.value = '0.8';
+                    metallicSlider.style.width = '100px';
+                    metallicSlider.oninput = function() {
+                        const metalness = parseFloat(this.value);
+                        model.traverse(function(node) {
+                            if (node.isMesh && node.material && node.material.metalness !== undefined) {
+                                node.material.metalness = metalness;
+                                node.material.needsUpdate = true;
+                            }
+                        });
+                    };
+                    controlPanel.appendChild(metallicSlider);
+                    controlPanel.appendChild(document.createElement('br'));
+
+                    const roughnessLabel = document.createElement('label');
+                    roughnessLabel.textContent = '粗糙度: ';
+                    roughnessLabel.style.marginRight = '5px';
+                    controlPanel.appendChild(roughnessLabel);
+
+                    const roughnessSlider = document.createElement('input');
+                    roughnessSlider.type = 'range';
+                    roughnessSlider.min = '0';
+                    roughnessSlider.max = '1';
+                    roughnessSlider.step = '0.05';
+                    roughnessSlider.value = '0.2';
+                    roughnessSlider.style.width = '100px';
+                    roughnessSlider.oninput = function() {
+                        const roughness = parseFloat(this.value);
+                        model.traverse(function(node) {
+                            if (node.isMesh && node.material && node.material.roughness !== undefined) {
+                                node.material.roughness = roughness;
+                                node.material.needsUpdate = true;
+                            }
+                        });
+                    };
+                    controlPanel.appendChild(roughnessSlider);
+                },
+                function (xhr) {
+                    // 加载进度已由loadingManager处理
+                },
+                function (error) {
+                    // 加载错误
+                    console.error('模型加载出错:', error);
+                    progressBar.style.display = 'none';
+                }
+            );
+        }
+
+        // 添加窗口大小调整事件
+        window.addEventListener('resize', function() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+            
+            // 更新FXAA分辨率
+            fxaaPass.material.uniforms['resolution'].value.x = 1 / (window.innerWidth * renderer.getPixelRatio());
+            fxaaPass.material.uniforms['resolution'].value.y = 1 / (window.innerHeight * renderer.getPixelRatio());
+        });
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            
+            // 使用后期处理渲染
+            composer.render();
+        }
+        animate();
+    </script>
+</body>
+</html>

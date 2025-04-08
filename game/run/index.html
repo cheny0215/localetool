@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D飞行模拟器</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>飞行模拟器</h3>
+        <p>速度: <span id="speed">0</span> km/h</p>
+        <p>高度: <span id="altitude">0</span> m</p>
+    </div>
+    <div id="controls">
+        <p>控制方式:</p>
+        <p>W/↑ - 向前移动</p>
+        <p>S/↓ - 向后移动</p>
+        <p>A/← - 向左移动</p>
+        <p>D/→ - 向右移动</p>
+        <p>空格 - 跳跃</p>
+        <p>鼠标 - 移动控制视角</p>
+        <p>鼠标左键 - 发射小球</p>
+        <p>ESC - 退出鼠标控制</p>
+        <p>点击画面 - 进入鼠标控制</p>
+        <p>右上角"设置"按钮可调整游戏参数</p>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
+    <script>
+        // 场景设置
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 20000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        // 光照设置
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(100, 300, 100);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        directionalLight.shadow.camera.near = 0.5;
+        directionalLight.shadow.camera.far = 1000;
+        directionalLight.shadow.camera.left = -500;
+        directionalLight.shadow.camera.right = 500;
+        directionalLight.shadow.camera.top = 500;
+        directionalLight.shadow.camera.bottom = -500;
+        scene.add(directionalLight);
+
+        // 天空盒
+        const skyboxLoader = new THREE.CubeTextureLoader();
+        const skyboxTexture = skyboxLoader.load([
+            'https://threejs.org/examples/textures/cube/Bridge2/negx.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/posx.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/negy.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/posy.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/negz.jpg',
+            'https://threejs.org/examples/textures/cube/Bridge2/posz.jpg'
+        ]);
+        scene.background = skyboxTexture;
+        scene.environment = skyboxTexture;
+
+        // 创建一个函数来设置材质的反射属性
+        function makeReflective(material) {
+            material.envMap = skyboxTexture;
+            material.envMapIntensity = 1; // 反射强度，可以调整
+            material.metalness = 0.6; // 金属度，影响反射效果
+            material.roughness = 0.7; // 粗糙度，值越小反射越清晰
+            material.needsUpdate = true;
+        }
+
+        // 地面
+        const groundSize = 10000;
+        const groundTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/terrain/grasslight-big.jpg');
+        groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set(groundSize / 100, groundSize / 100);
+        groundTexture.anisotropy = 16;
+        
+        const groundMaterial = new THREE.MeshStandardMaterial({ map: groundTexture });
+        makeReflective(groundMaterial);
+        const groundGeometry = new THREE.PlaneGeometry(groundSize, groundSize);
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = 0;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // 创建山脉
+        function createMountain(x, z, height, radius) {
+            const mountainGeometry = new THREE.ConeGeometry(radius, height, 32);
+            const mountainTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/terrain/grasslight-big.jpg');
+            mountainTexture.wrapS = mountainTexture.wrapT = THREE.RepeatWrapping;
+            mountainTexture.repeat.set(5, 5);
+            const mountainMaterial = new THREE.MeshStandardMaterial({ map: mountainTexture });
+            makeReflective(mountainMaterial);
+            const mountain = new THREE.Mesh(mountainGeometry, mountainMaterial);
+            mountain.position.set(x, height / 2, z);
+            mountain.castShadow = true;
+            mountain.receiveShadow = true;
+            scene.add(mountain);
+        }
+
+        // 创建多座山
+        for (let i = 0; i < 20; i++) {
+            const x = (Math.random() - 0.5) * groundSize * 0.8;
+            const z = (Math.random() - 0.5) * groundSize * 0.8;
+            const height = Math.random() * 500 + 200;
+            const radius = Math.random() * 300 + 100;
+            createMountain(x, z, height, radius);
+        }
+
+        // 创建云朵
+        function createCloud(x, y, z) {
+            const cloudGroup = new THREE.Group();
+            const cloudGeometry = new THREE.SphereGeometry(50, 16, 16);
+            const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+            makeReflective(cloudMaterial);
+            
+            // 创建多个球体组成一朵云
+            const mainSphere = new THREE.Mesh(cloudGeometry, cloudMaterial);
+            cloudGroup.add(mainSphere);
+            
+            for (let i = 0; i < 5; i++) {
+                const sphere = new THREE.Mesh(
+                    new THREE.SphereGeometry(30 + Math.random() * 20, 16, 16),
+                    cloudMaterial
+                );
+                sphere.position.set(
+                    (Math.random() - 0.5) * 70,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 70
+                );
+                cloudGroup.add(sphere);
+            }
+            
+            cloudGroup.position.set(x, y, z);
+            scene.add(cloudGroup);
+            return cloudGroup;
+        }
+
+        // 创建多朵云
+        const clouds = [];
+        for (let i = 0; i < 30; i++) {
+            const x = (Math.random() - 0.5) * groundSize * 0.8;
+            const y = Math.random() * 1000 + 500;
+            const z = (Math.random() - 0.5) * groundSize * 0.8;
+            clouds.push(createCloud(x, y, z));
+        }
+
+        // 创建建筑物
+        function createBuilding(x, z, width, height, depth) {
+            const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
+            const buildingTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/brick_diffuse.jpg');
+            buildingTexture.wrapS = buildingTexture.wrapT = THREE.RepeatWrapping;
+            buildingTexture.repeat.set(width / 50, height / 50);
+            const buildingMaterial = new THREE.MeshStandardMaterial({ map: buildingTexture });
+            makeReflective(buildingMaterial);
+            const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+            building.position.set(x, height / 2, z);
+            building.castShadow = true;
+            building.receiveShadow = true;
+            scene.add(building);
+        }
+
+        // 创建城市
+        for (let i = 0; i < 50; i++) {
+            const x = (Math.random() - 0.5) * 2000;
+            const z = (Math.random() - 0.5) * 2000;
+            const width = Math.random() * 100 + 50;
+            const height = Math.random() * 300 + 100;
+            const depth = Math.random() * 100 + 50;
+            createBuilding(x, z, width, height, depth);
+        }
+
+        // 创建浮空木板
+        const platforms = [];
+        function createPlatform(x, y, z, width, depth) {
+            const platformGeometry = new THREE.BoxGeometry(width, 5, depth);
+            const woodTexture = new THREE.TextureLoader().load('https://threejs.org/examples/textures/hardwood2_diffuse.jpg');
+            woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
+            woodTexture.repeat.set(2, 2);
+            
+            const platformMaterial = new THREE.MeshStandardMaterial({ map: woodTexture });
+            makeReflective(platformMaterial);
+            platformMaterial.envMapIntensity = 0.1;
+            platformMaterial.metalness = 0.3; // 降低木板金属度
+            platformMaterial.roughness = 0.8; // 增加木板粗糙度
+            
+            const platform = new THREE.Mesh(platformGeometry, platformMaterial);
+            platform.position.set(x, y, z);
+            platform.castShadow = true;
+            platform.receiveShadow = true;
+            scene.add(platform);
+            
+            // 保存平台信息，用于碰撞检测
+            platforms.push({
+                mesh: platform,
+                width: width,
+                depth: depth,
+                y: y
+            });
+            
+            return platform;
+        }
+
+        // 创建跳跃路径 - 螺旋向上的路径
+        const maxHeight = 6000; // 最大高度
+        const platformCount = 400; // 平台数量
+        const startRadius = 1000; // 起始半径
+        let lastPlatformY = 100; // 第一个平台的高度
+
+        // 创建漂浮在空中的跳跃木板路径
+        for (let i = 0; i < platformCount; i++) {
+            // 螺旋路径参数
+            const angle = (i / platformCount) * Math.PI * 12; // 螺旋角度
+            const radius = startRadius - (i / platformCount) * 300; // 半径逐渐减小
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            
+            // 高度逐渐增加，但不是均匀的
+            const heightStep = 20 + Math.random() * 20; // 每个平台的高度差 (20-40之间)
+            lastPlatformY += heightStep;
+            
+            // 平台大小随高度变化
+            const platformWidth = 60 - (i / platformCount) * 20; // 高处平台更小
+            const platformDepth = 60 - (i / platformCount) * 20;
+            
+            createPlatform(x, lastPlatformY, z, platformWidth, platformDepth);
+        }
+
+        // 添加特殊的大型平台作为休息点和检查点
+        for (let i = 0; i < 8; i++) {
+            const checkpointHeight = maxHeight * (i + 1) / 9;
+            const angle = Math.random() * Math.PI * 2;
+            const radius = startRadius * 0.5;
+            const x = Math.cos(angle) * radius;
+            const z = Math.sin(angle) * radius;
+            
+            // 创建更大的检查点平台
+            createPlatform(x, checkpointHeight, z, 200, 200);
+        }
+
+        // 在最高处添加一个最终目标平台
+        createPlatform(0, maxHeight, 0, 120, 120);
+
+        // 创建小火柴人
+        const stickmanGroup = new THREE.Group();
+        scene.add(stickmanGroup);
+
+        // 头部
+        const headGeometry = new THREE.SphereGeometry(10, 16, 16);
+        const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffcc99 });
+        makeReflective(headMaterial);
+        const head = new THREE.Mesh(headGeometry, headMaterial);
+        head.position.y = 40;
+        head.castShadow = true;
+        stickmanGroup.add(head);
+
+        // 身体
+        const bodyGeometry = new THREE.CylinderGeometry(5, 5, 30, 8);
+        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x3366cc });
+        makeReflective(bodyMaterial);
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.position.y = 20;
+        body.castShadow = true;
+        stickmanGroup.add(body);
+
+        // 左臂
+        const leftArmGeometry = new THREE.CylinderGeometry(3, 3, 20, 8);
+        const armMaterial = new THREE.MeshStandardMaterial({ color: 0x3366cc });
+        makeReflective(armMaterial);
+        const leftArm = new THREE.Mesh(leftArmGeometry, armMaterial);
+        leftArm.position.set(-10, 25, 0);
+        leftArm.rotation.z = Math.PI / 3;
+        leftArm.castShadow = true;
+        stickmanGroup.add(leftArm);
+
+        // 右臂
+        const rightArmGeometry = new THREE.CylinderGeometry(3, 3, 20, 8);
+        const rightArm = new THREE.Mesh(rightArmGeometry, armMaterial);
+        rightArm.position.set(10, 25, 0);
+        rightArm.rotation.z = -Math.PI / 3;
+        rightArm.castShadow = true;
+        stickmanGroup.add(rightArm);
+
+        // 左腿
+        const leftLegGeometry = new THREE.CylinderGeometry(3, 3, 25, 8);
+        const legMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+        makeReflective(legMaterial);
+        const leftLeg = new THREE.Mesh(leftLegGeometry, legMaterial);
+        leftLeg.position.set(-5, 0, 0);
+        leftLeg.castShadow = true;
+        stickmanGroup.add(leftLeg);
+
+        // 右腿
+        const rightLegGeometry = new THREE.CylinderGeometry(3, 3, 25, 8);
+        const rightLeg = new THREE.Mesh(rightLegGeometry, legMaterial);
+        rightLeg.position.set(5, 0, 0);
+        rightLeg.castShadow = true;
+        stickmanGroup.add(rightLeg);
+
+        // 设置小人的初始位置
+        stickmanGroup.position.y = 12.5;
+
+        // 设置相机位置
+        camera.position.set(0, 70, 150);
+        camera.lookAt(stickmanGroup.position);
+        stickmanGroup.add(camera);
+
+        // 移动控制变量
+        const movementState = {
+            speed: 0,
+            maxSpeed: 200,
+            acceleration: 1,
+            deceleration: 0.5,
+            rotationSpeed: 0.02,
+            jumpForce: 100,
+            gravity: 0.5,
+            isJumping: false,
+            verticalVelocity: 0,
+            mouseControl: true,
+            mouseSensitivity: 0.002
+        };
+
+        // 键盘控制
+        const keys = {};
+        document.addEventListener('keydown', (event) => {
+            keys[event.key.toLowerCase()] = true;
+        });
+        document.addEventListener('keyup', (event) => {
+            keys[event.key.toLowerCase()] = false;
+        });
+
+        // 添加一个变量来跟踪指针锁定状态
+        let isPointerLocked = false;
+
+        // 修改指针锁定事件监听
+        document.addEventListener('pointerlockchange', () => {
+            isPointerLocked = document.pointerLockElement === renderer.domElement;
+            // 根据锁定状态显示/隐藏鼠标
+            if (isPointerLocked) {
+                document.body.style.cursor = 'none';
+            } else {
+                document.body.style.cursor = 'auto';
+            }
+        });
+
+        // 修改mousemove事件监听器
+        document.addEventListener('mousemove', (event) => {
+            if (isPointerLocked && movementState.mouseControl) {
+                const movementX = event.movementX || 0;
+                const movementY = event.movementY || 0;
+                
+                // 水平旋转（允许360度）
+                stickmanGroup.rotation.y -= movementX * movementState.mouseSensitivity;
+                
+                // 垂直旋转（限制在-85度到85度之间）
+                const currentRotationX = camera.rotation.x;
+                const newRotationX = currentRotationX - movementY * movementState.mouseSensitivity;
+                // 将限制从PI/3改为85度（约1.48弧度）
+                camera.rotation.x = Math.max(-1.48, Math.min(1.48, newRotationX));
+            }
+        });
+
+        // 修改点击事件监听器
+        renderer.domElement.addEventListener('click', () => {
+            if (!isPointerLocked) {
+                renderer.domElement.requestPointerLock();
+            }
+        });
+
+        // 更新UI信息
+        function updateInfo() {
+            document.getElementById('speed').textContent = Math.round(movementState.speed);
+            document.getElementById('altitude').textContent = Math.round(stickmanGroup.position.y);
+            
+            // 添加高度进度信息
+            const heightProgress = Math.min(100, Math.round((stickmanGroup.position.y / maxHeight) * 100));
+            document.getElementById('info').innerHTML = `
+                <h3>飞行模拟器</h3>
+                <p>速度: <span id="speed">${Math.round(movementState.speed)}</span> km/h</p>
+                <p>高度: <span id="altitude">${Math.round(stickmanGroup.position.y)}</span> m</p>
+                <p>进度: <span id="progress">${heightProgress}</span>%</p>
+            `;
+        }
+
+        // 更新控制说明
+        document.getElementById('controls').innerHTML = `
+            <p>控制方式:</p>
+            <p>W/↑ - 向前移动</p>
+            <p>S/↓ - 向后移动</p>
+            <p>A/← - 向左移动</p>
+            <p>D/→ - 向右移动</p>
+            <p>空格 - 跳跃</p>
+            <p>鼠标 - 移动控制视角</p>
+            <p>鼠标左键 - 发射小球</p>
+            <p>ESC - 退出鼠标控制</p>
+            <p>点击画面 - 进入鼠标控制</p>
+            <p>右上角"设置"按钮可调整游戏参数</p>
+        `;
+
+        // 添加设置面板
+        const settingsPanel = document.createElement('div');
+        settingsPanel.style.position = 'absolute';
+        settingsPanel.style.top = '10px';
+        settingsPanel.style.right = '10px';
+        settingsPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        settingsPanel.style.color = 'white';
+        settingsPanel.style.padding = '10px';
+        settingsPanel.style.borderRadius = '5px';
+        settingsPanel.style.width = '250px';
+        settingsPanel.style.maxHeight = '80vh';
+        settingsPanel.style.overflowY = 'auto';
+        settingsPanel.style.display = 'none'; // 默认隐藏
+        document.body.appendChild(settingsPanel);
+
+        // 添加设置面板标题和开关按钮
+        const settingsTitle = document.createElement('div');
+        settingsTitle.innerHTML = '<h3>游戏设置</h3>';
+        settingsTitle.style.textAlign = 'center';
+        settingsTitle.style.marginBottom = '10px';
+        settingsPanel.appendChild(settingsTitle);
+
+        // 创建设置开关按钮
+        const settingsToggle = document.createElement('button');
+        settingsToggle.textContent = '设置';
+        settingsToggle.style.position = 'absolute';
+        settingsToggle.style.top = '10px';
+        settingsToggle.style.right = '10px';
+        settingsToggle.style.padding = '5px 10px';
+        settingsToggle.style.backgroundColor = '#4CAF50';
+        settingsToggle.style.color = 'white';
+        settingsToggle.style.border = 'none';
+        settingsToggle.style.borderRadius = '5px';
+        settingsToggle.style.cursor = 'pointer';
+        settingsToggle.style.zIndex = '1000';
+        document.body.appendChild(settingsToggle);
+
+        // 设置开关按钮点击事件
+        settingsToggle.addEventListener('click', function() {
+            if (settingsPanel.style.display === 'none') {
+                settingsPanel.style.display = 'block';
+            } else {
+                settingsPanel.style.display = 'none';
+            }
+        });
+
+        // 为每个参数创建滑块
+        function createSlider(name, min, max, step, value, label, description) {
+            const container = document.createElement('div');
+            container.style.marginBottom = '15px';
+            
+            const labelEl = document.createElement('label');
+            labelEl.textContent = label || name;
+            labelEl.title = description || '';
+            labelEl.style.display = 'block';
+            labelEl.style.marginBottom = '5px';
+            container.appendChild(labelEl);
+            
+            const sliderContainer = document.createElement('div');
+            sliderContainer.style.display = 'flex';
+            sliderContainer.style.alignItems = 'center';
+            
+            const slider = document.createElement('input');
+            slider.type = 'range';
+            slider.min = min;
+            slider.max = max;
+            slider.step = step;
+            slider.value = value;
+            slider.style.flex = '1';
+            sliderContainer.appendChild(slider);
+            
+            const valueDisplay = document.createElement('span');
+            valueDisplay.textContent = value;
+            valueDisplay.style.marginLeft = '10px';
+            valueDisplay.style.width = '40px';
+            valueDisplay.style.textAlign = 'right';
+            sliderContainer.appendChild(valueDisplay);
+            
+            container.appendChild(sliderContainer);
+            
+            // 滑块改变事件
+            slider.addEventListener('input', function() {
+                const newValue = parseFloat(this.value);
+                valueDisplay.textContent = newValue;
+                movementState[name] = newValue;
+            });
+            
+            return container;
+        }
+
+        // 添加所有参数滑块
+        settingsPanel.appendChild(createSlider('maxSpeed', 50, 500, 10, movementState.maxSpeed, 
+            '最大速度', '角色可达到的最大移动速度'));
+        settingsPanel.appendChild(createSlider('acceleration', 0.1, 5, 0.1, movementState.acceleration, 
+            '加速度', '按键时的加速速率'));
+        settingsPanel.appendChild(createSlider('deceleration', 0.1, 3, 0.1, movementState.deceleration, 
+            '减速度', '松开按键时的自然减速速率'));
+        settingsPanel.appendChild(createSlider('rotationSpeed', 0.005, 0.05, 0.005, movementState.rotationSpeed, 
+            '转向速度', '键盘左右转向的速度'));
+        settingsPanel.appendChild(createSlider('jumpForce', 50, 300, 10, movementState.jumpForce, 
+            '跳跃力量', '跳跃的高度'));
+        settingsPanel.appendChild(createSlider('gravity', 0.1, 2, 0.1, movementState.gravity, 
+            '重力', '下落的速度'));
+        settingsPanel.appendChild(createSlider('mouseSensitivity', 0.0005, 0.01, 0.0005, movementState.mouseSensitivity, 
+            '鼠标灵敏度', '鼠标视角转动的灵敏度'));
+
+        // 添加重置按钮
+        const resetButton = document.createElement('button');
+        resetButton.textContent = '恢复默认设置';
+        resetButton.style.width = '100%';
+        resetButton.style.padding = '8px';
+        resetButton.style.backgroundColor = '#f44336';
+        resetButton.style.color = 'white';
+        resetButton.style.border = 'none';
+        resetButton.style.borderRadius = '5px';
+        resetButton.style.cursor = 'pointer';
+        resetButton.style.marginTop = '15px';
+
+        resetButton.addEventListener('click', function() {
+            // 恢复默认值
+            movementState.maxSpeed = 200;
+            movementState.acceleration = 1;
+            movementState.deceleration = 0.5;
+            movementState.rotationSpeed = 0.02;
+            movementState.jumpForce = 100;
+            movementState.gravity = 0.5;
+            movementState.mouseSensitivity = 0.002;
+            
+            // 更新所有滑块
+            const sliders = settingsPanel.querySelectorAll('input[type="range"]');
+            const valueDisplays = settingsPanel.querySelectorAll('span');
+            
+            sliders[0].value = movementState.maxSpeed;
+            valueDisplays[0].textContent = movementState.maxSpeed;
+            
+            sliders[1].value = movementState.acceleration;
+            valueDisplays[1].textContent = movementState.acceleration;
+            
+            sliders[2].value = movementState.deceleration;
+            valueDisplays[2].textContent = movementState.deceleration;
+            
+            sliders[3].value = movementState.rotationSpeed;
+            valueDisplays[3].textContent = movementState.rotationSpeed;
+            
+            sliders[4].value = movementState.jumpForce;
+            valueDisplays[4].textContent = movementState.jumpForce;
+            
+            sliders[5].value = movementState.gravity;
+            valueDisplays[5].textContent = movementState.gravity;
+            
+            sliders[6].value = movementState.mouseSensitivity;
+            valueDisplays[6].textContent = movementState.mouseSensitivity;
+        });
+
+        settingsPanel.appendChild(resetButton);
+
+        // 在场景初始化后添加落地点指示器
+        // 添加在创建小火柴人之前
+
+        // 创建落地点指示器
+        const landingMarker = new THREE.Mesh(
+            new THREE.CircleGeometry(10, 32),
+            new THREE.MeshBasicMaterial({
+                color: 0xff0000,
+                transparent: true,
+                opacity: 0.6,
+                side: THREE.DoubleSide,
+                depthWrite: false
+            })
+        );
+        landingMarker.rotation.x = -Math.PI / 2; // 使圆形平躺
+        landingMarker.visible = false; // 初始时隐藏
+        scene.add(landingMarker);
+
+        // 在场景初始化后添加小球相关的代码
+        // 添加在创建落地点指示器之前
+
+        // 创建小球池和物理参数
+        const balls = [];
+        const maxBalls = 50; // 最大同时存在的小球数量
+        const ballLifetime = 18000; // 小球存在时间（毫秒）
+        const ballSpeed = 200; // 小球发射速度
+
+        // 创建小球材质
+        // 创建小球纹理
+        const textureLoader = new THREE.TextureLoader();
+        const ballTexture = textureLoader.load('https://threejs.org/examples/textures/ambientcg/Ice002_1K-JPG_Color.jpg'); // 替换为实际的纹理图片路径
+        const ballNormalMap = textureLoader.load('https://threejs.org/examples/textures/ambientcg/Ice002_1K-JPG_NormalGL.jpg'); // 替换为实际的法线贴图路径
+        const ballRoughnessMap = textureLoader.load('https://threejs.org/examples/textures/ambientcg/Ice002_1K-JPG_Roughness.jpg'); // 替换为实际的粗糙度贴图路径
+
+        const ballMaterial = new THREE.MeshStandardMaterial({
+            map: ballTexture,
+            normalMap: ballNormalMap, 
+            roughnessMap: ballRoughnessMap,
+            metalness: 0.7,
+            roughness: 0.3
+        });
+        makeReflective(ballMaterial);
+
+        // 创建小球的函数
+        function createBall() {
+            const ballGeometry = new THREE.SphereGeometry(9, 16, 16);
+            const ball = new THREE.Mesh(ballGeometry, ballMaterial);
+            ball.castShadow = true;
+            
+            // 获取发射方向 - 使用相机的方向
+            const direction = new THREE.Vector3();
+            camera.getWorldDirection(direction); // 使用getWorldDirection替代getWorldQuaternion
+            
+            // 设置小球初始位置（从相机位置稍微往前）
+            const position = new THREE.Vector3();
+            position.copy(stickmanGroup.position);
+            position.y += 30; // 从头部位置发射
+            position.add(direction.multiplyScalar(20)); // 往前一点，避免碰撞到自己
+            ball.position.copy(position);
+            
+            // 保存小球的速度和创建时间
+            ball.velocity = direction.normalize().multiplyScalar(ballSpeed);
+            ball.velocity.y += 7; // 稍微向上一点
+            ball.createTime = Date.now();
+            
+            scene.add(ball);
+            balls.push(ball);
+            
+            // 如果超过最大数量，移除最早的小球
+            if (balls.length > maxBalls) {
+                const oldestBall = balls.shift();
+                scene.remove(oldestBall);
+            }
+        }
+
+        // 修改鼠标点击事件处理
+        document.addEventListener('mousedown', (event) => {
+            // 只在指针锁定状态下且是左键点击时发射小球
+            if (event.button === 0 && document.pointerLockElement === renderer.domElement) {
+                createBall();
+            }
+        });
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 处理键盘输入
+            if (keys['w'] || keys['arrowup']) {
+                movementState.speed += movementState.acceleration;
+            }
+            if (keys['s'] || keys['arrowdown']) {
+                movementState.speed -= movementState.acceleration;
+            }
+            
+            // 修改左右移动逻辑，使其独立于前进速度
+            let sideMovement = 0;
+            if (keys['d'] || keys['arrowleft']) {
+                // 直接使用固定值或最大速度的一部分，不依赖当前速度
+                sideMovement = -movementState.maxSpeed * 0.3;
+            }
+            if (keys['a'] || keys['arrowright']) {
+                sideMovement = movementState.maxSpeed * 0.3;
+            }
+            
+            // 跳跃处理保持不变
+            if (keys[' '] && !movementState.isJumping) {
+                movementState.verticalVelocity = movementState.jumpForce;
+                movementState.isJumping = true;
+                
+                // 跳跃动作
+                leftArm.rotation.x = -Math.PI / 4;
+                rightArm.rotation.x = -Math.PI / 4;
+                leftLeg.rotation.x = Math.PI / 6;
+                rightLeg.rotation.x = Math.PI / 6;
+            }
+
+            // 限制速度
+            movementState.speed = Math.min(movementState.speed, movementState.maxSpeed);
+            movementState.speed = Math.max(movementState.speed, -movementState.maxSpeed / 2);
+
+            // 自然减速
+            if (movementState.speed > 0) {
+                movementState.speed -= movementState.deceleration;
+                if (movementState.speed < 0) movementState.speed = 0;
+            } else if (movementState.speed < 0) {
+                movementState.speed += movementState.deceleration;
+                if (movementState.speed > 0) movementState.speed = 0;
+            }
+
+            // 计算前进方向
+            const forwardDirection = new THREE.Vector3(0, 0, -1);
+            forwardDirection.applyQuaternion(stickmanGroup.quaternion);
+            forwardDirection.normalize();
+            
+            // 计算侧向方向（与前进方向垂直）
+            const sideDirection = new THREE.Vector3(-1, 0, 0);
+            sideDirection.applyQuaternion(stickmanGroup.quaternion);
+            sideDirection.normalize();
+            
+            // 应用前进移动
+            stickmanGroup.position.x += forwardDirection.x * movementState.speed / 60;
+            stickmanGroup.position.z += forwardDirection.z * movementState.speed / 60;
+            
+            // 应用侧向移动
+            stickmanGroup.position.x += sideDirection.x * sideMovement / 60;
+            stickmanGroup.position.z += sideDirection.z * sideMovement / 60;
+
+            // 应用重力和跳跃
+            movementState.verticalVelocity -= movementState.gravity;
+            stickmanGroup.position.y += movementState.verticalVelocity / 10;
+
+            // 地面检测
+            if (stickmanGroup.position.y < 12.5) {
+                stickmanGroup.position.y = 12.5;
+                movementState.verticalVelocity = 0;
+                movementState.isJumping = false;
+            }
+            
+            // 添加平台碰撞检测
+            // 只有当小人正在下落时才检测平台碰撞
+            if (movementState.verticalVelocity < 0) {
+                const stickmanPosition = stickmanGroup.position.clone();
+                const stickmanFeet = stickmanPosition.y - 12.5; // 小人脚部位置
+                
+                for (const platform of platforms) {
+                    const platformTop = platform.y + 2.5; // 平台顶部
+                    const platformBottom = platform.y - 2.5; // 平台底部
+                    
+                    // 检查小人是否在平台正上方且距离很近
+                    if (stickmanFeet <= platformTop && stickmanFeet >= platformTop - 5) {
+                        // 获取平台的宽度和深度一半
+                        const halfWidth = platform.width / 2;
+                        const halfDepth = platform.depth / 2;
+                        
+                        // 获取平台位置
+                        const platformPosition = platform.mesh.position;
+                        
+                        // 检查小人是否在平台的水平范围内
+                        if (stickmanPosition.x >= platformPosition.x - halfWidth &&
+                            stickmanPosition.x <= platformPosition.x + halfWidth &&
+                            stickmanPosition.z >= platformPosition.z - halfDepth &&
+                            stickmanPosition.z <= platformPosition.z + halfDepth) {
+                            
+                            // 碰撞到平台，将小人放在平台上
+                            stickmanGroup.position.y = platformTop + 12.5;
+                            movementState.verticalVelocity = 0;
+                            movementState.isJumping = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 腿部动画
+            if (!movementState.isJumping) {
+                if (Math.abs(movementState.speed) > 5) {
+                    // 行走动画
+                    const walkCycle = Date.now() % 1000 / 500 * Math.PI;
+                    leftLeg.rotation.x = Math.sin(walkCycle) * 0.5;
+                    rightLeg.rotation.x = Math.sin(walkCycle + Math.PI) * 0.5;
+                    leftArm.rotation.x = Math.sin(walkCycle + Math.PI) * 0.5;
+                    rightArm.rotation.x = Math.sin(walkCycle) * 0.5;
+                } else {
+                    // 站立姿势
+                    leftLeg.rotation.x = 0;
+                    rightLeg.rotation.x = 0;
+                    leftArm.rotation.x = 0;
+                    rightArm.rotation.x = 0;
+                }
+            } else {
+                // 跳跃过程中的动画
+                // 根据垂直速度调整姿势，创建更自然的跳跃动作
+                const jumpProgress = Math.max(0, Math.min(1, movementState.verticalVelocity / movementState.jumpForce));
+                
+                if (movementState.verticalVelocity > 0) {
+                    // 上升阶段 - 手臂上举，腿部弯曲
+                    leftArm.rotation.x = -Math.PI / 4 * jumpProgress;
+                    rightArm.rotation.x = -Math.PI / 4 * jumpProgress;
+                    leftLeg.rotation.x = Math.PI / 6 * jumpProgress;
+                    rightLeg.rotation.x = Math.PI / 6 * jumpProgress;
+                } else {
+                    // 下降阶段 - 手臂前伸，腿部伸直准备着陆
+                    leftArm.rotation.x = Math.PI / 6;
+                    rightArm.rotation.x = Math.PI / 6;
+                    leftLeg.rotation.x = -Math.PI / 8;
+                    rightLeg.rotation.x = -Math.PI / 8;
+                }
+            }
+
+            // 更新落地点指示器
+            const raycaster = new THREE.Raycaster();
+            if (movementState.isJumping) {
+                // 从小人位置向下发射射线
+                const origin = stickmanGroup.position.clone();
+                const direction = new THREE.Vector3(0, -1, 0);
+                raycaster.set(origin, direction);
+                
+                // 检测与地面和平台的相交
+                const intersectObjects = [ground];
+                platforms.forEach(platform => intersectObjects.push(platform.mesh));
+                const intersects = raycaster.intersectObjects(intersectObjects);
+                
+                if (intersects.length > 0) {
+                    // 找到最近的交点
+                    const point = intersects[0].point;
+                    
+                    // 更新标记位置
+                    landingMarker.position.set(point.x, point.y + 0.1, point.z); // 略微上移以避免z-fighting
+                    
+                    // 根据高度调整标记大小和透明度
+                    const distance = origin.y - point.y;
+                    const scale = Math.min(1 + distance / 100, 3); // 随距离增大而增大，但有上限
+                    landingMarker.scale.set(scale, scale, scale);
+                    
+                    // 距离越远越透明
+                    landingMarker.material.opacity = Math.max(0.1, 0.4 - distance / 1000);
+                    
+                    landingMarker.visible = true;
+                } else {
+                    landingMarker.visible = false;
+                }
+            } else {
+                landingMarker.visible = false;
+            }
+
+            // 更新小球
+            const gravity = new THREE.Vector3(0, -1, 0); // 小球重力
+            const now = Date.now();
+
+            for (let i = balls.length - 1; i >= 0; i--) {
+                const ball = balls[i];
+                
+                // 更新位置
+                ball.position.add(ball.velocity.clone().multiplyScalar(1/40));
+                ball.velocity.add(gravity);
+                
+                // 检查地面碰撞
+                if (ball.position.y < 9) { // 小球半径
+                    ball.position.y = 9;
+                    ball.velocity.y = -ball.velocity.y * 0.6; // 反弹，损失一些能量
+                    ball.velocity.x *= 0.8; // 水平方向摩擦
+                    ball.velocity.z *= 0.8;
+                }
+                
+                // 检查与平台的碰撞
+                for (const platform of platforms) {
+                    const platformY = platform.y;
+                    const halfWidth = platform.width / 2;
+                    const halfDepth = platform.depth / 2;
+                    const platformPos = platform.mesh.position;
+                    
+                    if (ball.position.y - 3 <= platformY + 2.5 && // 小球底部低于平台顶部
+                        ball.position.y + 3 >= platformY - 2.5 && // 小球顶部高于平台底部
+                        ball.position.x >= platformPos.x - halfWidth &&
+                        ball.position.x <= platformPos.x + halfWidth &&
+                        ball.position.z >= platformPos.z - halfDepth &&
+                        ball.position.z <= platformPos.z + halfDepth) {
+                        
+                        // 简单的碰撞响应
+                        ball.position.y = platformY + 5.5;
+                        ball.velocity.y = -ball.velocity.y * 0.6;
+                        ball.velocity.x *= 0.8;
+                        ball.velocity.z *= 0.8;
+                    }
+                }
+                
+                // 检查生命周期
+                if (now - ball.createTime > ballLifetime) {
+                    scene.remove(ball);
+                    balls.splice(i, 1);
+                }
+            }
+
+            // 更新UI
+            updateInfo();
+
+            // 渲染场景
+            renderer.render(scene, camera);
+        }
+
+        // 窗口大小调整
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 开始动画
+        animate();
+    </script>
+</body>
+</html>

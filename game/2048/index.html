@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 卡通版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>2048</h1>
+            <div class="score-container">
+                分数: <span id="score">0</span>
+            </div>
+            <button id="reset-button">重新开始</button>
+        </header>
+        <div class="game-container">
+            <div class="grid-container">
+                <!-- 16个格子背景 -->
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+                <div class="grid-cell"></div>
+            </div>
+            <div class="tile-container" id="tile-container">
+                <!-- 游戏方块将动态添加到这里 -->
+            </div>
+            <div class="game-over-message" id="game-over-message" style="display: none;">
+                <p>游戏结束!</p>
+                <button id="try-again-button">再试一次</button>
+            </div>
+        </div>
+        <footer>
+            <p>使用方向键或滑动屏幕来移动方块</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

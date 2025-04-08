@@ -1,0 +1,234 @@
+/* 全局样式 */
+body {
+    font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+    background-color: #faf8ef;
+    color: #776e65;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px; /* 限制最大宽度 */
+    text-align: center;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 3em;
+    font-weight: bold;
+    color: #776e65;
+    margin: 0;
+}
+
+.score-container {
+    background-color: #bbada0;
+    color: #eee4da;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#reset-button, #try-again-button {
+    background-color: #8f7a66;
+    color: #f9f6f2;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#reset-button:hover, #try-again-button:hover {
+    background-color: #9f8b77;
+}
+
+/* 游戏区域 */
+.game-container {
+    position: relative;
+    background-color: #bbada0; /* 游戏板背景 */
+    border-radius: 10px;
+    padding: 15px; /* 内边距 */
+    box-sizing: border-box;
+    touch-action: none; /* 禁用默认触摸滚动 */
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 15px; /* 格子间距 */
+    position: relative; /* 确保在方块下方 */
+    z-index: 1;
+}
+
+.grid-cell {
+    background-color: rgba(238, 228, 218, 0.35); /* 格子背景色 */
+    border-radius: 5px;
+    width: 100%;
+    padding-bottom: 100%; /* 使格子成为正方形 */
+    box-sizing: border-box;
+}
+
+.tile-container {
+    position: absolute;
+    top: 15px; /* 与 game-container 内边距一致 */
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    z-index: 2; /* 确保在格子上方 */
+    pointer-events: none; /* 允许下层元素接收事件 */
+}
+
+/* 方块样式 */
+.tile {
+    position: absolute;
+    width: calc((100% - 15px * 3) / 4); /* 计算方块宽度 */
+    height: calc((100% - 15px * 3) / 4); /* 计算方块高度 */
+    background-color: #eee4da; /* 默认方块背景 */
+    border-radius: 5px;
+    font-size: 2em; /* 初始字体大小 */
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    transition: transform 0.1s ease-in-out, background-color 0.1s ease-in-out, top 0.1s ease-in-out, left 0.1s ease-in-out; /* 平滑过渡 */
+    animation: appear 0.2s ease; /* 出现动画 */
+}
+
+/* 不同数字的方块颜色 */
+.tile[data-value="2"] { background-color: #eee4da; color: #776e65; }
+.tile[data-value="4"] { background-color: #ede0c8; color: #776e65; }
+.tile[data-value="8"] { background-color: #f2b179; color: #f9f6f2; }
+.tile[data-value="16"] { background-color: #f59563; color: #f9f6f2; }
+.tile[data-value="32"] { background-color: #f67c5f; color: #f9f6f2; }
+.tile[data-value="64"] { background-color: #f65e3b; color: #f9f6f2; }
+.tile[data-value="128"] { background-color: #edcf72; color: #f9f6f2; font-size: 1.8em; }
+.tile[data-value="256"] { background-color: #edcc61; color: #f9f6f2; font-size: 1.8em; }
+.tile[data-value="512"] { background-color: #edc850; color: #f9f6f2; font-size: 1.8em; }
+.tile[data-value="1024"] { background-color: #edc53f; color: #f9f6f2; font-size: 1.5em; }
+.tile[data-value="2048"] { background-color: #edc22e; color: #f9f6f2; font-size: 1.5em; }
+.tile[data-value="4096"] { background-color: #3c3a32; color: #f9f6f2; font-size: 1.5em; }
+.tile[data-value="8192"] { background-color: #3c3a32; color: #f9f6f2; font-size: 1.5em; }
+
+/* 方块位置 (通过 JS 设置 top 和 left) */
+/* 例如: .tile-position-0-0 { top: 0; left: 0; } */
+
+/* 动画 */
+@keyframes appear {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.tile.merged {
+    animation: pop 0.2s ease;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* 游戏结束 */
+.game-over-message {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(238, 228, 218, 0.7); /* 半透明遮罩 */
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-radius: 10px; /* 与游戏板一致 */
+}
+
+.game-over-message p {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #776e65;
+    margin-bottom: 20px;
+}
+
+footer {
+    margin-top: 20px;
+    font-size: 0.9em;
+    color: #776e65;
+}
+
+/* 响应式设计：小屏幕调整 */
+@media (max-width: 520px) {
+    body {
+        padding: 10px;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    .score-container {
+        font-size: 1em;
+        padding: 8px 15px;
+    }
+    #reset-button {
+        font-size: 0.9em;
+        padding: 8px 12px;
+    }
+    .game-container {
+        padding: 10px;
+    }
+    .grid-container {
+        gap: 10px;
+    }
+    .tile-container {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+    }
+    .tile {
+        font-size: 1.5em; /* 调整小屏幕字体 */
+        width: calc((100% - 10px * 3) / 4);
+        height: calc((100% - 10px * 3) / 4);
+    }
+    .tile[data-value="128"],
+    .tile[data-value="256"],
+    .tile[data-value="512"] { font-size: 1.3em; }
+    .tile[data-value="1024"],
+    .tile[data-value="2048"],
+    .tile[data-value="4096"],
+    .tile[data-value="8192"] { font-size: 1.1em; }
+
+    .game-over-message p {
+        font-size: 2em;
+    }
+    #try-again-button {
+        font-size: 1em;
+    }
+    footer {
+        font-size: 0.8em;
+    }
+} 
