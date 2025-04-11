@@ -12,7 +12,8 @@
     <script src="../common/components/Loading.js" defer></script>
     <style>
         .layui-elem-quote:hover {
-            color: #999
+            color: #999;
+            cursor:copy;
         }
 
         .content-block {
@@ -371,20 +372,58 @@
             text-align: left;
             margin-top: 5px;
         }
+
+        /* 拖拽排序样式 */
+        .dragging {
+            opacity: 0.6;
+            border: 2px dashed #009688;
+        }
+
+        .drag-above {
+            border-top: 2px solid #009688;
+        }
+
+        .drag-below {
+            border-bottom: 2px solid #009688;
+        }
+
+        .legend-container {
+            cursor: move;
+        }
+
+        /* 编辑状态下的光标样式 */
+        .layui-elem-quote:has(.editing) {
+            cursor: auto;
+        }
+
+        /* 对于不支持:has选择器的浏览器，可以添加备选方案 */
+        .layui-elem-quote.editing-parent {
+            cursor: auto;
+        }
+
+        /* 当便签处于编辑状态时隐藏删除图标 */
+        .layui-elem-quote.editing-parent .delete-icon {
+            display: none;
+        }
+
+        /* 对于使用:has选择器的浏览器 */
+        .layui-elem-quote:has(.editing) .delete-icon {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <div class="tip-container">
         <i class="layui-icon layui-icon-tips tip-icon"></i>
-        你可以将经常使用的内容存到便签里，它们会存到本地，方便你在需要的时候使用（点击即可复制便签）
+        你可以自定义删除、创建、编辑便签，并方便你在需要的时候使用（点击便签即可复制到剪贴板）
     </div>
-
+    
     <!-- 添加选项卡导航 -->
     <div class="tab-container">
         <div class="tab-nav">
-            <div class="tab-item active" data-tab="general">常用便签</div>
-            <div class="tab-item" data-tab="qa-emails">QA邮箱</div>
+            <div class="tab-item active" data-tab="general">常用便签 <i class="layui-icon layui-icon-note"></i></div>
+            <div class="tab-item" data-tab="qa-emails">QA邮箱 <i class="layui-icon layui-icon-email"></i></div>
         </div>
 
         <!-- 常用便签选项卡内容 -->
@@ -398,12 +437,12 @@
                 <div class="layui-field-box">
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <i class="layui-icon layui-icon-delete delete-icon"></i>
                         <div class="editable" contenteditable="false">Lvan.Chen@mullenlowe.com</div>
                     </blockquote>
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <i class="layui-icon layui-icon-delete delete-icon"></i>
                         <div class="editable" contenteditable="false">ivanyang_chen@apple.com</div>
                     </blockquote>
 
@@ -424,7 +463,7 @@
                 <div class="layui-field-box">
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <i class="layui-icon layui-icon-delete delete-icon"></i>
                         <div class="editable" contenteditable="false">
                             <div>ivanyang_chen@apple.com,</div>
                             <div>ivanchenyang99@outlook.com,</div>
@@ -452,7 +491,7 @@
                 <div class="layui-field-box">
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <i class="layui-icon layui-icon-delete delete-icon"></i>
                         <div class="editable" contenteditable="false">
                             <div>chester_haisheng_zhao@apple.com,</div>
                             <div>efforthongfei_zheng@apple.com,</div>
@@ -656,7 +695,7 @@
                         <legend class="legend-container">
                             <span class="editable-legend" contenteditable="false">${fieldTitle}</span>
                             <i class="layui-icon layui-icon-edit edit-icon"></i>
-                            <i class="layui-icon layui-icon-close field-delete-icon"></i>
+                            <i class="layui-icon layui-icon-delete field-delete-icon"></i>
                         </legend>
                         <div class="layui-field-box">
                             <!-- 便签内容将在这里添加 -->
@@ -683,7 +722,7 @@
                         const noteHtml = `
                         <blockquote class="layui-elem-quote content-block">
                             <i class="layui-icon layui-icon-edit edit-icon"></i>
-                            <i class="layui-icon layui-icon-close delete-icon"></i>
+                            <i class="layui-icon layui-icon-delete delete-icon"></i>
                             <div class="editable" contenteditable="false">${noteContent}</div>
                         </blockquote>
                         `;
@@ -767,7 +806,7 @@
                 if (!legend.querySelector('.field-delete-icon')) {
                     // 添加删除图标
                     const deleteIcon = document.createElement('i');
-                    deleteIcon.className = 'layui-icon layui-icon-close field-delete-icon';
+                    deleteIcon.className = 'layui-icon layui-icon-delete field-delete-icon';
                     legend.appendChild(deleteIcon);
                 }
             });
@@ -796,6 +835,9 @@
                     }
                 });
             });
+
+            // 添加拖拽排序功能
+            setupDragSort();
         }
 
         function upDateClipboard(finalText) {
@@ -823,6 +865,7 @@
             editIcon.addEventListener('click', (event) => {
                 event.stopPropagation();
                 const currentState = editableDiv.getAttribute('contenteditable');
+                const quoteElement = editableDiv.closest('.layui-elem-quote');
 
                 if (currentState === 'false') {
                     // 进入编辑状态
@@ -831,6 +874,8 @@
                     editIcon.classList.add('layui-icon-ok');
                     editIcon.classList.add('edit-active');
                     editableDiv.classList.add('editing');
+                    // 添加这一行来改变父元素的cursor并隐藏删除图标
+                    quoteElement.classList.add('editing-parent');
                     editableDiv.focus();
                 } else {
                     // 保存并退出编辑状态
@@ -839,9 +884,11 @@
                     editIcon.classList.add('layui-icon-edit');
                     editIcon.classList.remove('edit-active');
                     editableDiv.classList.remove('editing');
+                    // 移除editing-parent类，使删除图标重新显示
+                    quoteElement.classList.remove('editing-parent');
 
                     // 保存到localStorage
-                    saveContentToStorage('notes', 'note_' + index, editableDiv.innerHTML);
+                    updateAndSaveAllData();
                     showMessage({ msg: '内容已保存', type: 'success' });
                 }
             });
@@ -1092,12 +1139,12 @@
                             <legend class="legend-container">
                                 <span class="editable-legend" contenteditable="false">${fieldName}</span>
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-close field-delete-icon"></i>
+                                <i class="layui-icon layui-icon-delete field-delete-icon"></i>
                             </legend>
                             <div class="layui-field-box">
                                 <blockquote class="layui-elem-quote content-block">
                                     <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                    <i class="layui-icon layui-icon-close delete-icon"></i>
+                                    <i class="layui-icon layui-icon-delete delete-icon"></i>
                                     <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
                                 </blockquote>
                                 
@@ -1146,7 +1193,7 @@
                     const newNoteHtml = `
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <i class="layui-icon layui-icon-delete delete-icon"></i>
                         <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
                     </blockquote>
                     `;
@@ -1229,7 +1276,7 @@
                     const newNoteHtml = `
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <i class="layui-icon layui-icon-delete delete-icon"></i>
                         <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
                     </blockquote>
                     `;
@@ -1287,6 +1334,7 @@
             editIcon.addEventListener('click', (event) => {
                 event.stopPropagation();
                 const currentState = editableDiv.getAttribute('contenteditable');
+                const quoteElement = editableDiv.closest('.layui-elem-quote');
 
                 if (currentState === 'false') {
                     // 进入编辑状态
@@ -1295,6 +1343,8 @@
                     editIcon.classList.add('layui-icon-ok');
                     editIcon.classList.add('edit-active');
                     editableDiv.classList.add('editing');
+                    // 添加这一行来改变父元素的cursor并隐藏删除图标
+                    quoteElement.classList.add('editing-parent');
                     editableDiv.focus();
                 } else {
                     // 保存并退出编辑状态
@@ -1303,6 +1353,8 @@
                     editIcon.classList.add('layui-icon-edit');
                     editIcon.classList.remove('edit-active');
                     editableDiv.classList.remove('editing');
+                    // 移除editing-parent类，使删除图标重新显示
+                    quoteElement.classList.remove('editing-parent');
 
                     // 保存到localStorage
                     updateAndSaveAllData();
@@ -1399,7 +1451,6 @@
 
             // 保存到localStorage
             localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
-            console.log('保存数据成功');
         }
 
         // 选项卡切换功能
@@ -1417,7 +1468,6 @@
                 return;
             }
 
-            console.log('已找到选项卡元素:', tabGeneral, tabQaEmails);
 
             // 通用切换函数
             function setActiveTab(activeTab, activeContent, inactiveTab, inactiveContent) {
@@ -1429,7 +1479,6 @@
 
             // 直接为每个选项卡添加单独的点击处理函数
             tabGeneral.onclick = function () {
-                console.log('点击常用便签选项卡');
                 setActiveTab(tabGeneral, generalContent, tabQaEmails, qaEmailsContent);
                 
                 // 获取保存的数据并更新选项卡状态
@@ -1439,7 +1488,6 @@
             };
 
             tabQaEmails.onclick = function () {
-                console.log('点击QA邮箱选项卡');
                 setActiveTab(tabQaEmails, qaEmailsContent, tabGeneral, generalContent);
                 
                 // 获取保存的数据并更新选项卡状态
@@ -1458,8 +1506,6 @@
                 tabGeneral.onclick();
             }
 
-            // 添加调试信息
-            console.log('选项卡设置完成');
         }
 
         // 添加这个函数
@@ -1476,6 +1522,78 @@
 
             // 写回localStorage
             localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+        }
+
+        // 添加新函数实现拖拽排序
+        function setupDragSort() {
+            const generalTab = document.getElementById('general-tab');
+            const fields = generalTab.querySelectorAll('.layui-elem-field');
+            
+            fields.forEach(field => {
+                // 为每个legend添加可拖拽属性
+                const legend = field.querySelector('legend');
+                legend.draggable = true;
+                legend.style.cursor = 'move';
+                
+                // 拖拽开始时记录被拖拽的元素
+                legend.addEventListener('dragstart', e => {
+                    e.dataTransfer.setData('text/plain', '');
+                    e.target.closest('.layui-elem-field').classList.add('dragging');
+                });
+                
+                // 拖拽结束时移除标记
+                legend.addEventListener('dragend', e => {
+                    e.target.closest('.layui-elem-field').classList.remove('dragging');
+                });
+                
+                // 在可放置区域悬停时的视觉反馈
+                field.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    const draggingField = generalTab.querySelector('.dragging');
+                    if (draggingField && draggingField !== field) {
+                        const rect = field.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        
+                        if (e.clientY < midY) {
+                            field.classList.add('drag-above');
+                            field.classList.remove('drag-below');
+                        } else {
+                            field.classList.add('drag-below');
+                            field.classList.remove('drag-above');
+                        }
+                    }
+                });
+                
+                // 离开时移除视觉反馈
+                field.addEventListener('dragleave', e => {
+                    field.classList.remove('drag-above', 'drag-below');
+                });
+                
+                // 放置时执行排序
+                field.addEventListener('drop', e => {
+                    e.preventDefault();
+                    const draggingField = generalTab.querySelector('.dragging');
+                    if (draggingField && draggingField !== field) {
+                        const rect = field.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        
+                        if (e.clientY < midY) {
+                            field.before(draggingField);
+                        } else {
+                            field.after(draggingField);
+                        }
+                        
+                        // 保存新顺序
+                        updateAndSaveAllData();
+                        showMessage({ msg: '排序已更新', type: 'success' });
+                    }
+                    
+                    // 移除所有视觉反馈
+                    generalTab.querySelectorAll('.layui-elem-field').forEach(field => {
+                        field.classList.remove('drag-above', 'drag-below');
+                    });
+                });
+            });
         }
 
     </script>
