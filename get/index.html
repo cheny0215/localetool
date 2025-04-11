@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GET</title>
+    <title>便签</title>
     <link rel="stylesheet" href="../common/layui/css/layui.css" />
     <link rel="stylesheet" href="../css/index.css">
     <script src="../common/layui/layui.js"></script>
@@ -14,110 +14,790 @@
         .layui-elem-quote:hover {
             color: #999
         }
+
+        .content-block {
+            position: relative;
+        }
+
+        .edit-icon {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+            color: #009688;
+            font-size: 16px;
+            background: #f2f2f2;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            opacity: 0.6;
+        }
+
+        .edit-icon:hover {
+            opacity: 1;
+            background: #e6e6e6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .editable {
+            min-height: 20px;
+            padding: 4px 6px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .editable:focus {
+            outline: none;
+            background-color: #f8f8f8;
+            box-shadow: inset 0 0 0 2px #009688;
+        }
+
+        .editing {
+            background-color: #f8f8f8;
+            box-shadow: inset 0 0 0 2px #009688;
+        }
+
+        .edit-active {
+            background: #009688;
+            color: white;
+            opacity: 1;
+        }
+
+        .tip-container {
+            padding: 10px 15px 10px 20px;
+            margin: 10px 0 15px;
+            background-color: #f8f8f8;
+            border-left: 3px solid #009688;
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .tip-icon {
+            color: #009688;
+            margin-right: 5px;
+        }
+
+        .legend-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        legend .editable-legend {
+            display: inline-block;
+            min-width: 20px;
+            padding: 0 4px;
+            border-radius: 2px;
+        }
+
+        legend .edit-icon {
+            position: relative;
+            top: 0;
+            right: 0;
+            margin-left: 5px;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        /* 添加模块删除图标样式 */
+        .field-delete-icon {
+            position: relative;
+            margin-left: 5px;
+            cursor: pointer;
+            color: #FF5722;
+            font-size: 14px;
+            background: #f2f2f2;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            opacity: 0.6;
+        }
+
+        .field-delete-icon:hover {
+            opacity: 1;
+            background: #e6e6e6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .email-group {
+            margin-bottom: 15px;
+        }
+
+        .email-checkbox {
+            margin-right: 10px;
+        }
+
+        .email-section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .batch-copy-btn {
+            margin-left: 15px;
+            background-color: #009688;
+            color: white;
+            border: none;
+            padding: 3px 10px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .batch-copy-btn:hover {
+            background-color: #00877a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .copy-options {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .select-all {
+            margin-right: 15px;
+            color: #1E9FFF;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .select-all:hover {
+            text-decoration: underline;
+        }
+
+        /* 新增样式 */
+        .platform-selector {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .platform-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .platform-checkboxes label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .platform-checkboxes input {
+            margin-right: 5px;
+        }
+
+        .batch-copy-btn {
+            background-color: #009688;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .batch-copy-btn:hover {
+            background-color: #00877a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .batch-copy-btn i {
+            margin-right: 5px;
+        }
+
+        .email-platforms {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .email-platform {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .platform-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+            transition: all 0.3s;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 2px;
+        }
+
+        /* 添加删除按钮样式 */
+        .delete-icon {
+            position: absolute;
+            right: 40px;
+            top: 10px;
+            cursor: pointer;
+            color: #FF5722;
+            font-size: 16px;
+            background: #f2f2f2;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            opacity: 0.6;
+        }
+
+        .delete-icon:hover {
+            opacity: 1;
+            background: #e6e6e6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 添加新模块按钮样式 */
+        .add-field-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .add-field-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #009688;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .add-field-btn:hover {
+            background-color: #00877a;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-field-btn i {
+            margin-right: 8px;
+        }
+
+        /* 选项卡样式 */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid #e6e6e6;
+            margin-bottom: 20px;
+        }
+
+        .tab-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-item.active {
+            color: #009688;
+            border-bottom-color: #009688;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 修改添加便签按钮样式 */
+        .add-note-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 5px 0 5px 10px;
+            padding: 5px;
+            background-color: #f2f2f2;
+            border: 1px solid #e6e6e6;
+            border-radius: 50%;
+            color: #009688;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-note-btn:hover {
+            background-color: #009688;
+            color: white;
+        }
+
+        .add-note-btn i {
+            font-size: 18px;
+        }
+
+        /* 添加包装器，确保按钮靠左 */
+        .note-btn-wrapper {
+            display: block;
+            text-align: left;
+            margin-top: 5px;
+        }
     </style>
 </head>
 
 <body>
-    <fieldset class="layui-elem-field">
-        <legend>账号</legend>
-        <div class="layui-field-box">
-            <blockquote class="layui-elem-quote">
-                Lvan.Chen@mullenlowe.com
-            </blockquote>
-            <blockquote class="layui-elem-quote">
-                ivanyang_chen@apple.com
-            </blockquote>
-        </div>
-    </fieldset>
+    <div class="tip-container">
+        <i class="layui-icon layui-icon-tips tip-icon"></i>
+        你可以将经常使用的内容存到便签里，它们会存到本地，方便你在需要的时候使用（点击即可复制便签）
+    </div>
 
-    <fieldset class="layui-elem-field">
-        <legend>我的邮箱</legend>
-        <div class="layui-field-box">
-            <blockquote class="layui-elem-quote">
-                <div>ivanyang_chen@apple.com,</div>
-                <div>ivanchenyang99@outlook.com,</div>
-                <div>ivanchenyang@gmail.com,</div>
-                <div>1354749315@qq.com,</div>
-                <div>ivanchenyang@sina.com,</div>
-                <div>17506120452@163.com,</div>
-            </blockquote>
+    <!-- 添加选项卡导航 -->
+    <div class="tab-container">
+        <div class="tab-nav">
+            <div class="tab-item active" data-tab="general">常用便签</div>
+            <div class="tab-item" data-tab="qa-emails">QA邮箱</div>
         </div>
-    </fieldset>
 
-    <fieldset class="layui-elem-field">
-        <legend>小组成员邮箱</legend>
-        <div class="layui-field-box">
-            <blockquote class="layui-elem-quote">
-                <div>chester_haisheng_zhao@apple.com,</div>
-                <div>efforthongfei_zheng@apple.com,</div>
-                <div>nicoleshutun_li@apple.com,</div>
-            </blockquote>
-        </div>
-    </fieldset>
+        <!-- 常用便签选项卡内容 -->
+        <div class="tab-content active" id="general-tab">
+            <!-- 原有便签内容 -->
+            <fieldset class="layui-elem-field note-field">
+                <legend class="legend-container">
+                    <span class="editable-legend" contenteditable="false">账号</span>
+                    <i class="layui-icon layui-icon-edit edit-icon"></i>
+                </legend>
+                <div class="layui-field-box">
+                    <blockquote class="layui-elem-quote content-block">
+                        <i class="layui-icon layui-icon-edit edit-icon"></i>
+                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <div class="editable" contenteditable="false">Lvan.Chen@mullenlowe.com</div>
+                    </blockquote>
+                    <blockquote class="layui-elem-quote content-block">
+                        <i class="layui-icon layui-icon-edit edit-icon"></i>
+                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <div class="editable" contenteditable="false">ivanyang_chen@apple.com</div>
+                    </blockquote>
 
-    <fieldset class="layui-elem-field">
-        <legend>QA邮箱</legend>
-        <div class="layui-field-box">
-            <b>QQ</b>
-            <blockquote class="layui-elem-quote">
-                <div></div>
-                <div>1416413774@qq.com,</div>
-                <div>2099096391@qq.com,</div>
-                <div>gc_qatest@qq.com,</div>
-            </blockquote>
+                    <!-- 添加便签按钮 -->
+                    <div class="note-btn-wrapper">
+                        <div class="add-note-btn" title="添加便签">
+                            <i class="layui-icon layui-icon-add-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="layui-elem-field note-field">
+                <legend class="legend-container">
+                    <span class="editable-legend" contenteditable="false">我的邮箱</span>
+                    <i class="layui-icon layui-icon-edit edit-icon"></i>
+                </legend>
+                <div class="layui-field-box">
+                    <blockquote class="layui-elem-quote content-block">
+                        <i class="layui-icon layui-icon-edit edit-icon"></i>
+                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <div class="editable" contenteditable="false">
+                            <div>ivanyang_chen@apple.com,</div>
+                            <div>ivanchenyang99@outlook.com,</div>
+                            <div>ivanchenyang@gmail.com,</div>
+                            <div>1354749315@qq.com,</div>
+                            <div>ivanchenyang@sina.com,</div>
+                            <div>17506120452@163.com,</div>
+                        </div>
+                    </blockquote>
+
+                    <!-- 添加便签按钮 -->
+                    <div class="note-btn-wrapper">
+                        <div class="add-note-btn" title="添加便签">
+                            <i class="layui-icon layui-icon-add-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="layui-elem-field note-field">
+                <legend class="legend-container">
+                    <span class="editable-legend" contenteditable="false">小组成员邮箱</span>
+                    <i class="layui-icon layui-icon-edit edit-icon"></i>
+                </legend>
+                <div class="layui-field-box">
+                    <blockquote class="layui-elem-quote content-block">
+                        <i class="layui-icon layui-icon-edit edit-icon"></i>
+                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <div class="editable" contenteditable="false">
+                            <div>chester_haisheng_zhao@apple.com,</div>
+                            <div>efforthongfei_zheng@apple.com,</div>
+                            <div>nicoleshutun_li@apple.com,</div>
+                        </div>
+                    </blockquote>
+
+                    <!-- 添加便签按钮 -->
+                    <div class="note-btn-wrapper">
+                        <div class="add-note-btn" title="添加便签">
+                            <i class="layui-icon layui-icon-add-1"></i>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="add-field-container">
+                <button class="add-field-btn" id="add-field-btn">
+                    <i class="layui-icon layui-icon-add-1"></i>添加新模块
+                </button>
+            </div>
         </div>
-        <div class="layui-field-box">
-            <b>163</b>
-            <blockquote class="layui-elem-quote">
-                <div>apple_gc_qatest@163.com,</div>
-                <div>apple_gc_testing@163.com,</div>
-                <div>apple_gc_testing2@163.com,</div>
-            </blockquote>
+
+        <!-- QA邮箱选项卡内容 -->
+        <div class="tab-content" id="qa-emails-tab">
+            <fieldset class="layui-elem-field note-field">
+                <legend class="legend-container">
+                    <span class="editable-legend" contenteditable="false">QA邮箱</span>
+                </legend>
+                <div class="layui-field-box">
+                    <div class="platform-selector">
+                        <div class="platform-checkboxes">
+                            <label><input type="checkbox" class="platform-checkbox" data-platform="qq">QQ</label>
+                            <label><input type="checkbox" class="platform-checkbox" data-platform="163">163</label>
+                            <label><input type="checkbox" class="platform-checkbox" data-platform="sina">新浪sina</label>
+                            <label><input type="checkbox" class="platform-checkbox"
+                                    data-platform="outlook">Outlook</label>
+                            <label><input type="checkbox" class="platform-checkbox" data-platform="gmail">Gmail</label>
+                            <label><input type="checkbox" class="platform-checkbox" data-platform="yahoo">Yahoo</label>
+                            <label><input type="checkbox" class="platform-checkbox"
+                                    data-platform="apple">Apple/iCloud</label>
+                            <label><input type="checkbox" class="platform-checkbox" data-platform="all">全选</label>
+                        </div>
+                        <button class="batch-copy-btn" id="batch-copy-btn">
+                            <i class="layui-icon layui-icon-share"></i> 批量复制所选平台邮箱
+                        </button>
+                    </div>
+
+                    <div class="email-platforms">
+                        <div class="email-platform" data-platform="qq">
+                            <div class="platform-title">QQ</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="qq">
+                                    <div>1416413774@qq.com,</div>
+                                    <div>2099096391@qq.com,</div>
+                                    <div>gc_qatest@qq.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+
+                        <div class="email-platform" data-platform="163">
+                            <div class="platform-title">163</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="163">
+                                    <div>apple_gc_qatest@163.com,</div>
+                                    <div>apple_gc_testing@163.com,</div>
+                                    <div>apple_gc_testing2@163.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+
+                        <div class="email-platform" data-platform="sina">
+                            <div class="platform-title">新浪sina</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="sina">
+                                    <div>apple_gc_testing@sina.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+
+                        <div class="email-platform" data-platform="outlook">
+                            <div class="platform-title">Outlook</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="outlook">
+                                    <div>apple_gc_qatest1@outlook.com,</div>
+                                    <div>apple_gc_qatest3@outlook.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+
+                        <div class="email-platform" data-platform="gmail">
+                            <div class="platform-title">Gmail</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="gmail">
+                                    <div>apple.gc.testing@gmail.com,</div>
+                                    <div>apple.gc.qatest@gmail.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+
+                        <div class="email-platform" data-platform="yahoo">
+                            <div class="platform-title">Yahoo</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="yahoo">
+                                    <div>apple_gc_qatest@yahoo.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+
+                        <div class="email-platform" data-platform="apple">
+                            <div class="platform-title">Apple/iCloud</div>
+                            <blockquote class="layui-elem-quote content-block">
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <div class="editable" contenteditable="false" data-section="apple">
+                                    <div>apple_gc_testing4@icloud.com,</div>
+                                    <div>joe_le_jiang@apple.com,</div>
+                                    <div>blitzshaoming_zheng@apple.com,</div>
+                                    <div>cassie_wenjun_he@apple.com,</div>
+                                    <div>cw_chen@apple.com,</div>
+                                    <div>nicholaszhen_li@apple.com,</div>
+                                    <div>sophia_xiaoyun_shi@apple.com,</div>
+                                    <div>sherlockxiaoxin_zheng@apple.com,</div>
+                                    <div>wade_huaiqing_sun@apple.com,</div>
+                                </div>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
         </div>
-        <div class="layui-field-box">
-            <b>新浪sina</b>
-            <blockquote class="layui-elem-quote">
-                <div>apple_gc_testing@sina.com,</div>
-            </blockquote>
-        </div>
-        <div class="layui-field-box">
-            <b>Outlook</b>
-            <blockquote class="layui-elem-quote">
-                <div>apple_gc_qatest1@outlook.com,</div>
-                <div>apple_gc_qatest3@outlook.com,</div>
-            </blockquote>
-        </div>
-        <div class="layui-field-box">
-            <b>Gmail</b>
-            <blockquote class="layui-elem-quote">
-                <div>apple.gc.testing@gmail.com,</div>
-                <div>apple.gc.qatest@gmail.com,</div>
-            </blockquote>
-        </div>
-        <div class="layui-field-box">
-            <b>Yahoo</b>
-            <blockquote class="layui-elem-quote">
-                <div>apple_gc_qatest@yahoo.com,</div>
-            </blockquote>
-        </div>
-        <div class="layui-field-box">
-            <b>Apple/Icloud</b>
-            <blockquote class="layui-elem-quote">
-                <div>apple_gc_testing4@icloud.com,</div>
-                <div>joe_le_jiang@apple.com,</div>
-                <div>blitzshaoming_zheng@apple.com,</div>
-                <div>cassie_wenjun_he@apple.com,</div>
-                <div>cw_chen@apple.com,</div>
-                <div>nicholaszhen_li@apple.com,</div>
-                <div>sophia_xiaoyun_shi@apple.com,</div>
-                <div>sherlockxiaoxin_zheng@apple.com,</div>
-                <div>wade_huaiqing_sun@apple.com,</div>
-            </blockquote>
-        </div>
-    </fieldset>
+    </div>
 
     <script>
-        const quote = document.querySelectorAll('.layui-elem-quote')
+        const quote = document.querySelectorAll('.layui-elem-quote');
+        const legends = document.querySelectorAll('.legend-container');
+        // 统一的存储键名
+        const STORAGE_KEY = 'notes_data';
+
+        // 初始化，从localStorage加载内容
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllDataFromStorage();
+            initBatchCopyFeature();
+            setupAllEvents();
+            setupTabs();
+        });
+
+        // 获取所有保存的数据
+        function getAllDataFromStorage() {
+            const savedData = localStorage.getItem(STORAGE_KEY);
+            return savedData ? JSON.parse(savedData) : {
+                notes: {},
+                legends: {},
+                fields: [],
+                activeTab: 'general' // 添加默认选项卡状态
+            };
+        }
+
+        // 从localStorage加载所有数据
+        function loadAllDataFromStorage() {
+            const savedData = getAllDataFromStorage();
+
+            // 检查是否有新版本的数据格式
+            if (savedData.fields && savedData.fields.length > 0) {
+                console.log('从新格式加载数据');
+                loadFromNewFormat(savedData);
+            } else {
+                console.log('从旧格式加载数据');
+                // 兼容旧格式
+                loadFromOldFormat(savedData);
+            }
+        }
+
+        // 从新格式加载数据
+        function loadFromNewFormat(savedData) {
+            // 清空常用便签内容，重新构建
+            const generalTab = document.getElementById('general-tab');
+
+            // 保存原始内容作为备份
+            const originalContent = generalTab.innerHTML;
+
+            try {
+                // 保留添加模块按钮
+                const addFieldBtn = generalTab.querySelector('.add-field-container');
+                if (!addFieldBtn) throw new Error('找不到添加模块按钮');
+
+                // 清空当前内容
+                generalTab.innerHTML = '';
+                generalTab.appendChild(addFieldBtn);
+
+                // 重新创建所有模块
+                savedData.fields.forEach((field, index) => {
+                    const fieldTitle = savedData.legends[field.title] || '未命名模块';
+                    const fieldHtml = `
+                    <fieldset class="layui-elem-field note-field">
+                        <legend class="legend-container">
+                            <span class="editable-legend" contenteditable="false">${fieldTitle}</span>
+                            <i class="layui-icon layui-icon-edit edit-icon"></i>
+                            <i class="layui-icon layui-icon-close field-delete-icon"></i>
+                        </legend>
+                        <div class="layui-field-box">
+                            <!-- 便签内容将在这里添加 -->
+                            <div class="note-btn-wrapper">
+                                <div class="add-note-btn" title="添加便签">
+                                    <i class="layui-icon layui-icon-add-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    `;
+
+                    // 插入到添加按钮前面
+                    addFieldBtn.insertAdjacentHTML('beforebegin', fieldHtml);
+
+                    // 获取刚刚创建的模块
+                    const newField = generalTab.querySelector('.layui-elem-field:nth-last-child(2)');
+                    const fieldBox = newField.querySelector('.layui-field-box');
+                    const addNoteBtn = fieldBox.querySelector('.note-btn-wrapper');
+
+                    // 添加该模块下的所有便签
+                    field.notes.forEach(noteKey => {
+                        const noteContent = savedData.notes[noteKey] || '空便签';
+                        const noteHtml = `
+                        <blockquote class="layui-elem-quote content-block">
+                            <i class="layui-icon layui-icon-edit edit-icon"></i>
+                            <i class="layui-icon layui-icon-close delete-icon"></i>
+                            <div class="editable" contenteditable="false">${noteContent}</div>
+                        </blockquote>
+                        `;
+
+                        // 插入到添加便签按钮前面
+                        addNoteBtn.insertAdjacentHTML('beforebegin', noteHtml);
+                    });
+                });
+            } catch (error) {
+                console.error('加载新格式数据失败:', error);
+                // 恢复原始内容
+                generalTab.innerHTML = originalContent;
+            }
+
+            // 单独加载QA邮箱内容，不影响其结构
+            loadQAEmailSections(savedData);
+        }
+
+        // 从旧格式加载数据（兼容旧版本）
+        function loadFromOldFormat(savedData) {
+            // 加载便签内容
+            quote.forEach((o, index) => {
+                const editableDiv = o.querySelector('.editable');
+                const noteKey = 'note_' + index;
+
+                // 如果有保存的内容，则加载
+                if (savedData.notes && savedData.notes[noteKey]) {
+                    editableDiv.innerHTML = savedData.notes[noteKey];
+                } else {
+                    // 首次使用，保存当前内容
+                    saveContentToStorage('notes', noteKey, editableDiv.innerHTML);
+                }
+            });
+
+            // 加载标题内容
+            legends.forEach((legend, index) => {
+                const editableSpan = legend.querySelector('.editable-legend');
+                const legendKey = 'legend_' + index;
+
+                // 如果有保存的内容，则加载
+                if (savedData.legends && savedData.legends[legendKey]) {
+                    editableSpan.textContent = savedData.legends[legendKey];
+                } else {
+                    // 首次使用，保存当前内容
+                    saveContentToStorage('legends', legendKey, editableSpan.textContent);
+                }
+            });
+
+            // 加载QA邮箱内容
+            loadQAEmailSections(savedData);
+        }
+
+        // 加载QA邮箱部分
+        function loadQAEmailSections(savedData) {
+            document.querySelectorAll('.email-platform .editable').forEach(editableDiv => {
+                const sectionType = editableDiv.getAttribute('data-section');
+                const emailSectionKey = 'email_section_' + sectionType;
+
+                // 如果有保存的内容，则加载
+                if (savedData.notes && savedData.notes[emailSectionKey]) {
+                    editableDiv.innerHTML = savedData.notes[emailSectionKey];
+                } else {
+                    // 首次使用，保存当前内容
+                    saveContentToStorage('notes', emailSectionKey, editableDiv.innerHTML);
+                }
+            });
+        }
+
+        // 设置所有事件
+        function setupAllEvents() {
+            // 设置各种事件
+            setupEditableForEmailSections();
+            setupDeleteFeature();
+            setupAddFieldFeature();
+            setupAddNoteButtons();
+
+            // 为已有模块添加删除图标
+            document.querySelectorAll('#general-tab .layui-elem-field').forEach((field) => {
+                const legend = field.querySelector('.legend-container');
+                // 检查是否已有删除图标
+                if (!legend.querySelector('.field-delete-icon')) {
+                    // 添加删除图标
+                    const deleteIcon = document.createElement('i');
+                    deleteIcon.className = 'layui-icon layui-icon-close field-delete-icon';
+                    legend.appendChild(deleteIcon);
+                }
+            });
+
+            // 设置常用便签的事件
+            document.querySelectorAll('#general-tab .layui-elem-quote').forEach((note) => {
+                setupNoteEvents(note);
+            });
+
+            document.querySelectorAll('#general-tab .legend-container').forEach((legend) => {
+                setupLegendEvents(legend);
+            });
+            
+            // 为模块设置删除事件
+            document.querySelectorAll('#general-tab .field-delete-icon').forEach((icon) => {
+                icon.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const field = icon.closest('.layui-elem-field');
+                    if (field) {
+                        const confirmDelete = window.confirm('确定要删除这个模块及其所有便签吗？');
+                        if (confirmDelete) {
+                            field.remove();
+                            showMessage({ msg: '模块已删除', type: 'success' });
+                            updateAndSaveAllData();
+                        }
+                    }
+                });
+            });
+        }
+
         function upDateClipboard(finalText) {
             navigator.clipboard.writeText(finalText).then(function () {
                 showMessage({ msg: '复制成功', type: 'success' })
@@ -125,11 +805,679 @@
                 alert('复制失败: ' + err);
             });
         }
-        quote.forEach(o => {
-            o.onclick = () => {
-                upDateClipboard(o.textContent.replace(/\s+/g, ''))
+
+        quote.forEach((o, index) => {
+            const editableDiv = o.querySelector('.editable');
+
+            // 点击内容区域复制文本
+            editableDiv.addEventListener('click', (event) => {
+                if (editableDiv.getAttribute('contenteditable') === 'false') {
+                    upDateClipboard(editableDiv.textContent.replace(/\s+/g, ''));
+                }
+            });
+
+            // 获取编辑图标
+            const editIcon = o.querySelector('.edit-icon');
+
+            // 点击编辑图标切换编辑状态
+            editIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const currentState = editableDiv.getAttribute('contenteditable');
+
+                if (currentState === 'false') {
+                    // 进入编辑状态
+                    editableDiv.setAttribute('contenteditable', 'true');
+                    editIcon.classList.remove('layui-icon-edit');
+                    editIcon.classList.add('layui-icon-ok');
+                    editIcon.classList.add('edit-active');
+                    editableDiv.classList.add('editing');
+                    editableDiv.focus();
+                } else {
+                    // 保存并退出编辑状态
+                    editableDiv.setAttribute('contenteditable', 'false');
+                    editIcon.classList.remove('layui-icon-ok');
+                    editIcon.classList.add('layui-icon-edit');
+                    editIcon.classList.remove('edit-active');
+                    editableDiv.classList.remove('editing');
+
+                    // 保存到localStorage
+                    saveContentToStorage('notes', 'note_' + index, editableDiv.innerHTML);
+                    showMessage({ msg: '内容已保存', type: 'success' });
+                }
+            });
+        });
+
+        // 为标题添加编辑功能
+        legends.forEach((legend, index) => {
+            const editableSpan = legend.querySelector('.editable-legend');
+            const editIcon = legend.querySelector('.edit-icon');
+
+            // 点击编辑图标切换编辑状态
+            editIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const currentState = editableSpan.getAttribute('contenteditable');
+
+                if (currentState === 'false') {
+                    // 进入编辑状态
+                    editableSpan.setAttribute('contenteditable', 'true');
+                    editIcon.classList.remove('layui-icon-edit');
+                    editIcon.classList.add('layui-icon-ok');
+                    editIcon.classList.add('edit-active');
+                    editableSpan.classList.add('editing');
+                    editableSpan.focus();
+                } else {
+                    // 保存并退出编辑状态
+                    editableSpan.setAttribute('contenteditable', 'false');
+                    editIcon.classList.remove('layui-icon-ok');
+                    editIcon.classList.add('layui-icon-edit');
+                    editIcon.classList.remove('edit-active');
+                    editableSpan.classList.remove('editing');
+
+                    // 保存到localStorage
+                    saveContentToStorage('legends', 'legend_' + index, editableSpan.textContent);
+                    showMessage({ msg: '标题已保存', type: 'success' });
+                }
+            });
+        });
+
+        // 批量复制邮箱相关代码
+        function initBatchCopyFeature() {
+            const batchCopyBtn = document.getElementById('batch-copy-btn');
+            const platformCheckboxes = document.querySelectorAll('.platform-checkbox');
+            const allPlatformsCheckbox = document.querySelector('.platform-checkbox[data-platform="all"]');
+
+            // 全选复选框
+            allPlatformsCheckbox.onclick = function () {
+                const isChecked = this.checked;
+                platformCheckboxes.forEach(checkbox => {
+                    if (checkbox !== allPlatformsCheckbox) {
+                        checkbox.checked = isChecked;
+                    }
+                });
+            };
+
+            // 其他平台复选框更新全选状态
+            platformCheckboxes.forEach(checkbox => {
+                if (checkbox !== allPlatformsCheckbox) {
+                    checkbox.onclick = function () {
+                        const allChecked = Array.from(platformCheckboxes)
+                            .filter(cb => cb !== allPlatformsCheckbox)
+                            .every(cb => cb.checked);
+
+                        allPlatformsCheckbox.checked = allChecked;
+                    };
+                }
+            });
+
+            // 批量复制按钮
+            batchCopyBtn.onclick = function () {
+                const selectedPlatforms = [];
+                let selectedEmails = [];
+
+                // 获取选中的平台
+                platformCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked && checkbox !== allPlatformsCheckbox) {
+                        selectedPlatforms.push(checkbox.getAttribute('data-platform'));
+                    }
+                });
+
+                console.log('选中的平台:', selectedPlatforms);
+
+                // 如果没有选择平台，显示提示
+                if (selectedPlatforms.length === 0) {
+                    showMessage({ msg: '请先选择要复制的邮箱平台', type: 'warning' });
+                    return;
+                }
+
+                // 收集选定平台的所有邮箱
+                selectedPlatforms.forEach(platform => {
+                    const platformEmails = [];
+                    const emailDivs = document.querySelectorAll(`.email-platform[data-platform="${platform}"] .editable div`);
+
+                    emailDivs.forEach(div => {
+                        const emailText = div.textContent.trim();
+                        if (emailText) {
+                            // 提取邮箱地址（移除末尾的逗号）
+                            const email = emailText.replace(/,\s*$/, '');
+                            platformEmails.push(email);
+                        }
+                    });
+
+                    selectedEmails = selectedEmails.concat(platformEmails);
+                });
+
+                console.log('要复制的邮箱:', selectedEmails);
+
+                // 复制邮箱到剪贴板
+                if (selectedEmails.length > 0) {
+                    const emailText = selectedEmails.join(',');
+                    navigator.clipboard.writeText(emailText).then(function () {
+                        showMessage({ msg: `已复制 ${selectedEmails.length} 个邮箱`, type: 'success' });
+                    }).catch(function (err) {
+                        console.error('复制失败:', err);
+                        showMessage({ msg: '复制失败，请重试', type: 'error' });
+                    });
+                } else {
+                    showMessage({ msg: '没有找到邮箱', type: 'warning' });
+                }
+            };
+        }
+
+        // 编辑邮箱部分
+        function setupEditableForEmailSections() {
+            const emailSections = document.querySelectorAll('.email-platform .content-block');
+
+            emailSections.forEach(function (section) {
+                const editIcon = section.querySelector('.edit-icon');
+                const editableDiv = section.querySelector('.editable');
+                const sectionType = editableDiv.getAttribute('data-section');
+                const platform = section.closest('.email-platform').getAttribute('data-platform');
+
+                // 保存编辑前的状态
+                let originalContent;
+
+                // 移除可能存在的旧事件监听器
+                const newEditIcon = editIcon.cloneNode(true);
+                editIcon.parentNode.replaceChild(newEditIcon, editIcon);
+
+                // 为新的编辑图标添加事件监听器
+                newEditIcon.addEventListener('click', function (event) {
+                    console.log('编辑按钮被点击:', sectionType);
+
+                    event.stopPropagation();
+                    const currentState = editableDiv.getAttribute('contenteditable');
+
+                    if (currentState === 'false') {
+                        console.log('进入编辑状态');
+
+                        // 进入编辑状态前，保存原始内容
+                        originalContent = editableDiv.innerHTML;
+
+                        // 进入编辑状态
+                        editableDiv.setAttribute('contenteditable', 'true');
+                        newEditIcon.classList.remove('layui-icon-edit');
+                        newEditIcon.classList.add('layui-icon-ok');
+                        newEditIcon.classList.add('edit-active');
+                        editableDiv.classList.add('editing');
+                        editableDiv.focus();
+                    } else {
+                        console.log('退出编辑状态');
+
+                        // 保存并退出编辑状态
+                        editableDiv.setAttribute('contenteditable', 'false');
+                        newEditIcon.classList.remove('layui-icon-ok');
+                        newEditIcon.classList.add('layui-icon-edit');
+                        newEditIcon.classList.remove('edit-active');
+                        editableDiv.classList.remove('editing');
+
+                        // 保存到localStorage
+                        saveContentToStorage('notes', 'email_section_' + sectionType, editableDiv.innerHTML);
+
+                        showMessage({ msg: '内容已保存', type: 'success' });
+                    }
+                });
+
+                // 修改点击事件，点击区域复制该平台下所有邮箱
+                editableDiv.addEventListener('click', function (event) {
+                    if (editableDiv.getAttribute('contenteditable') === 'false') {
+                        event.stopPropagation();
+
+                        // 获取当前平台下所有邮箱
+                        const allEmails = [];
+                        const emailDivs = document.querySelectorAll(`.email-platform[data-platform="${platform}"] .editable div`);
+
+                        emailDivs.forEach(div => {
+                            const emailText = div.textContent.trim();
+                            if (emailText) {
+                                // 提取邮箱地址（移除末尾的逗号）
+                                const email = emailText.replace(/,\s*$/, '');
+                                allEmails.push(email);
+                            }
+                        });
+
+                        // 复制所有邮箱
+                        if (allEmails.length > 0) {
+                            const emailText = allEmails.join(',');
+                            upDateClipboard(emailText);
+                            showMessage({ msg: `已复制 ${platform} 平台的 ${allEmails.length} 个邮箱`, type: 'success' });
+                        }
+                    }
+                });
+
+            });
+        }
+
+        // 设置删除功能
+        function setupDeleteFeature() {
+            // 先移除所有可能的旧事件监听器
+            document.querySelectorAll('.delete-icon').forEach(icon => {
+                // 创建新的删除图标替换旧的，清除所有事件监听器
+                const newIcon = icon.cloneNode(true);
+                icon.parentNode.replaceChild(newIcon, icon);
+
+                // 为新图标添加事件监听器
+                newIcon.addEventListener('click', function (event) {
+                    // 阻止事件冒泡，防止触发其他点击事件
+                    event.stopPropagation();
+                    event.preventDefault();
+
+                    const contentBlock = this.closest('.content-block');
+                    if (contentBlock) {
+                        // 询问确认，只弹出一次确认框
+                        const confirmDelete = window.confirm('确定要删除这条便签吗？');
+                        if (confirmDelete) {
+                            // 删除并保存状态
+                            contentBlock.remove();
+                            showMessage({ msg: '便签已删除', type: 'success' });
+
+                            // 更新索引并保存
+                            updateAndSaveAllData();
+                        }
+                    }
+                });
+            });
+        }
+
+        // 设置添加新模块功能
+        function setupAddFieldFeature() {
+            const addBtn = document.getElementById('add-field-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', function () {
+                    // 弹出输入对话框获取模块名称
+                    const fieldName = window.prompt('请输入新模块名称:', '新模块');
+                    if (fieldName) {
+                        // 创建新模块
+                        const newFieldHtml = `
+                        <fieldset class="layui-elem-field note-field">
+                            <legend class="legend-container">
+                                <span class="editable-legend" contenteditable="false">${fieldName}</span>
+                                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-close field-delete-icon"></i>
+                            </legend>
+                            <div class="layui-field-box">
+                                <blockquote class="layui-elem-quote content-block">
+                                    <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                    <i class="layui-icon layui-icon-close delete-icon"></i>
+                                    <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
+                                </blockquote>
+                                
+                                <!-- 添加便签按钮 -->
+                                <div class="note-btn-wrapper">
+                                    <div class="add-note-btn" title="添加便签">
+                                        <i class="layui-icon layui-icon-add-1"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        `;
+
+                        // 插入到添加按钮的后面
+                        const addContainer = document.querySelector('.add-field-container');
+                        addContainer.insertAdjacentHTML('afterend', newFieldHtml);
+
+                        // 为新添加的模块绑定各种事件
+                        const newField = document.querySelector('.layui-elem-field:last-of-type');
+                        if (newField) {
+                            setupFieldEvents(newField);
+                        }
+
+                        // 保存状态 - 确保调用新的更新函数
+                        updateAndSaveAllData();
+
+                        showMessage({ msg: '新模块已添加', type: 'success' });
+                    }
+                });
             }
-        })
+        }
+
+        // 为每个模块中的"添加便签"按钮添加事件处理
+        function setupAddNoteButtons() {
+            document.querySelectorAll('.add-note-btn').forEach(button => {
+                // 移除可能的旧事件监听器
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+
+                // 添加点击事件
+                newButton.addEventListener('click', function () {
+                    // 获取父级元素 - 需要向上两级才能找到.layui-field-box
+                    const fieldBox = this.closest('.note-btn-wrapper').parentNode;
+
+                    // 创建新便签
+                    const newNoteHtml = `
+                    <blockquote class="layui-elem-quote content-block">
+                        <i class="layui-icon layui-icon-edit edit-icon"></i>
+                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
+                    </blockquote>
+                    `;
+
+                    // 插入到按钮包装器之前
+                    const wrapper = this.closest('.note-btn-wrapper');
+                    wrapper.insertAdjacentHTML('beforebegin', newNoteHtml);
+
+                    // 为新添加的便签绑定事件
+                    const newNote = wrapper.previousElementSibling;
+                    setupNoteEvents(newNote);
+
+                    // 保存状态 - 确保调用新的更新函数
+                    updateAndSaveAllData();
+
+                    showMessage({ msg: '便签已添加', type: 'success' });
+                });
+            });
+        }
+
+        // 为单个模块设置所有事件
+        function setupFieldEvents(field) {
+            // 设置标题编辑
+            const legend = field.querySelector('.legend-container');
+            const editableSpan = legend.querySelector('.editable-legend');
+            const editIcon = legend.querySelector('.edit-icon');
+            const deleteIcon = legend.querySelector('.field-delete-icon');
+
+            // 设置删除模块功能
+            if (deleteIcon) {
+                deleteIcon.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const confirmDelete = window.confirm('确定要删除这个模块及其所有便签吗？');
+                    if (confirmDelete) {
+                        field.remove();
+                        showMessage({ msg: '模块已删除', type: 'success' });
+                        updateAndSaveAllData();
+                    }
+                });
+            }
+
+            editIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const currentState = editableSpan.getAttribute('contenteditable');
+
+                if (currentState === 'false') {
+                    // 进入编辑状态
+                    editableSpan.setAttribute('contenteditable', 'true');
+                    editIcon.classList.remove('layui-icon-edit');
+                    editIcon.classList.add('layui-icon-ok');
+                    editIcon.classList.add('edit-active');
+                    editableSpan.classList.add('editing');
+                    editableSpan.focus();
+                } else {
+                    // 保存并退出编辑状态
+                    editableSpan.setAttribute('contenteditable', 'false');
+                    editIcon.classList.remove('layui-icon-ok');
+                    editIcon.classList.add('layui-icon-edit');
+                    editIcon.classList.remove('edit-active');
+                    editableSpan.classList.remove('editing');
+
+                    // 保存到localStorage
+                    updateAndSaveAllData();
+                    showMessage({ msg: '标题已保存', type: 'success' });
+                }
+            });
+
+            // 设置便签事件
+            const notes = field.querySelectorAll('.content-block');
+            notes.forEach(note => setupNoteEvents(note));
+
+            // 设置添加便签按钮
+            const addNoteBtn = field.querySelector('.add-note-btn');
+            if (addNoteBtn) {
+                addNoteBtn.addEventListener('click', function () {
+                    // 获取父级元素
+                    const fieldBox = this.closest('.layui-field-box');
+
+                    // 创建新便签
+                    const newNoteHtml = `
+                    <blockquote class="layui-elem-quote content-block">
+                        <i class="layui-icon layui-icon-edit edit-icon"></i>
+                        <i class="layui-icon layui-icon-close delete-icon"></i>
+                        <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
+                    </blockquote>
+                    `;
+
+                    // 插入到"添加便签"按钮之前
+                    this.insertAdjacentHTML('beforebegin', newNoteHtml);
+
+                    // 为新添加的便签绑定事件
+                    const newNote = this.previousElementSibling;
+                    setupNoteEvents(newNote);
+
+                    // 保存状态 - 确保调用新的更新函数
+                    updateAndSaveAllData();
+
+                    showMessage({ msg: '便签已添加', type: 'success' });
+                });
+            }
+        }
+
+        // 为单个便签设置事件
+        function setupNoteEvents(note) {
+            const editableDiv = note.querySelector('.editable');
+            const editIcon = note.querySelector('.edit-icon');
+            const deleteIcon = note.querySelector('.delete-icon');
+
+            // 先移除可能存在的旧事件监听器
+            if (deleteIcon) {
+                const newDeleteIcon = deleteIcon.cloneNode(true);
+                if (deleteIcon.parentNode) {
+                    deleteIcon.parentNode.replaceChild(newDeleteIcon, deleteIcon);
+                }
+
+                // 为新的删除图标添加单一事件监听器
+                newDeleteIcon.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+
+                    const confirmDelete = window.confirm('确定要删除这条便签吗？');
+                    if (confirmDelete) {
+                        note.remove();
+                        showMessage({ msg: '便签已删除', type: 'success' });
+                        updateAndSaveAllData();
+                    }
+                });
+            }
+
+            // 点击内容复制
+            editableDiv.addEventListener('click', (event) => {
+                if (editableDiv.getAttribute('contenteditable') === 'false') {
+                    upDateClipboard(editableDiv.textContent.replace(/\s+/g, ''));
+                }
+            });
+
+            // 编辑功能
+            editIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const currentState = editableDiv.getAttribute('contenteditable');
+
+                if (currentState === 'false') {
+                    // 进入编辑状态
+                    editableDiv.setAttribute('contenteditable', 'true');
+                    editIcon.classList.remove('layui-icon-edit');
+                    editIcon.classList.add('layui-icon-ok');
+                    editIcon.classList.add('edit-active');
+                    editableDiv.classList.add('editing');
+                    editableDiv.focus();
+                } else {
+                    // 保存并退出编辑状态
+                    editableDiv.setAttribute('contenteditable', 'false');
+                    editIcon.classList.remove('layui-icon-ok');
+                    editIcon.classList.add('layui-icon-edit');
+                    editIcon.classList.remove('edit-active');
+                    editableDiv.classList.remove('editing');
+
+                    // 保存到localStorage
+                    updateAndSaveAllData();
+                    showMessage({ msg: '内容已保存', type: 'success' });
+                }
+            });
+        }
+
+        // 为标题添加编辑功能
+        function setupLegendEvents(legend) {
+            const editableSpan = legend.querySelector('.editable-legend');
+            const editIcon = legend.querySelector('.edit-icon');
+
+            // 移除可能存在的旧事件监听器
+            const newEditIcon = editIcon.cloneNode(true);
+            editIcon.parentNode.replaceChild(newEditIcon, editIcon);
+
+            // 点击编辑图标切换编辑状态
+            newEditIcon.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const currentState = editableSpan.getAttribute('contenteditable');
+
+                if (currentState === 'false') {
+                    // 进入编辑状态
+                    editableSpan.setAttribute('contenteditable', 'true');
+                    newEditIcon.classList.remove('layui-icon-edit');
+                    newEditIcon.classList.add('layui-icon-ok');
+                    newEditIcon.classList.add('edit-active');
+                    editableSpan.classList.add('editing');
+                    editableSpan.focus();
+                } else {
+                    // 保存并退出编辑状态
+                    editableSpan.setAttribute('contenteditable', 'false');
+                    newEditIcon.classList.remove('layui-icon-ok');
+                    newEditIcon.classList.add('layui-icon-edit');
+                    newEditIcon.classList.remove('edit-active');
+                    editableSpan.classList.remove('editing');
+
+                    // 保存到localStorage
+                    updateAndSaveAllData();
+                    showMessage({ msg: '标题已保存', type: 'success' });
+                }
+            });
+        }
+
+        // 更新索引并保存所有数据
+        function updateAndSaveAllData() {
+            // 先获取旧的数据，保留QA邮箱部分
+            const oldData = getAllDataFromStorage();
+
+            // 创建新的数据对象
+            const newData = {
+                notes: {},
+                legends: {},
+                fields: [], // 用于保存模块结构
+                activeTab: oldData.activeTab // 保留当前选项卡状态
+            };
+
+            // 保留QA邮箱相关数据
+            Object.keys(oldData.notes || {}).forEach(key => {
+                if (key.startsWith('email_section_')) {
+                    newData.notes[key] = oldData.notes[key];
+                }
+            });
+
+            // 首先保存所有常用便签模块结构
+            const generalTab = document.getElementById('general-tab');
+            const fields = generalTab.querySelectorAll('.layui-elem-field');
+
+            fields.forEach((field, fieldIndex) => {
+                const fieldTitle = field.querySelector('.editable-legend').textContent;
+                const notes = [];
+
+                // 获取该模块下的所有便签
+                field.querySelectorAll('.content-block').forEach((block, blockIndex) => {
+                    const noteContent = block.querySelector('.editable').innerHTML;
+                    const noteKey = `note_${fieldIndex}_${blockIndex}`;
+
+                    // 保存便签内容
+                    newData.notes[noteKey] = noteContent;
+                    notes.push(noteKey);
+                });
+
+                // 保存模块标题
+                const legendKey = `legend_${fieldIndex}`;
+                newData.legends[legendKey] = fieldTitle;
+
+                // 记录模块结构
+                newData.fields.push({
+                    title: legendKey,
+                    notes: notes
+                });
+            });
+
+            // 保存到localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
+            console.log('保存数据成功');
+        }
+
+        // 选项卡切换功能
+        function setupTabs() {
+            // 直接获取DOM元素引用
+            const tabGeneral = document.querySelector('.tab-item[data-tab="general"]');
+            const tabQaEmails = document.querySelector('.tab-item[data-tab="qa-emails"]');
+            console.log("🚀 ~ setupTabs ~ tabQaEmails:", tabQaEmails)
+            const generalContent = document.getElementById('general-tab');
+            const qaEmailsContent = document.getElementById('qa-emails-tab');
+
+            // 检查是否找到所有需要的元素
+            if (!tabGeneral || !tabQaEmails || !generalContent || !qaEmailsContent) {
+                console.error('找不到选项卡相关元素');
+                return;
+            }
+
+            console.log('已找到选项卡元素:', tabGeneral, tabQaEmails);
+
+            // 通用切换函数
+            function setActiveTab(activeTab, activeContent, inactiveTab, inactiveContent) {
+                activeTab.classList.add('active');
+                activeContent.classList.add('active');
+                inactiveTab.classList.remove('active');
+                inactiveContent.classList.remove('active');
+            }
+
+            // 直接为每个选项卡添加单独的点击处理函数
+            tabGeneral.onclick = function () {
+                console.log('点击常用便签选项卡');
+                setActiveTab(tabGeneral, generalContent, tabQaEmails, qaEmailsContent);
+                
+                // 获取保存的数据并更新选项卡状态
+                const savedData = getAllDataFromStorage();
+                savedData.activeTab = 'general';
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+            };
+
+            tabQaEmails.onclick = function () {
+                console.log('点击QA邮箱选项卡');
+                setActiveTab(tabQaEmails, qaEmailsContent, tabGeneral, generalContent);
+                
+                // 获取保存的数据并更新选项卡状态
+                const savedData = getAllDataFromStorage();
+                savedData.activeTab = 'qa-emails';
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+            };
+
+            // 加载保存的选项卡状态
+            const savedData = getAllDataFromStorage();
+            const savedTab = savedData.activeTab;
+            
+            if (savedTab === 'qa-emails') {
+                tabQaEmails.onclick();
+            } else {
+                tabGeneral.onclick();
+            }
+
+            // 添加调试信息
+            console.log('选项卡设置完成');
+        }
+
+        // 添加这个函数
+        function saveContentToStorage(category, key, content) {
+            const savedData = getAllDataFromStorage();
+
+            // 如果该类别不存在，创建一个空对象
+            if (!savedData[category]) {
+                savedData[category] = {};
+            }
+
+            // 保存内容
+            savedData[category][key] = content;
+
+            // 写回localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+        }
+
     </script>
 </body>
 
