@@ -268,11 +268,15 @@
                     </ul>
                 </li>
                 <li class="menu-item">
+                    <a class="menu-header">联网</a>
+                    <ul class="submenu">
+                        <li><a class="clickBTN" name="聊天室">DM-Chat</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item">
                     <a class="menu-header">其他</a>
                     <ul class="submenu">
                         <li><a class="clickBTN" name="贪吃蛇">Snake Game</a></li>
-                        <li><a class="clickBTN" name="地球自转">Earth</a></li>
-                        <li><a class="clickBTN" name="火柴人跳跃">Match man jump</a></li>
                         <li><a class="clickBTN" name="2048 卡通版">2048</a></li>
                         <li><a class="clickBTN" name="打砖块">Break Bricks</a></li>
                     </ul>
@@ -310,22 +314,7 @@
                 </li>
               </ul>
             <div id="content">
-                <!-- <p>这里是内容区域。</p> -->
-                <iframe class="iframeBox hiddenIframe" src="./icCheckTool/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./codeDiff/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./txtnowrap/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./formatUrl/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./nbspAdd/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./compressCode/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./get/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./standby/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./DM-QA/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./game/snake/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./game/threejs/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./game/run/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./game/2048/index.html"></iframe>
-                <iframe class="iframeBox hiddenIframe" src="./game/breakBricks/index.html"></iframe>
-                <iframe name="demoFrame" class="iframeBox hiddenIframe" src="./demo/index.html"></iframe>
+                <!-- 移除所有静态 iframe 标签 -->
             </div>
         </div>
     </div>
@@ -439,21 +428,70 @@
             });
         });
 
-        // 激活按钮和显示对应的iframe
+        // 在 activeButton 函数之前添加新的函数
+        function createIframe(path, name) {
+            const iframe = document.createElement('iframe');
+            iframe.className = 'iframeBox';
+            iframe.style.display = 'block';
+            iframe.src = `./${path}/index.html`;
+            iframe.setAttribute('data-name', name);
+            return iframe;
+        }
+
+        // 修改 activeButton 函数
         function activeButton(index) {
-            header.innerText = clickBTN[index].name
-            iframeBox[index].className = 'iframeBox showIframe'
+            const content = document.getElementById('content');
+            const clickedBtn = clickBTN[index];
+            const name = clickedBtn.getAttribute('name');
+            header.innerText = name;
+
+            // 隐藏所有 iframe
+            const existingIframes = content.querySelectorAll('iframe');
+            existingIframes.forEach(iframe => {
+                iframe.style.display = 'none';
+            });
+
+            // 检查是否已存在对应的 iframe
+            let targetIframe = content.querySelector(`iframe[data-name="${name}"]`);
             
+            if (!targetIframe) {
+                // 根据菜单名称确定对应的路径
+                const pathMap = {
+                    'ic平台书签检查工具': 'icCheckTool',
+                    '文本对比工具': 'codeDiff',
+                    'txt文本去除换行': 'txtnowrap',
+                    '格式化Url': 'formatUrl',
+                    '英文前后添加空格nbsp': 'nbspAdd',
+                    '压缩js代码为书签': 'compressCode',
+                    '便签': 'get',
+                    '备份starling截图生成': 'standby',
+                    'DM-QA': 'DM-QA',
+                    '聊天室': 'dmChat',
+                    '贪吃蛇': 'game/snake',
+                    '2048 卡通版': 'game/2048',
+                    '打砖块': 'game/breakBricks'
+                };
+
+                const path = pathMap[name];
+                if (path) {
+                    targetIframe = createIframe(path, name);
+                    content.appendChild(targetIframe);
+                }
+            } else {
+                // 如果iframe已存在，显示它
+                targetIframe.style.display = 'block';
+            }
+
             // 移除所有菜单项的活动状态
             document.querySelectorAll('.activeButton').forEach(item => {
                 item.classList.remove('activeButton');
             });
             
             // 为当前点击的菜单项添加活动状态
-            clickBTN[index].parentElement.classList.add('activeButton');
+            clickedBtn.parentElement.classList.add('activeButton');
             
             // 展开包含当前菜单项的父菜单
-            const parentMenuItem = clickBTN[index].closest('.menu-item');
+            const parentMenuItem = clickedBtn.closest('.menu-item');
             if (parentMenuItem) {
                 parentMenuItem.classList.add('active');
             }
@@ -468,11 +506,6 @@
             clickBTN[index].onclick = function(e) {
                 // 阻止事件冒泡
                 e.stopPropagation();
-                
-                // 隐藏所有iframe
-                for (let i = 0; i < iframeBox.length; i++) {
-                    iframeBox[i].className = 'iframeBox hiddenIframe'
-                }
                 
                 // 激活当前点击的菜单项
                 activeButton(index);
