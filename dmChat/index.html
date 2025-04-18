@@ -5,154 +5,210 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聊天室</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Nunito', sans-serif;
             margin: 0;
             padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            background-color: #f0f8ff; /* 爱丽丝蓝 */
+            color: #4a5a6a; /* 石板灰 */
+            min-height: 100vh;
         }
-        #chat-container {
-            border: 1px solid #ccc;
-            height: 400px;
-            overflow-y: auto;
-            padding: 10px;
-            margin-bottom: 20px;
+
+        h1 {
+            color: #6495ed; /* 矢车菊蓝 */
+            text-align: center;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(100, 149, 237, 0.2);
         }
-        .message {
-            margin-bottom: 10px;
-            padding: 5px;
+
+        h2, h3 {
+            color: #7aaae0;
         }
-        .system {
-            color: #666;
-            font-style: italic;
+
+        .chat-page {
+            display: none;
+            max-width: 1000px;
+            margin: 20px auto;
         }
-        .chat {
-            background: #f0f0f0;
-            border-radius: 5px;
-            padding: 8px;
-        }
-        .input-container {
-            display: flex;
-            gap: 10px;
-        }
-        #message-input {
-            flex: 1;
-            padding: 5px;
-        }
-        button {
-            padding: 5px 15px;
-        }
-        .username {
-            font-weight: bold;
-            margin-right: 5px;
-        }
-        .timestamp {
-            color: #999;
-            font-size: 0.8em;
-            margin-left: 5px;
-        }
+
         .chat-wrapper {
             display: flex;
             gap: 20px;
-            margin-top: 20px;
         }
-        
+
         .chat-main {
             flex: 1;
         }
-        
-        .users-sidebar {
-            width: 200px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .users-sidebar h2 {
-            margin-top: 0;
-            font-size: 1.2em;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .online-users {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .online-users li {
-            padding: 5px 0;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-        
-        .online-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #2ecc71;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-        }
-        
-        .user-count {
-            color: #666;
-            font-size: 0.9em;
-            margin-left: 5px;
-        }
-        .auth-container {
-            max-width: 400px;
-            margin: 50px auto;
+
+        #chat-container {
+            height: 450px;
+            overflow-y: auto;
             padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            margin-bottom: 20px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            border: 2px solid #add8e6; /* 淡蓝色 */
+            box-shadow: 0 4px 15px rgba(173, 216, 230, 0.3);
         }
-        .auth-form {
-            display: none;
-        }
-        .auth-form.active {
-            display: block;
-        }
-        .form-group {
+
+        .message {
+            display: flex;
+            align-items: flex-start;
             margin-bottom: 15px;
         }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-        }
-        .chat-page {
-            display: none;
-        }
+
         .avatar-container {
-            position: relative;
-            width: 40px;
-            height: 40px;
             margin-right: 10px;
         }
 
         .avatar {
-            width: 100%;
-            height: 100%;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid #b0e0e6; /* 粉蓝色 */
         }
 
-        .message {
-            display: flex;
-            align-items: start;
-        }
-
-        .message-content {
+        .message-content-wrapper {
             flex: 1;
+            background-color: #e0f2f7; /* 淡青色变体 */
+            border-radius: 15px;
+            padding: 10px 15px;
+            border-left: 3px solid #87ceeb; /* 天蓝色 */
+        }
+
+        .username {
+            font-weight: bold;
+            color: #5f9ea0; /* 军校蓝 */
+            margin-right: 8px;
+        }
+
+        .timestamp {
+            color: #a0b9c4; /* 淡钢蓝色变体 */
+            font-size: 0.8em;
+            margin-left: 10px;
+        }
+
+        .system .message-content-wrapper {
+            background-color: #f0f8ff;
+            border: 1px dashed #add8e6;
+            color: #6495ed;
+            text-align: center;
+            padding: 8px;
+            border-left: none;
+        }
+
+        .message-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 15px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            border: 2px solid #add8e6;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(173, 216, 230, 0.3);
+        }
+
+        .message-tools {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tool-button {
+            padding: 8px;
+            cursor: pointer;
+            background: #f0f8ff;
+            border: 1px solid #b0e0e6;
+            border-radius: 50%;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            color: #6495ed;
+        }
+
+        .tool-button:hover {
+            background: #e0f2f7;
+            transform: scale(1.1);
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #b0e0e6;
+            border-radius: 15px;
+            font-size: 14px;
+            background-color: #faffff;
+        }
+
+        #message-input:focus {
+            outline: none;
+            border-color: #87ceeb;
+            box-shadow: 0 0 5px rgba(135, 206, 235, 0.5);
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 15px;
+            border: none;
+            background: linear-gradient(to bottom, #87ceeb, #6495ed);
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(100, 149, 237, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(100, 149, 237, 0.6);
+        }
+
+        .users-sidebar {
+            width: 250px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            border: 2px solid #add8e6;
+            box-shadow: 0 4px 15px rgba(173, 216, 230, 0.3);
+        }
+
+        .users-sidebar h2 {
+            margin-top: 0;
+            font-size: 1.3em;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #b0e0e6;
+            text-align: center;
+        }
+
+        .online-users {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
         }
 
         .online-users li {
             display: flex;
             align-items: center;
-            padding: 8px 0;
+            padding: 10px 5px;
+            border-bottom: 1px dotted #e0f2f7;
+            transition: background-color 0.2s;
+        }
+
+        .online-users li:hover {
+            background-color: #f0f8ff;
+            border-radius: 8px;
+        }
+
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #98fb98; /* 苍绿 */
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 1px solid #8fbc8f; /* 暗海绿 */
         }
 
         .user-avatar {
@@ -161,107 +217,105 @@
             border-radius: 50%;
             margin-right: 10px;
             object-fit: cover;
+            border: 1px solid #b0e0e6;
         }
 
-        .avatar-upload {
+        .user-count {
+            font-size: 0.9em;
+            background-color: #e0f2f7;
+            padding: 3px 8px;
+            border-radius: 10px;
+            color: #6495ed;
+            margin-left: 5px;
+        }
+
+        .current-user {
+            background-color: rgba(135, 206, 235, 0.15); /* 淡天蓝色背景 */
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        .current-user-badge {
+            background-color: #87ceeb;
+            color: white;
+            font-size: 0.8em;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 5px;
+        }
+
+        .avatar-upload, .user-settings {
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #eee;
+            border-top: 1px dashed #b0e0e6;
+        }
+
+        .avatar-upload h3, .user-settings h3 {
+            text-align: center;
+            margin-bottom: 15px;
         }
 
         #preview-avatar {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            margin: 10px 0;
+            margin: 10px auto;
             display: none;
+            border: 3px solid #add8e6;
         }
 
-        .form-group label {
-            margin-right: 10px;
-        }
-        
-        input[type="radio"] {
-            margin-right: 5px;
-        }
-        
-        .form-group label + label {
-            margin-left: 15px;
-        }
-
-        .user-settings {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-
-        .user-settings h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #333;
+        .avatar-upload input[type="file"] {
+            display: block;
+            margin: 10px auto;
+            font-size: 12px;
+            color: #778899; /* 亮石板灰 */
         }
 
         .user-settings input {
-            /* width: 100%; */
-            margin-bottom: 12px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .user-settings input:focus {
-            border-color: #2ecc71;
-            outline: none;
-            box-shadow: 0 0 3px rgba(46, 204, 113, 0.3);
-        }
-
-        .user-settings button {
-            width: 60%;
-            padding: 8px 0;
-            border: none;
-            border-radius: 4px;
-            background-color: #b3b3b3;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-
-        .user-settings button:hover {
-            background-color: #e9e9e9;
-        }
-
-        .message-input-container {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+            width: calc(100% - 22px); /* 调整宽度以适应内边距和边框 */
+            margin-bottom: 10px;
             padding: 10px;
-            border-top: 1px solid #eee;
-            position: relative;
+            border: 1px solid #b0e0e6;
+            border-radius: 10px;
+            font-size: 14px;
         }
 
-        .message-tools {
-            display: flex;
-            gap: 10px;
-            margin-right: 10px;
+        .user-settings button,
+        .avatar-upload button {
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .logout-button {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .logout-button button {
+            background: linear-gradient(to bottom, #ffb6c1, #ff7f9e); /* 淡粉色到深粉色 */
+            box-shadow: 0 2px 5px rgba(255, 127, 158, 0.4);
+        }
+
+        .logout-button button:hover {
+            box-shadow: 0 4px 8px rgba(255, 127, 158, 0.6);
         }
 
         .emoji-picker {
             position: absolute;
-            bottom: 45px;
-            left: 0;
+            bottom: 70px; /* 调整位置 */
+            left: 10px;
             background: white;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 10px;
+            border: 1px solid #add8e6;
+            border-radius: 15px;
+            padding: 15px;
             display: none;
             grid-template-columns: repeat(8, 1fr);
-            gap: 5px;
+            gap: 8px;
             max-height: 200px;
             overflow-y: auto;
             z-index: 100;
+            box-shadow: 0 5px 15px rgba(173, 216, 230, 0.4);
         }
 
         .emoji-picker.active {
@@ -270,21 +324,24 @@
 
         .emoji-item {
             cursor: pointer;
-            font-size: 20px;
+            font-size: 22px;
             text-align: center;
             padding: 5px;
-            border-radius: 4px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
         }
 
         .emoji-item:hover {
-            background: #f0f0f0;
+            background: #e0f2f7;
         }
 
         .message img.chat-image {
             max-width: 200px;
             max-height: 200px;
-            border-radius: 4px;
+            border-radius: 10px;
             cursor: pointer;
+            border: 1px solid #add8e6;
+            margin-top: 5px;
         }
 
         .image-preview {
@@ -293,96 +350,185 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            backdrop-filter: blur(5px);
         }
 
         .image-preview img {
             max-width: 90%;
             max-height: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .image-preview.active {
             display: flex;
         }
 
-        .tool-button {
-            padding: 5px 10px;
-            cursor: pointer;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 4px;
-        }
-
-        .tool-button:hover {
-            background: #e0e0e0;
-        }
-
-        .current-user {
-            background-color: rgba(46, 204, 113, 0.1);
-            font-weight: bold;
-        }
-        
-        .current-user-badge {
-            background-color: #2ecc71;
-            color: white;
-            font-size: 0.8em;
-            padding: 2px 5px;
-            border-radius: 3px;
-            margin-left: 5px;
-        }
-        
-        .logout-button {
-            margin-top: 30px;
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            border: 2px solid #add8e6;
+            box-shadow: 0 6px 20px rgba(173, 216, 230, 0.4);
             text-align: center;
         }
-        
-        .logout-button button {
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 14px;
-        }
-        
-        .logout-button button:hover {
-            background-color: #c0392b;
+
+        .auth-container h2 {
+            color: #6495ed;
+            margin-bottom: 25px;
         }
 
-        .certificate-notice{
-            font-size: 12px;
-            color: #ff5537;
-            cursor: pointer;
+        .auth-form {
+            display: none;
         }
-        #certificate-steps{
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin: 10px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 1px solid #eee;
+        .auth-form.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #5f9ea0;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #b0e0e6;
+            border-radius: 10px;
             font-size: 14px;
-            line-height: 1.8;
-            color: #666;
-            transition: all 0.3s ease;
         }
+
+        .form-group input[type="radio"] {
+            margin-right: 5px;
+        }
+        .form-group label + label {
+            margin-left: 15px;
+        }
+
+        .auth-container button {
+            margin-top: 10px;
+            width: calc(50% - 10px); /* 两个按钮并排放置 */
+            margin-right: 5px;
+        }
+        .auth-container button:last-of-type {
+            margin-right: 0;
+        }
+
+        .error-message {
+            color: #ff6b6b; /* 淡珊瑚色 */
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            font-size: 0.9em;
+        }
+
+        .certificate-notice {
+            font-size: 12px;
+            color: #6495ed;
+            cursor: pointer;
+            margin-bottom: 15px;
+            padding: 8px;
+            border: 1px dashed #add8e6;
+            border-radius: 8px;
+            background-color: #f0f8ff;
+        }
+
+        #certificate-steps {
+            background: #f0f8ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #add8e6;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #4a5a6a;
+            text-align: left;
+        }
+        #certificate-steps div {
+            margin-bottom: 5px;
+        }
+        #certificate-steps a {
+            color: #6495ed;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        #certificate-steps a:hover {
+            text-decoration: underline;
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f8ff;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #add8e6;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #87ceeb;
+        }
+
+        /* 覆盖消息内容结构以实现气泡效果 */
+        .message {
+            display: block; /* 移除 flex 布局 */
+        }
+        .message .message-content { /* 定位原始消息内容 */
+            display: flex;
+            align-items: flex-start;
+        }
+        .message .message-content-wrapper { /* 在这里应用气泡样式 */
+             /* 样式已在上面定义 */
+        }
+        /* 系统消息需要特殊处理，如果结构改变 */
+        .system {
+             padding: 8px;
+             background-color: #f0f8ff;
+             border: 1px dashed #add8e6;
+             color: #6495ed;
+             text-align: center;
+             border-radius: 15px;
+             margin-bottom: 15px;
+        }
+        /* 如果需要，隐藏原始系统消息包装器 */
+        .system .message-content-wrapper {
+            display: none;
+        }
+        .system .message-content { /* 直接设置系统消息内容的样式 */
+            color: #6495ed;
+        }
+
     </style>
 </head>
 <body>
     <div id="auth-page" class="auth-container">
-        <h2>聊天室登录</h2>
-        <div class="certificate-notice" onclick="toggleCertificateSteps()">注：第一次登录/注册请一定手动按照以下方法进行自签名证书认证！！！ 展开▼</div>
+        <h2>☁️ 欢迎来到云朵聊天室 ☁️</h2>
+        <div class="certificate-notice" onclick="toggleCertificateSteps()">⚠️ 首次访问提示：需要手动信任证书哦！(点击展开/收起)</div>
         <div id="certificate-steps" style="display:none">
-            <div>1. 打开浏览器，访问<a target="_blank" href="https://10.148.60.37:3693">https://10.148.60.37:3693</a></div>
-            <div>2. 点击"高级"</div>
-            <div>3. 点击"继续前往"</div>
-            <div>4. 重新打开聊天室</div>
+            <div>1. 在新标签页打开 <a target="_blank" href="https://10.148.60.37:3693">https://10.148.60.37:3693</a></div>
+            <div>2. 浏览器可能会提示"不安全"，请点击"高级"或类似选项</div>
+            <div>3. 点击"继续前往..." 或 "接受风险并继续"</div>
+            <div>4. 完成后，刷新本页面或重新打开即可正常登录/注册✨</div>
         </div>
         <script>
             function toggleCertificateSteps() {
@@ -390,95 +536,102 @@
                 const notice = document.querySelector('.certificate-notice');
                 if(steps.style.display === 'none') {
                     steps.style.display = 'block';
-                    notice.innerHTML = notice.innerHTML.replace('▼', '▲');
+                    notice.innerHTML = '⚠️ 首次访问提示：需要手动信任证书哦！(点击收起)';
                 } else {
                     steps.style.display = 'none';
-                    notice.innerHTML = notice.innerHTML.replace('▲', '▼');
+                    notice.innerHTML = '⚠️ 首次访问提示：需要手动信任证书哦！(点击展开)';
                 }
             }
         </script>
-        <div id="error-message" class="error-message"></div>
-        
+        <div id="error-message" class="error-message" style="display: none;"></div>
+
         <div id="login-form" class="auth-form active">
             <div class="form-group">
-                <label for="login-username">用户名：</label>
-                <input type="text" id="login-username">
+                <label for="login-username">昵称：</label>
+                <input type="text" id="login-username" placeholder="请输入可爱的昵称吧~">
             </div>
             <div class="form-group">
                 <label for="login-password">密码：</label>
-                <input type="password" id="login-password">
+                <input type="password" id="login-password" placeholder="输入密码~">
             </div>
             <button onclick="login()">登录</button>
-            <button onclick="showRegister()">注册新账号</button>
+            <button onclick="showRegister()" style="background: linear-gradient(to bottom, #b0e0e6, #87cefa);">注册</button>
         </div>
 
         <div id="register-form" class="auth-form">
             <div class="form-group">
-                <label for="register-username">用户名：</label>
-                <input type="text" id="register-username">
+                <label for="register-username">新昵称：</label>
+                <input type="text" id="register-username" placeholder="想一个独一无二的名字~">
             </div>
             <div class="form-group">
-                <label for="register-password">密码：</label>
-                <input type="password" id="register-password">
+                <label for="register-password">设置密码：</label>
+                <input type="password" id="register-password" placeholder="悄悄设置密码~">
             </div>
             <div class="form-group">
                 <label>性别：</label>
                 <label>
-                    <input type="radio" name="gender" value="male" checked> 男
+                    <input type="radio" name="gender" value="male" checked> 👦 男孩
                 </label>
                 <label>
-                    <input type="radio" name="gender" value="female"> 女
+                    <input type="radio" name="gender" value="female"> 👧 女孩
                 </label>
             </div>
-            <button onclick="register()">注册</button>
-            <button onclick="showLogin()">返回登录</button>
+            <button onclick="register()">立即注册</button>
+            <button onclick="showLogin()" style="background: linear-gradient(to bottom, #f0f8ff, #e0f2f7); color: #6495ed;">返回登录</button>
         </div>
     </div>
 
     <div id="chat-page" class="chat-page">
-        <h1>聊天室</h1>
+        <h1>☁️ 云朵聊天室 ☁️</h1>
         <div class="chat-wrapper">
             <div class="chat-main">
-                <div id="chat-container"></div>
+                <div id="chat-container">
+                    <!-- 聊天消息将显示在这里 -->
+                </div>
                 <div class="message-input-container">
                     <div class="message-tools">
-                        <button class="tool-button" onclick="toggleEmojiPicker()">😊</button>
+                        <button class="tool-button" onclick="toggleEmojiPicker()" title="表情">😊</button>
                         <input type="file" id="image-input" accept="image/*" style="display: none" onchange="handleImageUpload(event)">
-                        <button class="tool-button" onclick="document.getElementById('image-input').click()">🖼️</button>
+                        <button class="tool-button" onclick="document.getElementById('image-input').click()" title="图片">🖼️</button>
                     </div>
-                    <input type="text" id="message-input" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
+                    <input type="text" id="message-input" placeholder="有什么新鲜事想分享吗~" onkeypress="handleKeyPress(event)">
                     <button onclick="sendMessage()">发送</button>
                     <div class="emoji-picker" id="emoji-picker">
                         <!-- 表情将通过 JavaScript 动态添加 -->
                     </div>
                 </div>
             </div>
-            
+
             <div class="users-sidebar">
-                <h2>在线用户 <span id="user-count" class="user-count">(0)</span></h2>
-                <ul id="online-users" class="online-users"></ul>
-                
+                <h2>✨ 在线小伙伴 ✨</h2>
+                <ul id="online-users" class="online-users">
+                    <!-- 在线用户列表 -->
+                </ul>
+                <div class="user-count-wrapper" style="text-align: center; margin-top: 10px;">
+                    当前在线: <span id="user-count" class="user-count">(0)</span>
+                </div>
+
                 <div class="avatar-upload">
-                    <h3>更新头像</h3>
-                    <img id="preview-avatar" src="" alt="预览">
+                    <h3>🎀 更换头像 🎀</h3>
+                    <img id="preview-avatar" src="" alt="头像预览">
                     <input type="file" id="avatar-input" accept="image/*">
-                    <button onclick="uploadAvatar()">上传头像</button>
+                    <button onclick="uploadAvatar()">上传新头像</button>
                 </div>
-                
+
                 <div class="user-settings">
-                    <h3>修改用户名</h3>
-                    <input type="text" id="new-username" placeholder="输入新用户名">
-                    <button onclick="changeUsername()">更新用户名</button>
+                    <h3>✏️ 修改昵称 ✏️</h3>
+                    <input type="text" id="new-username" placeholder="输入新的昵称~">
+                    <button onclick="changeUsername()">保存新昵称</button>
                 </div>
-                
+
                 <div class="logout-button">
-                    <button onclick="logout()">退出登录</button>
+                    <button onclick="logout()">退出登录 👋</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="image-preview" id="image-preview" onclick="closeImagePreview()">
+    <div class="image-preview" id="image-preview" style="display: none;" onclick="closeImagePreview()">
         <img src="" alt="预览图片">
     </div>
 
@@ -493,17 +646,41 @@
             connectWebSocket(token);
         }
 
+        // 显示错误信息并自动隐藏
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            if (errorElement) {
+                errorElement.textContent = `😥 ${message}`;
+                errorElement.style.display = 'block';
+                // 保持错误信息可见，直到下次操作或新错误出现
+                // 如果需要自动隐藏，可以取消下面注释
+                // setTimeout(() => {
+                //     errorElement.textContent = '';
+                //     errorElement.style.display = 'none';
+                // }, 5000);
+            }
+        }
+
         // 发送消息函数
         function sendMessage() {
             const messageInput = document.getElementById('message-input');
             const content = messageInput.value.trim();
-            
-            if (content && ws) {
+
+            if (!content) {
+                showError('不能发送空消息哦~');
+                return;
+            }
+
+            if (content && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
                     type: 'chat',
                     content: content
                 }));
                 messageInput.value = '';
+                // 关闭可能打开的表情选择器
+                document.getElementById('emoji-picker').classList.remove('active');
+            } else {
+                showError('连接已断开，无法发送消息 T_T');
             }
         }
 
@@ -514,80 +691,102 @@
             }
         }
 
-        // 显示消息函数
+        // 显示消息函数 (适配新样式结构)
         function displayMessage(message) {
             const chatContainer = document.getElementById('chat-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.type}`;
-            
-            const timestamp = new Date(message.timestamp).toLocaleTimeString();
-            const defaultAvatar = 'https://10.148.60.37:3693/avatars/default1.png';
-            
-            let content;
+            const messageWrapper = document.createElement('div'); // 最外层容器
+            messageWrapper.className = `message ${message.type}`;
+
+            const timestamp = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const defaultAvatar = 'https://10.148.60.37:3693/avatars/default1.png'; // 保持不变
+
+            let innerHTML;
             switch (message.type) {
                 case 'chat':
-                    content = message.content;
-                    break;
-                case 'emoji':
-                    content = `<span style="font-size: 2em;">${message.content}</span>`;
-                    break;
+                case 'emoji': // 将表情视为聊天结构
                 case 'image':
-                    content = `<img src="${"https://10.148.60.37:3693"+message.content}" alt="图片" class="chat-image" onclick="showImagePreview('${message.content}')">`;
+                    const avatarUrl = "https://10.148.60.37:3693" + (message.avatar || defaultAvatar);
+                    let contentHTML;
+                    if (message.type === 'emoji') {
+                        contentHTML = `<span style="font-size: 2em; vertical-align: middle;">${message.content}</span>`;
+                    } else if (message.type === 'image') {
+                        const imageUrl = "https://10.148.60.37:3693" + message.content;
+                        contentHTML = `<img src="${imageUrl}" alt="图片" class="chat-image" onclick="showImagePreview('${message.content}')">`;
+                    } else {
+                        // 基本 XSS 预防：转义聊天内容中的 HTML
+                        const tempDiv = document.createElement('div');
+                        tempDiv.textContent = message.content;
+                        contentHTML = tempDiv.innerHTML;
+                    }
+
+                    innerHTML = `
+                        <div class="message-content">
+                            <div class="avatar-container">
+                                <img class="avatar" src="${avatarUrl}"
+                                     alt="${message.username} 头像" onerror="this.src='${defaultAvatar}'">
+                            </div>
+                            <div class="message-content-wrapper">
+                                <span class="username">${message.username}:</span>
+                                ${contentHTML}
+                                <span class="timestamp">${timestamp}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'system':
+                    // 系统消息结构 (简化)
+                    innerHTML = `
+                         <div class="message-content">
+                             ${message.content}
+                             <span class="timestamp">${timestamp}</span>
+                         </div>
+                     `;
                     break;
                 default:
-                    content = message.content;
+                     // 未知消息类型
+                     innerHTML = `
+                         <div class="message-content">
+                             [未知消息类型] ${message.content || ''}
+                             <span class="timestamp">${timestamp}</span>
+                         </div>
+                     `;
             }
 
-            if (message.type !== 'system') {
-                messageDiv.innerHTML = `
-                    <div class="avatar-container">
-                        <img class="avatar" src="${"https://10.148.60.37:3693"+message.avatar || defaultAvatar}" 
-                             alt="头像" onerror="this.src='${defaultAvatar}'">
-                    </div>
-                    <div class="message-content">
-                        <span class="username">${message.username}:</span>
-                        ${content}
-                        <span class="timestamp">${timestamp}</span>
-                    </div>
-                `;
-            } else {
-                messageDiv.innerHTML = `
-                    <div class="message-content">
-                        ${content}
-                        <span class="timestamp">${timestamp}</span>
-                    </div>
-                `;
-            }
+            messageWrapper.innerHTML = innerHTML;
+            chatContainer.appendChild(messageWrapper);
 
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            // 滚动到底部
+             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
+
 
         // 更新用户列表函数
         function updateUserList(users) {
             const onlineUsers = document.getElementById('online-users');
             const userCount = document.getElementById('user-count');
-            
-            onlineUsers.innerHTML = '';
+
+            if (!onlineUsers || !userCount) return; // 防止元素未找到
+
+            onlineUsers.innerHTML = ''; // 清除之前的列表
             userCount.textContent = `(${users.length})`;
-            
+
+            const defaultAvatar = 'https://10.148.60.37:3693/avatars/default1.png'; // 默认头像
+
             users.forEach(user => {
                 const li = document.createElement('li');
                 const isCurrentUser = user.userId === currentUserId;
-                // console.log("🚀 ~ updateUserList ~ user:", user)
-                
+
                 if (isCurrentUser) {
                     li.classList.add('current-user');
                 }
-                
-                // 使用默认头像URL
-                const defaultAvatar = 'https://10.148.60.37:3693/avatars/default1.png';
-                
+
+                const avatarUrl = "https://10.148.60.37:3693" + (user.avatar || defaultAvatar);
+
                 li.innerHTML = `
                     <span class="online-dot"></span>
-                    <img class="user-avatar" src="${"https://10.148.60.37:3693"+user.avatar || defaultAvatar}" 
-                         alt="头像" onerror="this.src='${defaultAvatar}'">
-                    ${user.username}
+                    <img class="user-avatar" src="${avatarUrl}"
+                         alt="${user.username} 头像" onerror="this.src='${defaultAvatar}'">
+                    <span class="online-username">${user.username}</span>
                     ${isCurrentUser ? '<span class="current-user-badge">我</span>' : ''}
                 `;
                 onlineUsers.appendChild(li);
@@ -595,189 +794,308 @@
         }
 
         function connectWebSocket(token) {
-            // 使用固定IP地址而不是动态获取
             const wsUrl = `wss://10.148.60.37:3693?token=${token}`;
             ws = new WebSocket(wsUrl);
-            
-            console.log('正在连接WebSocket:', wsUrl); // 添加调试信息
-            
+
+            console.log('正在连接 WebSocket:', wsUrl);
+
             ws.onopen = () => {
-                console.log('WebSocket连接成功'); // 添加调试信息
+                console.log('WebSocket 连接成功 ✿');
                 document.getElementById('auth-page').style.display = 'none';
                 document.getElementById('chat-page').style.display = 'block';
-                
+
                 try {
                     const tokenData = JSON.parse(atob(token.split('.')[1]));
                     currentUserId = tokenData.userId;
                 } catch (error) {
-                    console.error('解析token失败:', error);
+                    console.error('解析 token 失败:', error);
+                    showError('无法解析用户信息，请重新登录');
+                    logout(); // 如果 token 无效，强制退出
+                    return;
                 }
+
+                sessionId = generateSessionId();
+                ws.send(JSON.stringify({
+                    type: 'session',
+                    sessionId: sessionId
+                }));
+                 // 连接成功后隐藏之前的任何错误消息
+                const errorElement = document.getElementById('error-message');
+                if (errorElement) errorElement.style.display = 'none';
             };
 
             ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                
-                switch(data.type) {
-                    case 'history':
-                        document.getElementById('chat-container').innerHTML = '';
-                        data.messages.forEach(message => {
-                            displayMessage(message);
-                        });
-                        break;
-                    case 'userList':
-                        updateUserList(data.users);
-                        break;
-                    default:
-                        displayMessage(data);
+                try {
+                    const data = JSON.parse(event.data);
+                    // console.log("收到消息:", data); // 记录收到的消息
+
+                    switch(data.type) {
+                        case 'history':
+                            document.getElementById('chat-container').innerHTML = ''; // 首先清除历史记录
+                            data.messages.forEach(msg => displayMessage(msg));
+                            break;
+                        case 'userList':
+                            updateUserList(data.users);
+                            break;
+                        case 'forceLogout':
+                            handleForceLogout();
+                            break;
+                        case 'chat':
+                        case 'emoji':
+                        case 'image':
+                        case 'system':
+                            displayMessage(data);
+                            break;
+                        default:
+                            console.log("收到未知类型的消息:", data);
+                    }
+                } catch (error) {
+                    console.error("处理消息时出错:", error, "原始数据:", event.data);
                 }
             };
 
-            ws.onclose = () => {
-                showError('连接已断开，请重新登录');
-                document.getElementById('chat-page').style.display = 'none';
-                document.getElementById('auth-page').style.display = 'block';
+            ws.onclose = (event) => {
+                console.log('WebSocket 关闭:', event.code, event.reason);
+                 // 4000 是我们自定义的强制登出代码，不显示通用错误
+                if (event.code !== 1000 && event.code !== 4000) {
+                    showError('连接已断开，请尝试重新登录');
+                } else if (event.code === 1000 && !event.wasClean) {
+                    // 正常关闭，但可能是由于网络问题
+                     showError('连接意外断开，请检查网络并重试');
+                }
+                // 关闭时总是返回认证页面，除非是由强制登出处理的
+                if (event.code !== 4000) {
+                    document.getElementById('chat-page').style.display = 'none';
+                    document.getElementById('auth-page').style.display = 'block';
+                }
             };
 
             ws.onerror = (error) => {
-                console.error('WebSocket错误:', error);
-                showError('连接聊天服务器失败，请重试');
+                console.error('WebSocket 错误:', error);
+                showError('连接聊天服务器失败，请检查网络或证书设置');
+                 // 可选：在出错时切换回认证页面
+                document.getElementById('chat-page').style.display = 'none';
+                document.getElementById('auth-page').style.display = 'block';
             };
         }
 
-        function showError(message) {
-            const errorElement = document.getElementById('error-message');
-            errorElement.textContent = message;
-            setTimeout(() => {
-                errorElement.textContent = '';
-            }, 3000);
+        // 生成随机会话ID
+        function generateSessionId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2, 15);
         }
+
+        // 处理被强制登出
+        function handleForceLogout() {
+            showError('您的账号已在其他设备登录，本设备已下线 T_T');
+            localStorage.removeItem('chatToken');
+            if (ws) {
+                 // 使用自定义代码和原因
+                ws.close(4000, '从另一台设备登录');
+            }
+            // 确保即使 onclose 事件延迟/丢失，UI 也更新
+            document.getElementById('chat-page').style.display = 'none';
+            document.getElementById('auth-page').style.display = 'block';
+        }
+
 
         // 登录相关函数
         function showRegister() {
             document.getElementById('login-form').classList.remove('active');
             document.getElementById('register-form').classList.add('active');
+            document.getElementById('error-message').style.display = 'none'; // 切换表单时隐藏错误
         }
 
         function showLogin() {
             document.getElementById('register-form').classList.remove('active');
             document.getElementById('login-form').classList.add('active');
+             document.getElementById('error-message').style.display = 'none'; // 切换表单时隐藏错误
         }
 
         async function login() {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
+            const usernameInput = document.getElementById('login-username');
+            const passwordInput = document.getElementById('login-password');
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                showError("昵称和密码都不能为空哦~");
+                return;
+            }
 
             try {
-                console.log('尝试登录:', username); // 添加调试信息
+                console.log('尝试登录:', username);
                 const response = await fetch('https://10.148.60.37:3693/api/auth/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username,
+                        password,
+                        deviceInfo: { // 可选：发送设备信息
+                            type: 'web',
+                            browser: navigator.userAgent.substring(0, 100), // 限制长度
+                            timestamp: new Date().toISOString()
+                        }
+                    }),
                 });
 
                 const data = await response.json();
-                console.log('登录响应:', data); // 添加调试信息
-                
-                if (response.ok) {
+                console.log('登录响应:', data);
+
+                if (response.ok && data.token) {
                     localStorage.setItem('chatToken', data.token);
                     connectWebSocket(data.token);
+                    passwordInput.value = ''; // 成功登录尝试后清除密码字段
                 } else {
-                    showError(data.message);
+                    showError(data.message || '登录失败，请检查昵称和密码');
                 }
             } catch (error) {
-                console.error('登录错误:', error); // 添加详细错误信息
-                showError('登录失败，请重试');
+                console.error('登录错误:', error);
+                showError('登录请求失败，请检查网络或服务器状态');
             }
         }
 
         async function register() {
-            const username = document.getElementById('register-username').value;
-            const password = document.getElementById('register-password').value;
-            const gender = document.querySelector('input[name="gender"]:checked').value;
+            const usernameInput = document.getElementById('register-username');
+            const passwordInput = document.getElementById('register-password');
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            const genderElement = document.querySelector('input[name="gender"]:checked');
+            const gender = genderElement ? genderElement.value : 'male'; // 如果未选择，默认为男性
+
+            if (!username || !password) {
+                showError("昵称和密码都不能为空哦~");
+                return;
+            }
+            if (password.length < 4) { // 示例：基本密码长度检查
+                showError("密码至少需要4位哦~");
+                return;
+            }
+
 
             try {
                 const response = await fetch('https://10.148.60.37:3693/api/auth/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, password, gender }),
                 });
 
                 const data = await response.json();
-                if (response.ok) {
-                    localStorage.setItem('chatToken', data.token);
-                    connectWebSocket(data.token);
+                if (response.ok && data.token) {
+                     showError('注册成功！现在将自动登录...'); // 使用 showError 保持一致性
+                     setTimeout(() => {
+                         localStorage.setItem('chatToken', data.token);
+                         connectWebSocket(data.token);
+                         passwordInput.value = ''; // 清除密码
+                     }, 1000); // 短暂延迟
                 } else {
-                    showError(data.message);
+                    showError(data.message || '注册失败，昵称可能已被使用');
                 }
             } catch (error) {
-                showError('注册失败，请重试');
+                console.error('注册错误:', error);
+                showError('注册请求失败，请检查网络或服务器状态');
             }
         }
+
+        // 退出登录功能
+        function logout() {
+            // 添加一个可爱的确认框
+            if (confirm('真的要离开云朵聊天室了吗？🥺')) {
+                if (ws) {
+                    // 使用正常代码关闭
+                    ws.close(1000, '用户已登出');
+                }
+                localStorage.removeItem('chatToken');
+                document.getElementById('chat-page').style.display = 'none';
+                document.getElementById('auth-page').style.display = 'block';
+                // 可选地清除字段
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                // 显示可爱的登出消息
+                showError('下次再来玩哦~ 👋');
+            }
+        }
+
 
         // 添加头像预览功能
         document.getElementById('avatar-input').addEventListener('change', function(e) {
             const file = e.target.files[0];
-            if (file) {
+            const preview = document.getElementById('preview-avatar');
+            if (file && file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('preview-avatar');
                     preview.src = e.target.result;
-                    preview.style.display = 'block';
+                    preview.style.display = 'block'; // 显示预览
                 }
                 reader.readAsDataURL(file);
+            } else if (file) {
+                showError('请选择图片文件哦~');
+                preview.style.display = 'none'; // 如果文件无效则隐藏预览
+                e.target.value = ''; // 清除输入
+            } else {
+                 preview.style.display = 'none'; // 如果没有选择文件则隐藏
             }
         });
 
         // 添加头像上传功能
         async function uploadAvatar() {
             const input = document.getElementById('avatar-input');
-            if (!input.files[0]) {
-                showError('请选择要上传的图片');
+            const file = input.files[0];
+
+            if (!file) {
+                showError('还没有选择图片呢~');
+                return;
+            }
+            if (file.size > 2 * 1024 * 1024) { // 限制大小为 2MB
+                showError('图片有点太大了哦（最大2MB）~');
                 return;
             }
 
             const formData = new FormData();
-            formData.append('avatar', input.files[0]);
+            formData.append('avatar', file);
 
             try {
                 const response = await fetch('https://10.148.60.37:3693/api/auth/avatar', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
 
                 const data = await response.json();
                 if (response.ok) {
-                    showError('头像更新成功');
-                    
-                    // 重新连接 WebSocket 以更新头像
-                    ws.close(); // 先关闭当前连接
+                    showError('头像更新成功！✨');
+                    document.getElementById('preview-avatar').style.display = 'none'; // 上传后隐藏预览
+                    input.value = ''; // 清除文件输入
+
+                    // 重新连接以立即在各处更新头像
+                    if (ws) ws.close(1000, '头像已更新，正在重新连接');
+                    // 在重新连接前添加一个小的延迟
                     setTimeout(() => {
-                        connectWebSocket(token); // 重新连接
+                         connectWebSocket(token);
                     }, 500);
+
                 } else {
-                    showError(data.message);
+                    showError(data.message || '头像上传失败了 T_T');
                 }
             } catch (error) {
-                showError('上传失败，请重试');
+                console.error("上传头像错误:", error);
+                showError('头像上传失败，请检查网络');
             }
         }
 
         // 修改用户名功能
         async function changeUsername() {
-            const newUsername = document.getElementById('new-username').value.trim();
-            
+            const newUsernameInput = document.getElementById('new-username');
+            const newUsername = newUsernameInput.value.trim();
+
             if (!newUsername) {
-                showError('请输入新用户名');
+                showError('新的昵称不能为空哦~');
                 return;
             }
-            
+            if (newUsername.length > 15) { // 示例长度限制
+                 showError('昵称有点太长了哦（最多15个字）~');
+                 return;
+            }
+
             try {
                 const response = await fetch('https://10.148.60.37:3693/api/auth/username', {
                     method: 'PUT',
@@ -790,39 +1108,47 @@
 
                 const data = await response.json();
                 if (response.ok) {
-                    showError('用户名修改成功');
-                    document.getElementById('new-username').value = '';
-                    
-                    // 重新连接 WebSocket 以更新用户名
-                    ws.close();
-                    setTimeout(() => {
-                        connectWebSocket(token);
-                    }, 500);
+                    showError('昵称修改成功！✨');
+                    newUsernameInput.value = ''; // 清除输入
+
+                    // 重新连接以立即在各处更新用户名
+                    if (ws) ws.close(1000, '用户名已更新，正在重新连接');
+                     // 在重新连接前添加一个小的延迟
+                     setTimeout(() => {
+                         connectWebSocket(token);
+                     }, 500);
+
                 } else {
-                    showError(data.message || '修改失败');
+                    showError(data.message || '修改失败，昵称可能已被使用或无效');
                 }
             } catch (error) {
-                showError('修改用户名失败，请重试');
+                console.error("修改昵称错误:", error);
+                showError('修改昵称失败，请检查网络');
             }
         }
 
-        // 表情列表
+        // 表情列表 (保持表情简单)
         const emojis = [
-            '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊',
-            '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘',
-            '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪',
-            '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒',
-            '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖'
+            '😀', '😂', '😊', '😍', '🤔', '😭', '🙏', '👍', '🎉', '✨',
+            '💖', '⭐', '🥳', '😎', '😜', '😇', '🥺', '😴', '👋', '👀',
+            '🍎', '🍓', '🍦', '🍕', '🚀', '🎈', '🎁', '🐶', '🐱', '🐰'
+            // 如果需要，添加更多可爱的表情
         ];
 
         // 初始化表情选择器
         function initEmojiPicker() {
             const picker = document.getElementById('emoji-picker');
+            picker.innerHTML = ''; // 先清除现有表情
             emojis.forEach(emoji => {
                 const span = document.createElement('span');
                 span.className = 'emoji-item';
                 span.textContent = emoji;
-                span.onclick = () => addEmoji(emoji);
+                span.onclick = (e) => {
+                    e.stopPropagation(); // 防止点击立即关闭选择器
+                    addEmoji(emoji);
+                    // 可选：选择后关闭选择器
+                    // picker.classList.remove('active');
+                };
                 picker.appendChild(span);
             });
         }
@@ -837,17 +1163,7 @@
         function addEmoji(emoji) {
             const input = document.getElementById('message-input');
             input.value += emoji;
-            input.focus();
-        }
-
-        // 发送表情消息
-        function sendEmojiMessage(emoji) {
-            if (ws) {
-                ws.send(JSON.stringify({
-                    type: 'emoji',
-                    content: emoji
-                }));
-            }
+            input.focus(); // 保持焦点在输入框
         }
 
         // 处理图片上传
@@ -856,95 +1172,85 @@
             if (!file) return;
 
             if (!file.type.startsWith('image/')) {
-                showError('请选择图片文件');
+                showError('请选择图片文件哦~');
                 return;
             }
-
-            // 检查文件大小
-            if (file.size > 5 * 1024 * 1024) {
-                showError('图片大小不能超过5MB');
+            if (file.size > 5 * 1024 * 1024) { // 5MB 限制
+                showError('图片太大了哦（最大5MB）~');
                 return;
             }
 
             const formData = new FormData();
             formData.append('image', file);
 
+            // 如果需要，显示一个临时的"上传中"指示器
+            // displayMessage({ type: 'system', content: '正在上传图片...', timestamp: new Date() });
+
             try {
                 const response = await fetch('https://10.148.60.37:3693/api/chat/image', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
+                    headers: { 'Authorization': `Bearer ${token}` },
                     body: formData
                 });
 
                 const data = await response.json();
-                if (response.ok) {
-                    // 发送图片消息
-                    ws.send(JSON.stringify({
-                        type: 'image',
-                        content: data.imageUrl
-                    }));
+                if (response.ok && data.imageUrl) {
+                    // 通过 WebSocket 发送图片消息
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'image',
+                            content: data.imageUrl // 发送服务器返回的相对 URL
+                        }));
+                    } else {
+                         showError('连接已断开，无法发送图片 T_T');
+                    }
                 } else {
-                    showError(data.message || '图片上传失败');
+                    showError(data.message || '图片上传失败了 T_T');
                 }
             } catch (error) {
-                console.error('上传错误:', error);
-                showError('图片上传失败，请重试');
+                console.error('上传图片错误:', error);
+                showError('图片上传失败，请检查网络');
             } finally {
-                // 清空文件输入框，允许重复上传相同文件
+                // 清除文件输入，以便可以重新上传相同的文件
                 event.target.value = '';
             }
         }
 
         // 图片预览
-        function showImagePreview(url) {
-            const preview = document.getElementById('image-preview');
-            preview.querySelector('img').src = "https://10.148.60.37:3693"+url;
-            preview.classList.add('active');
+        function showImagePreview(relativeUrl) {
+             const preview = document.getElementById('image-preview');
+             const imgElement = preview.querySelector('img');
+             if (preview && imgElement) {
+                 imgElement.src = "https://10.148.60.37:3693" + relativeUrl; // 构建完整 URL
+                 preview.classList.add('active');
+                 // 不需要 display:flex，类会处理它
+             }
         }
 
         function closeImagePreview() {
-            document.getElementById('image-preview').classList.remove('active');
+            const preview = document.getElementById('image-preview');
+             if (preview) {
+                preview.classList.remove('active');
+                // 清除 src 以防止下次打开时短暂闪烁旧图像
+                preview.querySelector('img').src = '';
+            }
         }
 
         // 初始化页面
         document.addEventListener('DOMContentLoaded', () => {
             initEmojiPicker();
-            
-            // 点击页面其他地方关闭表情选择器
+
+            // 点击表情选择器外部关闭它
             document.addEventListener('click', (e) => {
                 const picker = document.getElementById('emoji-picker');
-                const emojiButton = document.querySelector('.tool-button');
-                if (picker && !picker.contains(e.target) && e.target !== emojiButton) {
-                    picker.classList.remove('active');
+                const emojiButton = document.querySelector('.tool-button[title="表情"]'); // 更具体的选择器
+                if (picker && picker.classList.contains('active')) {
+                    if (!picker.contains(e.target) && e.target !== emojiButton && !emojiButton.contains(e.target)) {
+                        picker.classList.remove('active');
+                    }
                 }
             });
         });
-
-        // 退出登录功能
-        function logout() {
-            if (confirm('确定要退出登录吗？')) {
-                // 关闭WebSocket连接
-                if (ws) {
-                    ws.close();
-                }
-                
-                // 清除本地存储的token
-                localStorage.removeItem('chatToken');
-                
-                // 返回登录页面
-                document.getElementById('chat-page').style.display = 'none';
-                document.getElementById('auth-page').style.display = 'block';
-                
-                // 清空登录表单
-                document.getElementById('login-username').value = '';
-                document.getElementById('login-password').value = '';
-                
-                // 提示用户已退出
-                showError('您已成功退出登录');
-            }
-        }
     </script>
 </body>
 </html> 

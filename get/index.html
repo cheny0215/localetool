@@ -36,6 +36,7 @@
             justify-content: center;
             transition: all 0.3s;
             opacity: 0.6;
+            z-index: 2;
         }
 
         .edit-icon:hover {
@@ -49,6 +50,28 @@
             padding: 4px 6px;
             border-radius: 4px;
             transition: all 0.3s;
+            max-height: 100px;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            position: relative;
+        }
+
+        .editable.has-overflow::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 25px;
+            background: linear-gradient(to bottom, rgba(242, 242, 242, 0), rgba(255, 255, 255, 0.5));
+            pointer-events: none;
+            z-index: 1;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .editable.expanded {
+            max-height: 1000px;
+            overflow: visible;
         }
 
         .editable:focus {
@@ -269,6 +292,7 @@
             justify-content: center;
             transition: all 0.3s;
             opacity: 0.6;
+            z-index: 2;
         }
 
         .delete-icon:hover {
@@ -410,6 +434,44 @@
         .layui-elem-quote:has(.editing) .delete-icon {
             display: none;
         }
+
+        /* 新增：展开/收起按钮样式 */
+        .expand-icon {
+            position: absolute;
+            right: 70px;
+            top: 10px;
+            cursor: pointer;
+            color: #1E9FFF;
+            font-size: 16px;
+            background: #f2f2f2;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            opacity: 0.8;
+            z-index: 2;
+        }
+
+        .expand-icon:hover {
+            opacity: 1;
+            background: #e6e6e6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 当便签处于编辑状态时隐藏删除图标 和 展开图标 */
+        .layui-elem-quote.editing-parent .delete-icon,
+        .layui-elem-quote.editing-parent .expand-icon {
+            display: none;
+        }
+
+        /* 对于使用:has选择器的浏览器 */
+        .layui-elem-quote:has(.editing) .delete-icon,
+        .layui-elem-quote:has(.editing) .expand-icon {
+            display: none;
+        }
     </style>
 </head>
 
@@ -438,11 +500,13 @@
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
                         <i class="layui-icon layui-icon-delete delete-icon"></i>
+                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                         <div class="editable" contenteditable="false">Lvan.Chen@mullenlowe.com</div>
                     </blockquote>
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
                         <i class="layui-icon layui-icon-delete delete-icon"></i>
+                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                         <div class="editable" contenteditable="false">ivanyang_chen@apple.com</div>
                     </blockquote>
 
@@ -464,6 +528,7 @@
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
                         <i class="layui-icon layui-icon-delete delete-icon"></i>
+                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                         <div class="editable" contenteditable="false">
                             <div>ivanyang_chen@apple.com,</div>
                             <div>ivanchenyang99@outlook.com,</div>
@@ -492,6 +557,7 @@
                     <blockquote class="layui-elem-quote content-block">
                         <i class="layui-icon layui-icon-edit edit-icon"></i>
                         <i class="layui-icon layui-icon-delete delete-icon"></i>
+                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                         <div class="editable" contenteditable="false">
                             <div>chester_haisheng_zhao@apple.com,</div>
                             <div>efforthongfei_zheng@apple.com,</div>
@@ -545,6 +611,8 @@
                             <div class="platform-title">QQ</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="qq">
                                     <div>1416413774@qq.com,</div>
                                     <div>2099096391@qq.com,</div>
@@ -557,6 +625,8 @@
                             <div class="platform-title">163</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="163">
                                     <div>apple_gc_qatest@163.com,</div>
                                     <div>apple_gc_testing@163.com,</div>
@@ -569,6 +639,8 @@
                             <div class="platform-title">新浪sina</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="sina">
                                     <div>apple_gc_testing@sina.com,</div>
                                 </div>
@@ -579,6 +651,8 @@
                             <div class="platform-title">Outlook</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="outlook">
                                     <div>apple_gc_qatest1@outlook.com,</div>
                                     <div>apple_gc_qatest3@outlook.com,</div>
@@ -590,6 +664,8 @@
                             <div class="platform-title">Gmail</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="gmail">
                                     <div>apple.gc.testing@gmail.com,</div>
                                     <div>apple.gc.qatest@gmail.com,</div>
@@ -601,6 +677,8 @@
                             <div class="platform-title">Yahoo</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="yahoo">
                                     <div>apple_gc_qatest@yahoo.com,</div>
                                 </div>
@@ -611,6 +689,8 @@
                             <div class="platform-title">Apple/iCloud</div>
                             <blockquote class="layui-elem-quote content-block">
                                 <i class="layui-icon layui-icon-edit edit-icon"></i>
+                                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                                 <div class="editable" contenteditable="false" data-section="apple">
                                     <div>apple_gc_testing4@icloud.com,</div>
                                     <div>joe_le_jiang@apple.com,</div>
@@ -721,6 +801,7 @@
                         <blockquote class="layui-elem-quote content-block">
                             <i class="layui-icon layui-icon-edit edit-icon"></i>
                             <i class="layui-icon layui-icon-delete delete-icon"></i>
+                            <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
                             <div class="editable" contenteditable="false">${noteContent}</div>
                         </blockquote>
                         `;
@@ -1140,13 +1221,7 @@
                                 <i class="layui-icon layui-icon-delete field-delete-icon"></i>
                             </legend>
                             <div class="layui-field-box">
-                                <blockquote class="layui-elem-quote content-block">
-                                    <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                    <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                    <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
-                                </blockquote>
-                                
-                                <!-- 添加便签按钮 -->
+                                ${createNewNoteHtml()}
                                 <div class="note-btn-wrapper">
                                     <div class="add-note-btn" title="添加便签">
                                         <i class="layui-icon layui-icon-add-1"></i>
@@ -1188,13 +1263,7 @@
                     const fieldBox = this.closest('.note-btn-wrapper').parentNode;
 
                     // 创建新便签
-                    const newNoteHtml = `
-                    <blockquote class="layui-elem-quote content-block">
-                        <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-delete delete-icon"></i>
-                        <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
-                    </blockquote>
-                    `;
+                    const newNoteHtml = createNewNoteHtml();
 
                     // 插入到按钮包装器之前
                     const wrapper = this.closest('.note-btn-wrapper');
@@ -1266,29 +1335,22 @@
             // 设置添加便签按钮
             const addNoteBtn = field.querySelector('.add-note-btn');
             if (addNoteBtn) {
-                addNoteBtn.addEventListener('click', function () {
-                    // 获取父级元素
+                // --- 为添加便签按钮创建新的克隆并添加事件监听 ---
+                const newAddNoteBtn = addNoteBtn.cloneNode(true);
+                addNoteBtn.parentNode.replaceChild(newAddNoteBtn, addNoteBtn);
+
+                newAddNoteBtn.addEventListener('click', function () {
                     const fieldBox = this.closest('.layui-field-box');
+                    const newNoteHtml = createNewNoteHtml();
+                    const wrapper = this.closest('.note-btn-wrapper');
+                    wrapper.insertAdjacentHTML('beforebegin', newNoteHtml);
 
-                    // 创建新便签
-                    const newNoteHtml = `
-                    <blockquote class="layui-elem-quote content-block">
-                        <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-delete delete-icon"></i>
-                        <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
-                    </blockquote>
-                    `;
+                    const newNote = wrapper.previousElementSibling;
+                    if (newNote) {
+                        setupNoteEvents(newNote);
+                    }
 
-                    // 插入到"添加便签"按钮之前
-                    this.insertAdjacentHTML('beforebegin', newNoteHtml);
-
-                    // 为新添加的便签绑定事件
-                    const newNote = this.previousElementSibling;
-                    setupNoteEvents(newNote);
-
-                    // 保存状态 - 确保调用新的更新函数
                     updateAndSaveAllData();
-
                     showMessage({ msg: '便签已添加', type: 'success' });
                 });
             }
@@ -1299,19 +1361,52 @@
             const editableDiv = note.querySelector('.editable');
             const editIcon = note.querySelector('.edit-icon');
             const deleteIcon = note.querySelector('.delete-icon');
+            const expandIcon = note.querySelector('.expand-icon');
 
-            // 先移除可能存在的旧事件监听器
+            // 检查内容是否溢出，决定是否显示展开按钮和底部渐变
+            function checkOverflow() {
+                // 总是先移除，再根据条件添加
+                editableDiv.classList.remove('has-overflow');
+                if (!expandIcon) return; // 如果没有展开图标，直接返回
+
+                // 确保元素可见且不是编辑状态
+                if (editableDiv.offsetParent !== null && editableDiv.contentEditable === 'false') {
+                    const computedStyle = window.getComputedStyle(editableDiv);
+                    // 检查 max-height 是否是 'none' 或无效值，避免NaN
+                    let maxHeight = parseInt(computedStyle.maxHeight, 10);
+                    if (isNaN(maxHeight) || computedStyle.maxHeight === 'none') {
+                        // 如果没有有效的 max-height (例如已展开)，则不应显示展开按钮或渐变
+                        expandIcon.style.display = 'none';
+                        return;
+                    }
+
+                    // 比较滚动高度和最大高度
+                    if (editableDiv.scrollHeight > maxHeight + 1) { // 加1像素容差
+                        expandIcon.style.display = 'flex'; // 显示展开按钮
+                        // 只有在未展开时才添加渐变效果
+                        if (!editableDiv.classList.contains('expanded')) {
+                            editableDiv.classList.add('has-overflow');
+                        }
+                    } else {
+                        expandIcon.style.display = 'none'; // 隐藏展开按钮
+                    }
+                } else {
+                     expandIcon.style.display = 'none'; // 不可见或编辑中则隐藏
+                }
+            }
+
+            // 初始检查
+            setTimeout(checkOverflow, 50); // 稍作延迟以确保样式计算准确
+
+            // --- 原有的删除按钮逻辑 ---
             if (deleteIcon) {
                 const newDeleteIcon = deleteIcon.cloneNode(true);
                 if (deleteIcon.parentNode) {
                     deleteIcon.parentNode.replaceChild(newDeleteIcon, deleteIcon);
                 }
-
-                // 为新的删除图标添加单一事件监听器
                 newDeleteIcon.addEventListener('click', function (event) {
                     event.stopPropagation();
                     event.preventDefault();
-
                     const confirmDelete = window.confirm('确定要删除这条便签吗？');
                     if (confirmDelete) {
                         note.remove();
@@ -1321,14 +1416,18 @@
                 });
             }
 
-            // 点击内容复制
+            // --- 原有的点击内容复制逻辑 ---
             editableDiv.addEventListener('click', (event) => {
-                if (editableDiv.getAttribute('contenteditable') === 'false') {
-                    upDateClipboard(editableDiv.textContent.replace(/\s+/g, ''));
+                if (editableDiv.getAttribute('contenteditable') === 'false' && !editableDiv.classList.contains('expanded')) {
+                    // 只有在未展开状态下点击才复制，避免展开时误触
+                     upDateClipboard(editableDiv.textContent.replace(/\s+/g, ''));
+                } else if (editableDiv.classList.contains('expanded')) {
+                     // 如果已展开，阻止冒泡，防止点击内容区域也触发复制（如果需要展开后仍能复制，移除此else if）
+                     event.stopPropagation();
                 }
             });
 
-            // 编辑功能
+            // --- 修改后的编辑按钮逻辑 ---
             editIcon.addEventListener('click', (event) => {
                 event.stopPropagation();
                 const currentState = editableDiv.getAttribute('contenteditable');
@@ -1337,28 +1436,53 @@
                 if (currentState === 'false') {
                     // 进入编辑状态
                     editableDiv.setAttribute('contenteditable', 'true');
+                    editableDiv.classList.add('editing');
+                    editableDiv.classList.remove('expanded');
+                    editableDiv.classList.remove('has-overflow'); // 编辑时移除渐变
                     editIcon.classList.remove('layui-icon-edit');
                     editIcon.classList.add('layui-icon-ok');
                     editIcon.classList.add('edit-active');
-                    editableDiv.classList.add('editing');
-                    // 添加这一行来改变父元素的cursor并隐藏删除图标
                     quoteElement.classList.add('editing-parent');
                     editableDiv.focus();
+                    if(expandIcon) expandIcon.style.display = 'none';
                 } else {
                     // 保存并退出编辑状态
                     editableDiv.setAttribute('contenteditable', 'false');
+                    editableDiv.classList.remove('editing');
                     editIcon.classList.remove('layui-icon-ok');
                     editIcon.classList.add('layui-icon-edit');
                     editIcon.classList.remove('edit-active');
-                    editableDiv.classList.remove('editing');
-                    // 移除editing-parent类，使删除图标重新显示
                     quoteElement.classList.remove('editing-parent');
 
-                    // 保存到localStorage
                     updateAndSaveAllData();
                     showMessage({ msg: '内容已保存', type: 'success' });
+
+                    // 退出编辑后，重新检查是否需要显示展开按钮和渐变
+                    checkOverflow();
                 }
             });
+
+            // --- 修改后的展开/收起按钮点击逻辑 ---
+            if (expandIcon) {
+                expandIcon.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const isExpanded = editableDiv.classList.toggle('expanded');
+
+                    if (isExpanded) {
+                        expandIcon.classList.remove('layui-icon-down');
+                        expandIcon.classList.add('layui-icon-up');
+                        expandIcon.title = '收起';
+                        editableDiv.classList.remove('has-overflow'); // 展开时移除渐变
+                    } else {
+                        expandIcon.classList.remove('layui-icon-up');
+                        expandIcon.classList.add('layui-icon-down');
+                        expandIcon.title = '展开';
+                        // 收起后，需要重新检查是否溢出以决定是否显示渐变
+                        // 使用 setTimeout 确保 max-height 过渡完成后再检查
+                        setTimeout(checkOverflow, 300); // 300ms 匹配 CSS 过渡时间
+                    }
+                });
+            }
         }
 
         // 为标题添加编辑功能
@@ -1592,6 +1716,18 @@
                     });
                 });
             });
+        }
+
+        // 修改：确保添加新便签时包含展开图标
+        function createNewNoteHtml() {
+            return `
+            <blockquote class="layui-elem-quote content-block">
+                <i class="layui-icon layui-icon-edit edit-icon"></i>
+                <i class="layui-icon layui-icon-delete delete-icon"></i>
+                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
+                <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
+            </blockquote>
+            `;
         }
 
     </script>
