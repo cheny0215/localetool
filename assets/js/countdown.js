@@ -158,37 +158,55 @@ function initCountdown() {
             return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         };
         
+        // 辅助函数：从 URL 中获取文件名
+        const getFilenameFromUrl = (url) => {
+             try {
+                 const parsedUrl = new URL(url, window.location.href); // 处理相对路径和绝对路径
+                 return parsedUrl.pathname.substring(parsedUrl.pathname.lastIndexOf('/') + 1);
+             } catch (e) {
+                 // 如果 URL 无效或为空，返回空字符串或进行错误处理
+                 return ""; 
+             }
+         };
+        
         let timeDiff;
+        let newIconFilename = '';
+        let currentIconFilename = getFilenameFromUrl(countdownIcon.src);
         
         // 上班前
         if (nowTime < workStartTime) {
             countdownDesc.innerHTML = '可恶！快<span style="color:#fff;font-size:16px;">上班</span>了💼<br>只有';
-            countdownIcon.src = './assets/icons/coffee.png';
+            newIconFilename = 'coffee.png';
             timeDiff = workStartDate - now;
         } 
         // 上午工作时间
         else if (nowTime >= workStartTime && nowTime < lunchStartTime) {
             countdownDesc.innerHTML = '距离<span style="color:#fff;font-size:16px;">干饭</span>时间<br>竟然还有';
-            countdownIcon.src = './assets/icons/work.png';
+            newIconFilename = 'work.png';
             timeDiff = lunchStartDate - now;
         }
         // 午休时间
         else if (nowTime >= lunchStartTime && nowTime < lunchEndTime) {
             countdownDesc.innerHTML = '<span style="color:#fff;font-size:16px;">午休</span>时间告急～<br>仅剩';
-            countdownIcon.src = './assets/icons/lunch.png';
+            newIconFilename = 'lunch.png';
             timeDiff = lunchEndDate - now;
         }
         // 下午工作时间
         else if (nowTime >= lunchEndTime && nowTime < workEndTime) {
             countdownDesc.innerHTML = '坚持就是胜利✌️<br>距离<span style="color:#fff;font-size:16px;">下班</span>还有';
-            countdownIcon.src = './assets/icons/run.png';
+            newIconFilename = 'run.png';
             timeDiff = workEndDate - now;
         }
         // 下班后
         else {
             countdownDesc.innerHTML = '晚上好，加班🐶<br>你已经<span style="color:#fff;font-size:16px;">加班</span>';
-            countdownIcon.src = './assets/icons/moon.png';
+            newIconFilename = 'moon.png';
             timeDiff = now - workEndDate; // 注意这里是计算已经加班的时间
+        }
+        
+        // 只有当图标需要改变时才更新 src
+        if (newIconFilename && currentIconFilename !== newIconFilename) {
+             countdownIcon.src = `./assets/icons/${newIconFilename}`;
         }
         
         // 更新倒计时显示
