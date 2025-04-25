@@ -244,20 +244,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function moveUp() {
-        rotateGrid(); // 旋转90度，向上移动变为向左移动
-        rotateGrid();
-        rotateGrid();
+        rotateGrid(); // 旋转一次，使向上变为向左
         const moved = moveLeft();
-        rotateGrid(); // 旋转回来
+        rotateGrid(); // 旋转三次回到原始位置
+        rotateGrid();
+        rotateGrid();
         return moved;
     }
 
     function moveDown() {
-        rotateGrid(); // 旋转90度，向下移动变为向右移动
-        const moved = moveRight();
-        rotateGrid(); // 旋转回来
+        rotateGrid(); // 旋转一次
+        rotateGrid(); // 再旋转一次，使向下变为向左
         rotateGrid();
-        rotateGrid();
+        const moved = moveLeft();
+        rotateGrid(); // 旋转一次回到原始位置
         return moved;
     }
 
