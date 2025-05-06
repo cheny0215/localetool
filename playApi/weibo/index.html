@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微博热搜榜</title>
+    <style>
+        /* CSS变量定义 */
+        :root {
+            --primary-color: #ff8200;
+            --secondary-color: #ffb74d;
+            --accent-color: #ff5722;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #eaeaea;
+            --header-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 15px auto;
+            padding: 0 15px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--header-bg);
+            border-radius: 10px;
+            color: var(--text-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            text-shadow: none;
+        }
+
+        .update-time {
+            font-size: 14px;
+            color: var(--text-light);
+            opacity: 1;
+        }
+
+        .hot-list-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .hot-list {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .hot-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hot-item:hover {
+            background-color: #f9f9f9;
+            transform: none;
+        }
+
+        .hot-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            border-radius: 6px;
+            background: var(--bg-color);
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .rank.top-3 {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .content {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .title {
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .loading::after {
+            content: "...";
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: "."; }
+            40% { content: ".."; }
+            60%, 100% { content: "..."; }
+        }
+
+        /* 响应式布局设计 */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 960px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hot-list-container {
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 10px;
+                margin: 10px auto;
+            }
+
+            .header {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .hot-list-container {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .hot-item {
+                padding: 10px 12px;
+            }
+
+            .rank {
+                width: 26px;
+                height: 26px;
+                line-height: 26px;
+                font-size: 14px;
+            }
+
+            .title {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .rank {
+                width: 24px;
+                height: 24px;
+                line-height: 24px;
+                font-size: 13px;
+                margin-right: 8px;
+            }
+
+            .title {
+                font-size: 13px;
+            }
+        }
+
+        /* 移除动画效果以获得更紧凑的显示效果 */
+        .hot-item {
+            animation: none;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>微博热搜榜</h1>
+            <div class="update-time" id="updateTime"></div>
+        </div>
+        <div class="hot-list-container" id="hotListContainer">
+            <!-- JS将填充内容 -->
+            <div class="loading">加载中</div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchHotList() {
+            try {
+                const response = await fetch('https://cn.apihz.cn/api/xinwen/weibo.php?id=10004465&key=0e8b0763210c6f7f19b175a6c177ca4f');
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    updateUI(data);
+                } else {
+                    throw new Error(`接口错误: ${data.code} - ${data.msg || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('获取数据失败:', error);
+                const container = document.getElementById('hotListContainer');
+                if (container) {
+                    container.innerHTML = '<div class="loading">加载失败，请稍后重试</div>';
+                }
+            }
+        }
+
+        function updateUI(data) {
+            // 更新时间显示
+            const updateTimeElement = document.getElementById('updateTime');
+            if (updateTimeElement) {
+                updateTimeElement.textContent = `更新时间：${data.time2}`;
+            }
+            
+            // 处理热搜列表
+            const hotListContainer = document.getElementById('hotListContainer');
+            if (!hotListContainer) return;
+
+            const items = data.data || [];
+            if (items.length === 0) {
+                hotListContainer.innerHTML = '<div class="loading">暂无数据</div>';
+                return;
+            }
+
+            // 根据屏幕宽度确定列数
+            const columnCount = window.innerWidth > 992 ? 4 : (window.innerWidth > 768 ? 3 : 1);
+            const itemsPerColumn = Math.ceil(items.length / columnCount);
+            
+            hotListContainer.innerHTML = Array(columnCount).fill().map((_, columnIndex) => {
+                const startIndex = columnIndex * itemsPerColumn;
+                const endIndex = Math.min(startIndex + itemsPerColumn, items.length);
+                if (startIndex >= items.length) return ''; // 避免创建空列
+                const columnItems = items.slice(startIndex, endIndex);
+                
+                return `
+                    <div class="hot-list">
+                        ${columnItems.map((item, index) => {
+                            const globalIndex = startIndex + index;
+                            return `
+                                <a href="${item.scheme}" class="hot-item" target="_blank" title="${item.title}">
+                                    <div class="rank ${globalIndex < 3 ? 'top-3' : ''}">${globalIndex + 1}</div>
+                                    <div class="content">
+                                        <div class="title">
+                                            ${item.title}
+                                            ${item.icon ? `<img src="${item.icon}" class="icon" alt="icon">` : ''}
+                                        </div>
+                                    </div>
+                                </a>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }).join('');
+
+            // 根据实际内容分布调整网格列
+            if (items.length > 0 && columnCount > 1) {
+                // 可以在这里添加列布局的动态调整逻辑
+                // 目前依赖CSS Grid的自动布局行为
+            }
+        }
+        
+        // 初始化加载
+        fetchHotList();
+
+        // 自动刷新设置
+        let refreshInterval = setInterval(fetchHotList, 5 * 60 * 1000);
+
+        // 当标签页不可见时停止刷新以节省资源
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                clearInterval(refreshInterval);
+            } else {
+                fetchHotList(); // 标签页可见时立即刷新
+                refreshInterval = setInterval(fetchHotList, 5 * 60 * 1000);
+            }
+        });
+        
+        // 窗口大小改变时重新计算布局
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                // 重新获取数据并更新布局
+                fetchHotList(); 
+            }, 250); // 防抖延迟
+        });
+
+    </script>
+</body>
+</html>
