@@ -111,6 +111,8 @@
                     checked>
                 <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
                 <input type="checkbox" id="addDateZwnjCheckbox" name="addDateZwnj" title="日期间添加zwnj" checked>
+                <input type="checkbox" id="appStoreNowrapCheckbox" name="addDateZwnj" title="footer下载appStore不换行"
+                    checked>
                 <hr>
                 <div>
                     <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
@@ -180,6 +182,7 @@
             const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
             const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
             const addDateZwnjCheckbox = document.getElementById('addDateZwnjCheckbox');
+            const appStoreNowrapCheckbox = document.getElementById('appStoreNowrapCheckbox');
 
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
             const setNowrapSpanCheckbox = document.getElementById('setNowrapSpanCheckbox');
@@ -194,11 +197,13 @@
             let html_doc = '';
             let hiddenPreContent = '';
             let hiddenFontContent = '';
-            let hexColorObj = {
+            const originalHexColorObj = {
                 addMargin: [],
                 delUnderline: [],
                 delUnderlineImportant: [],
+                appStoreNowrap: [],
             };
+            let hexColorObj = originalHexColorObj
             const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
             const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
             const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
@@ -224,6 +229,7 @@
                     legalPackageCheckbox.checked = elem.checked
                     imgToCenterCheckbox.checked = elem.checked
                     addDateZwnjCheckbox.checked = elem.checked
+                    appStoreNowrapCheckbox.checked = elem.checked
                 });
             })
 
@@ -249,27 +255,24 @@
             }
             function delPlaceholder(iframehtml) {
                 iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
-                iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent)
+                iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent);
 
                 console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
-                let count1 = 0
-                let count2 = 0
-                let count3 = 0
-                iframehtml = iframehtml.replace(/cornflowerblue/g, () => {
-                    const formatColor = hexColorObj.addMargin[count1]
-                    count1++
-                    return formatColor
-                });
-                iframehtml = iframehtml.replace(/mediumspringgreen/g, () => {
-                    const formatColor = hexColorObj.delUnderline[count2]
-                    count2++
-                    return formatColor
-                });
-                iframehtml = iframehtml.replace(/lightgoldenrodyellow/g, () => {
-                    const formatColor = hexColorObj.delUnderlineImportant[count3]
-                    count3++
-                    return formatColor
-                });
+
+                const placeholders = {
+                    'cornflowerblue': ['addMargin', 0],
+                    'mediumspringgreen': ['delUnderline', 0],
+                    'lightgoldenrodyellow': ['delUnderlineImportant', 0],
+                    'blanchedalmond': ['appStoreNowrap', 0]
+                };
+                
+                iframehtml = iframehtml.replace(/(cornflowerblue|mediumspringgreen|lightgoldenrodyellow|blanchedalmond)/g, 
+                    (match) => {
+                        const [prop, index] = placeholders[match];
+                        placeholders[match][1]++; // 更新索引计数
+                        return hexColorObj[prop][index];
+                    }
+                );
                 iframehtml = iframehtml.replace(new RegExp(escapeRegExp(zwnj_placeholder), 'g'), '&zwnj;')
                 return iframehtml
             }
@@ -332,6 +335,10 @@
                         if (addDateZwnjCheckbox.checked) {
                             addDateZwnj();
                         }
+                        if (appStoreNowrapCheckbox.checked) {
+                            appStoreNowrap();
+                        }
+
                         if (supNormalSizeCheckbox.checked) {
                             supNormalSize();
                         }
@@ -383,11 +390,7 @@
                 localStorage.setItem('cy_outputButton_current_html', '')
                 hiddenPreContent = '';
                 hiddenFontContent = '';
-                hexColorObj = {
-                    addMargin: [],
-                    delUnderline: [],
-                    delUnderlineImportant: [],
-                };
+                hexColorObj = originalHexColorObj;
                 dataInput.value = dataOutput.value = ''
                 html_doc = ''
                 handleOutput()
@@ -577,14 +580,33 @@
                 datePatterns.forEach(pattern => {
                     htmlContent = htmlContent.replace(pattern, (match) => {
                         // 将日期中的每个字符用 &zwnj; 连接
-                        console.log(match,'hh');
-                        
+                        console.log(match, 'hh');
+
                         return match.split('').join('&zwnj;');
                     });
                 });
                 html_doc = htmlContent;
                 handleOutput();
             }
+            // footer下载appStore不换行
+            function appStoreNowrap() {
+                //查找a标签，如果href="${clicks.get('BNAV_APP')}"，则设置white-space:nowrap
+                const a = iframeDoc.querySelectorAll('a');
+
+                a.forEach(o => {
+
+                    if (o.href.includes("clicks.get('BNAV_APP')")) {
+                        o.style.setProperty('white-space', 'nowrap');
+                        if (o.style.color) {
+                            const hexColor = rgbToHex(o.style.color)
+                            console.log("🚀 ~ appStoreNowrap ~ hexColor:", hexColor)
+                            o.style.color = 'blanchedalmond'
+                            hexColorObj.appStoreNowrap.push(hexColor)
+                        }
+                    }
+                })
+            }
+
             // mobile的sup标签设置行内样式（sina邮箱）
             function supNormalSize() {
                 const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
