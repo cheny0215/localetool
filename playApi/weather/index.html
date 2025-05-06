@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天气预报</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="weather-app">
+        <header>
+            <h1>天气预报</h1>
+            <div class="location-input-area">
+                <select id="province-select">
+                    <option value="北京市">北京市</option>
+                    <option value="天津市">天津市</option>
+                    <option value="河北省">河北省</option>
+                    <option value="山西省">山西省</option>
+                    <option value="内蒙古自治区">内蒙古自治区</option>
+                    <option value="辽宁省">辽宁省</option>
+                    <option value="吉林省">吉林省</option>
+                    <option value="黑龙江省">黑龙江省</option>
+                    <option value="上海市" selected>上海市</option>
+                    <option value="江苏省">江苏省</option>
+                    <option value="浙江省">浙江省</option>
+                    <option value="安徽省">安徽省</option>
+                    <option value="福建省">福建省</option>
+                    <option value="江西省">江西省</option>
+                    <option value="山东省">山东省</option>
+                    <option value="河南省">河南省</option>
+                    <option value="湖北省">湖北省</option>
+                    <option value="湖南省">湖南省</option>
+                    <option value="广东省">广东省</option>
+                    <option value="广西壮族自治区">广西壮族自治区</option>
+                    <option value="海南省">海南省</option>
+                    <option value="重庆市">重庆市</option>
+                    <option value="四川省">四川省</option>
+                    <option value="贵州省">贵州省</option>
+                    <option value="云南省">云南省</option>
+                    <option value="西藏自治区">西藏自治区</option>
+                    <option value="陕西省">陕西省</option>
+                    <option value="甘肃省">甘肃省</option>
+                    <option value="青海省">青海省</option>
+                    <option value="宁夏回族自治区">宁夏回族自治区</option>
+                    <option value="新疆维吾尔自治区">新疆维吾尔自治区</option>
+                    <option value="香港特别行政区">香港特别行政区</option>
+                    <option value="澳门特别行政区">澳门特别行政区</option>
+                    <option value="台湾省">台湾省</option>
+                </select>
+                <input type="text" id="city-input" placeholder="输入城市 (例如: 上海)">
+                <input type="text" id="county-input" placeholder="输入区/县 (可留空)">
+                <button id="search-weather-btn">查询天气</button>
+            </div>
+            <div class="location">
+                当前查询: 
+                <span id="current-province"></span>
+                <span id="current-city"></span>
+                <span id="current-county"></span>
+            </div>
+            <a class="weather-chart-title" href="#weather-chart-container">查看未来几日气温趋势>></a>
+        </header>
+
+        <main id="forecast-container">
+            <!-- 天气预报卡片将在这里动态插入 -->
+            <div class="loading">正在加载天气数据...</div>
+        </main>
+
+        <footer>
+            <p>天气数据来源: APIHZ.CN (示例)</p>
+        </footer>
+    </div>
+
+    <div id="forecast-container" class="forecast-container">
+        <!-- Weather forecast cards will be displayed here -->
+    </div>
+
+    <div id="weather-chart-container" style="width: 100%; height: 400px;"></div>
+
+    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@latest/dist/echarts.min.js"></script>
+</body>
+</html>

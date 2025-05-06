@@ -15,7 +15,7 @@
         /* 基本样式 */
         #layout {
             display: flex;
-            height: 100vh;
+            /* height: 100vh; */
             transition: margin-left 0.3s;
             position: relative;
         }
@@ -109,6 +109,7 @@
         }
 
         #main {
+            height: 100vh;
             flex: 1;
             display: flex;
             flex-direction: column;
@@ -231,6 +232,34 @@
         #sidebar ul.submenu li a {
             background: transparent;
         }
+
+        #header-text{
+            color: #ff7373;
+            padding-left: 20px;
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            overflow-x: auto;
+            text-decoration: none;
+            scrollbar-width: 1px;
+            scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
+        }
+        #header-text::-webkit-scrollbar {
+            height: 6px;
+        }
+        #header-text::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #header-text::-webkit-scrollbar-thumb {
+            background-color: rgba(128, 128, 128, 0.5);
+            border-radius: 3px;
+        }
+        #header-text::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(128, 128, 128, 0.7);
+        }
     </style>
 </head>
 
@@ -246,47 +275,49 @@
                 <li class="menu-item">
                     <a class="menu-header">检查工具</a>
                     <ul class="submenu">
-                        <li><a class="clickBTN" name="ic平台书签检查工具">icCheckTool</a></li>
-                        <li><a class="clickBTN" name="文本对比工具">codeDiff</a></li>
+                        <li><a class="cBTN" name="ic平台书签检查工具" path="icCheckTool">icCheckTool</a></li>
+                        <li><a class="cBTN" name="文本对比工具" path="codeDiff">codeDiff</a></li>
                     </ul>
                 </li>
                 <li class="menu-item">
                     <a class="menu-header">常用工具</a>
                     <ul class="submenu">
-                        <li><a class="clickBTN" name="txt文本去除换行">txtnowrap</a></li>
-                        <li><a class="clickBTN" name="格式化Url">formatUrl</a></li>
-                        <li><a class="clickBTN" name="英文前后添加空格nbsp">nbspAdd</a></li>
-                        <li><a class="clickBTN" name="压缩js代码为书签">compressCode</a></li>
-                        <li><a class="clickBTN" name="便签">note</a></li>
+                        <li><a class="cBTN" name="txt文本去除换行" path="txtnowrap">txtnowrap</a></li>
+                        <li><a class="cBTN" name="格式化Url" path="formatUrl">formatUrl</a></li>
+                        <li><a class="cBTN" name="英文前后添加空格nbsp" path="nbspAdd">nbspAdd</a></li>
+                        <li><a class="cBTN" name="压缩js代码为书签" path="compressCode">compressCode</a></li>
+                        <li><a class="cBTN" name="便签" path="note">note</a></li>
                     </ul>
                 </li>
                 <li class="menu-item">
                     <a class="menu-header">后期开发工具</a>
                     <ul class="submenu">
-                        <li><a class="clickBTN" name="备份starling截图生成">standby</a></li>
-                        <li><a class="clickBTN" name="DM-QA">DM-QA</a></li>
+                        <li><a class="cBTN" name="备份starling截图生成" path="standby">standby</a></li>
+                        <li><a class="cBTN" name="DM-QA" path="DM-QA">DM-QA</a></li>
                     </ul>
                 </li>
                 <li class="menu-item">
                     <a class="menu-header">联网</a>
                     <ul class="submenu">
-                        <li><a class="clickBTN" name="☁️ 云朵聊天室 ☁️">DM-Chat</a></li>
+                        <li><a class="cBTN" name="☁️ 云朵聊天室 ☁️" path="dmChat">DM-Chat</a></li>
                     </ul>
                 </li>
                 <li class="menu-item">
                     <a class="menu-header">其他</a>
                     <ul class="submenu">
-                        <li><a class="clickBTN" name="贪吃蛇">Snake Game(贪吃蛇)</a></li>
-                        <li><a class="clickBTN" name="2048 卡通版">2048</a></li>
-                        <li><a class="clickBTN" name="打砖块">Break Bricks(打砖块)</a></li>
-                        <li><a class="clickBTN" name="微博热搜榜">Weibo Hot Search(微博热搜榜)</a></li>
+                        <li><a class="cBTN" name="贪吃蛇" path="game/snake">Snake Game(贪吃蛇)</a></li>
+                        <li><a class="cBTN" name="2048 卡通版" path="game/2048">2048</a></li>
+                        <li><a class="cBTN" name="打砖块" path="game/breakBricks">Break Bricks(打砖块)</a></li>
+                        <li><a class="cBTN" name="微博热搜榜" path="playApi/weibo">Weibo Hot Search(微博热搜榜)</a></li>
+                        <li><a class="cBTN" name="天气预报" path="playApi/weather">Weather Forecast(天气预报)</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
         <div id="main">
             <ul class="layui-nav nav layui-bg-gray">
-                <li id="header" style="flex: 1;line-height: 60px;">标题</li>
+                <li id="header" style="line-height: 60px;">标题</li>
+                <li id="header-text" style="flex: 1;line-height: 60px;text-align: left;"></li>
                 <li class="layui-nav-item layui-this"><a href="">暂无</a></li>
                 <li class="layui-nav-item"><a href="">暂无</a></li>
                 <li class="layui-nav-item">
@@ -390,7 +421,7 @@
         const sidebar = document.getElementById('sidebar');
         const toggleSidebarButton = document.getElementById('sidebar-box');
         const toggleBtn = document.querySelectorAll('#toggleBtn li')
-        const clickBTN = document.querySelectorAll('.clickBTN')
+        const cBTN = document.querySelectorAll('.cBTN')
         const iframeBox = document.querySelectorAll('.iframeBox')
         
         // 初始化状态
@@ -442,7 +473,7 @@
         // 修改 activeButton 函数
         function activeButton(index) {
             const content = document.getElementById('content');
-            const clickedBtn = clickBTN[index];
+            const clickedBtn = cBTN[index];
             const name = clickedBtn.getAttribute('name');
             header.innerText = name;
 
@@ -456,23 +487,15 @@
             let targetIframe = content.querySelector(`iframe[data-name="${name}"]`);
             
             if (!targetIframe) {
-                // 根据菜单名称确定对应的路径
-                const pathMap = {
-                    'ic平台书签检查工具': 'icCheckTool',
-                    '文本对比工具': 'codeDiff',
-                    'txt文本去除换行': 'txtnowrap',
-                    '格式化Url': 'formatUrl',
-                    '英文前后添加空格nbsp': 'nbspAdd',
-                    '压缩js代码为书签': 'compressCode',
-                    '便签': 'get',
-                    '备份starling截图生成': 'standby',
-                    'DM-QA': 'DM-QA',
-                    '☁️ 云朵聊天室 ☁️': 'dmChat',
-                    '贪吃蛇': 'game/snake',
-                    '2048 卡通版': 'game/2048',
-                    '打砖块': 'game/breakBricks',
-                    '微博热搜榜': 'playApi/weibo'
-                };
+                // 动态生成 pathMap
+                const pathMap = {};
+                document.querySelectorAll('.cBTN').forEach(btn => {
+                    const btnName = btn.getAttribute('name');
+                    const btnPath = btn.getAttribute('path');
+                    if (btnName && btnPath) {
+                        pathMap[btnName] = btnPath;
+                    }
+                });
 
                 const path = pathMap[name];
                 if (path) {
@@ -504,8 +527,8 @@
         activeButton(parseInt(savedIndex));
 
         // 为每个菜单项添加点击事件
-        for (let index = 0; index < clickBTN.length; index++) {
-            clickBTN[index].onclick = function(e) {
+        for (let index = 0; index < cBTN.length; index++) {
+            cBTN[index].onclick = function(e) {
                 // 阻止事件冒泡
                 e.stopPropagation();
                 
@@ -520,6 +543,9 @@
     <!-- 添加主题和倒计时脚本引用 -->
     <script src="./assets/js/theme.js"></script>
     <script src="./assets/js/countdown.js"></script>
+
+    <!-- 添加每日一言内容 -->
+    <script src="./assets/js/daily-sentence.js"></script>
 </body>
 
 </html>
