@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', function() {
 const apiKey = '0e8b0763210c6f7f19b175a6c177ca4f'; // 示例 Key，请替换
 const apiId = '10004465'; // 示例 ID，请替换
 const fixedNumId = 1; // 固定使用numid=1存储所有留言
+const PAGE_SIZE = 20; // 每页显示留言数
+let currentPage = 1; // 当前页码
+let totalMessages = []; // 存储所有留言
 
 // 显示留言板面板
 function showMessageBoard() {
@@ -45,6 +48,7 @@ function showMessageBoard() {
             <div class="board-tab-content active" id="viewContent">
                 <div class="message-filter">
                     <button id="refreshMessages" class="message-btn">刷新留言</button>
+                    <div class="message-count" id="messageCount">共 0 条留言</div>
                 </div>
                 <div class="message-display">
                     <div class="message-loading" id="messageLoading">
@@ -58,6 +62,13 @@ function showMessageBoard() {
                     <div class="messages-list" id="messagesList">
                         <!-- 留言内容将在这里动态生成 -->
                     </div>
+                </div>
+                <div class="pagination" id="messagePagination">
+                    <button class="pagination-btn" id="prevPage" disabled>&laquo; 上一页</button>
+                    <div class="pagination-info">
+                        <span id="pageInfo">第 1 页 / 共 1 页</span>
+                    </div>
+                    <button class="pagination-btn" id="nextPage" disabled>下一页 &raquo;</button>
                 </div>
             </div>
             <div class="board-tab-content" id="postContent">
@@ -86,14 +97,35 @@ function showMessageBoard() {
     
     document.body.appendChild(messageBoardPanel);
     
-    // 添加事件监听器
-    setupMessageBoardEvents();
-    
     // 添加CSS样式文件
     addMessageBoardCSS();
     
-    // 加载留言数据
-    fetchMessages();
+    // 添加事件监听器
+    setupMessageBoardEvents();
+    
+    // 等待DOM完全加载后再加载留言数据
+    setTimeout(() => {
+        // 加载留言数据
+        fetchMessages();
+        
+        // 强制重新计算布局，确保滚动条正确显示
+        const messageDisplay = document.querySelector('.message-display');
+        const boardTabContent = document.querySelector('.board-tab-content.active');
+        
+        if (messageDisplay) {
+            messageDisplay.style.display = 'none';
+            setTimeout(() => {
+                messageDisplay.style.display = '';
+            }, 0);
+        }
+        
+        if (boardTabContent) {
+            boardTabContent.style.display = 'none';
+            setTimeout(() => {
+                boardTabContent.style.display = 'block';
+            }, 0);
+        }
+    }, 100);
 }
 
 // 添加留言板CSS样式文件
@@ -138,6 +170,23 @@ function setupMessageBoardEvents() {
         fetchMessages();
     });
     
+    // 上一页按钮
+    document.getElementById('prevPage').addEventListener('click', function() {
+        if (currentPage > 1) {
+            currentPage--;
+            renderCurrentPage();
+        }
+    });
+    
+    // 下一页按钮
+    document.getElementById('nextPage').addEventListener('click', function() {
+        const totalPages = Math.ceil(totalMessages.length / PAGE_SIZE);
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderCurrentPage();
+        }
+    });
+    
     // 字符计数
     document.getElementById('postContentTextarea').addEventListener('input', function() {
         const charCount = this.value.length;
@@ -164,6 +213,9 @@ function fetchMessages() {
     document.getElementById('messageLoading').style.display = 'block';
     document.getElementById('messagePlaceholder').style.display = 'none';
     document.getElementById('messagesList').style.display = 'none';
+    
+    // 重置分页
+    currentPage = 1;
     
     // 构建请求参数
     const params = {
@@ -199,22 +251,30 @@ function handleMessagesResponse(response) {
     if (response.code === 200 && response.words) {
         try {
             // 尝试解析JSON数据
-            let messages = [];
             try {
-                messages = JSON.parse(response.words);
-                if (!Array.isArray(messages)) {
-                    messages = [];
+                totalMessages = JSON.parse(response.words);
+                if (!Array.isArray(totalMessages)) {
+                    totalMessages = [];
                 }
             } catch (e) {
                 console.error('解析留言数据失败:', e);
-                messages = [];
+                totalMessages = [];
             }
             
+            // 更新留言计数
+            document.getElementById('messageCount').textContent = `共 ${totalMessages.length} 条留言`;
+            
             // 显示留言列表
-            if (messages.length > 0) {
-                renderMessages(messages);
+            if (totalMessages.length > 0) {
+                // 更新分页信息
+                updatePagination();
+                
+                // 渲染当前页
+                renderCurrentPage();
+                
                 document.getElementById('messagesList').style.display = 'block';
                 document.getElementById('messagePlaceholder').style.display = 'none';
+                document.getElementById('messagePagination').style.display = 'flex';
                 
                 // 将消息显示区域滚动到顶部
                 const messageDisplay = document.querySelector('.message-display');
@@ -224,15 +284,16 @@ function handleMessagesResponse(response) {
             } else {
                 document.getElementById('messagePlaceholder').style.display = 'flex';
                 document.getElementById('messagesList').style.display = 'none';
+                document.getElementById('messagePagination').style.display = 'none';
             }
         } catch (e) {
             console.error('处理留言数据失败:', e);
             document.getElementById('messagePlaceholder').style.display = 'flex';
             document.getElementById('messagePlaceholder').innerHTML = `
-                <img src="./assets/icons/error.png" class="empty-icon" alt="错误图标">
                 <p>留言数据格式错误</p>
             `;
             document.getElementById('messagesList').style.display = 'none';
+            document.getElementById('messagePagination').style.display = 'none';
         }
     } else {
         // 显示错误信息或空白提示
@@ -243,6 +304,40 @@ function handleMessagesResponse(response) {
             `;
         }
         document.getElementById('messagesList').style.display = 'none';
+        document.getElementById('messagePagination').style.display = 'none';
+    }
+}
+
+// 更新分页信息
+function updatePagination() {
+    const totalPages = Math.ceil(totalMessages.length / PAGE_SIZE);
+    document.getElementById('pageInfo').textContent = `第 ${currentPage} 页 / 共 ${totalPages} 页`;
+    
+    // 更新按钮状态
+    document.getElementById('prevPage').disabled = currentPage <= 1;
+    document.getElementById('nextPage').disabled = currentPage >= totalPages;
+}
+
+// 渲染当前页留言
+function renderCurrentPage() {
+    // 按时间倒序排列
+    const sortedMessages = [...totalMessages].sort((a, b) => new Date(b.time) - new Date(a.time));
+    
+    // 计算当前页的留言
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, sortedMessages.length);
+    const currentPageMessages = sortedMessages.slice(startIndex, endIndex);
+    
+    // 渲染留言
+    renderMessages(currentPageMessages);
+    
+    // 更新分页信息
+    updatePagination();
+    
+    // 滚动到顶部
+    const messageDisplay = document.querySelector('.message-display');
+    if (messageDisplay) {
+        messageDisplay.scrollTop = 0;
     }
 }
 
@@ -263,9 +358,6 @@ function renderMessages(messages) {
         }
     `;
     document.head.appendChild(styleTag);
-    
-    // 按时间倒序排列
-    messages.sort((a, b) => new Date(b.time) - new Date(a.time));
     
     messages.forEach(message => {
         const messageItem = document.createElement('div');
