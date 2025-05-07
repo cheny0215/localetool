@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>精美图库 - 图片搜索</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-images"></i>
+                    <span>精美图库</span>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索图片，例如：风景、美食、动物..." autofocus>
+                    <button class="search-btn" id="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="toolbar">
+                    <button class="btn" title="设置">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="btn" title="更多选项">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="view-controls">
+            <div class="results-info">
+                <span id="results-count">0</span> 张图片
+            </div>
+            <div class="display-options">
+                <button id="grid-view" class="active" title="网格视图">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button id="large-view" title="大图视图">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button id="list-view" title="列表视图">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="image-grid" class="image-grid"></div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>正在加载更多图片...</p>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <i class="far fa-images"></i>
+            <h3>未找到图片</h3>
+            <p>尝试使用不同的关键词搜索，或者查看热门推荐。</p>
+        </div>
+    </main>
+
+    <div id="lightbox" class="lightbox">
+        <button class="lightbox-close" id="lightbox-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <button class="lightbox-prev" id="lightbox-prev">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <div class="lightbox-content">
+            <img id="lightbox-img" src="" alt="">
+        </div>
+        <button class="lightbox-next" id="lightbox-next">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <button class="lightbox-download" id="lightbox-download">
+            <i class="fas fa-download"></i>
+            <span>下载图片</span>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

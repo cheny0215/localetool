@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     provinceSelect.addEventListener('change', () => {
         setDefaultCityForProvince(provinceSelect.value);
+        countyInput.value = '';
         // 省份改变后，可以自动触发一次查询，或者让用户点击按钮
         // 为简化，此处仅填充，用户需按查询按钮
     });
@@ -204,6 +205,10 @@ function renderWeatherChart(forecastData, {province, city, county}) {
 
     const dates = forecastData.map(day => {
         const date = new Date(day.time);
+        // 如果日期是今天，则显示今天
+        if (date.toDateString() === new Date().toDateString()) {
+            return `${date.getMonth() + 1}/${date.getDate()} (今天)`;
+        }
         return `${date.getMonth() + 1}/${date.getDate()}`;
     });
     const maxTemps = forecastData.map(day => parseFloat(day.max_degree));

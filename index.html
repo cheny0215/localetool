@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./common/layui/css/layui.css"/>
     <link rel="stylesheet" href="./assets/css/theme.css">
     <link rel="stylesheet" href="./assets/css/countdown.css">
+    <link rel="stylesheet" href="./assets/css/messageBoard.css">
     <script src="./common/layui/layui.js"></script>
     <style>
         /* 基本样式 */
@@ -259,6 +260,19 @@
             background-color: rgba(128, 128, 128, 0.7);
             scrollbar-width: thin;
         }
+
+        /* 添加设置按钮小圆点样式 */
+        .layui-nav-item .settings-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #ff4d4f;
+            border-radius: 50%;
+            margin-left: 6px;
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
+        }
     </style>
 </head>
 
@@ -307,8 +321,9 @@
                         <li><a class="cBTN" name="贪吃蛇" path="game/snake">Snake Game(贪吃蛇)</a></li>
                         <li><a class="cBTN" name="2048 卡通版" path="game/2048">2048</a></li>
                         <li><a class="cBTN" name="打砖块" path="game/breakBricks">Break Bricks(打砖块)</a></li>
-                        <li><a class="cBTN" name="微博热搜榜" path="playApi/weibo">Weibo Hot Search(微博热搜榜)</a></li>
-                        <li><a class="cBTN" name="天气预报" path="playApi/weather">Weather Forecast(天气预报)</a></li>
+                        <li><a class="cBTN" name="微博热搜榜" path="playApi/weibo">微博热搜榜</a></li>
+                        <li><a class="cBTN" name="天气预报" path="playApi/weather">天气预报</a></li>
+                        <li><a class="cBTN" name="精美图库" path="playApi/pictures">精美图库</a></li>
                     </ul>
                 </li>
             </ul>
@@ -316,19 +331,19 @@
         <div id="main">
             <ul class="layui-nav nav layui-bg-gray">
                 <li id="header" style="line-height: 60px;padding-right: 16px;">标题</li>
-                <li id="header-text" style="line-height: 60px;text-align: left;"></li>
+                <li id="header-text" style="line-height: 60px;text-align: left;display: none;">暂无内容～</li>
                 <li style="line-height: 60px;flex:1;"></li>
                 <li class="layui-nav-item layui-this"><a href="">暂无</a></li>
-                <li class="layui-nav-item"><a href="">暂无</a></li>
+                <li class="layui-nav-item"><a href="" aria-label="留言板">留言板</a></li>
                 <li class="layui-nav-item">
-                  <a href="javascript:;">设置</a>
+                  <a href="javascript:;" class="layui-icon-set-fill layui-icon">设置</a>
                   <dl class="layui-nav-child">
                     <dd><a href="javascript:;" id="toggleCountdown">显示下班倒计时</a></dd>
-                    <dd><a href="javascript:;" id="toggleDailyText">隐藏每日一言</a></dd>
+                    <dd><a href="javascript:;" id="toggleDailyText">显示每日一言</a></dd>
                   </dl>
                 </li>
                 <li class="layui-nav-item">
-                  <a href="javascript:;">主题切换</a>
+                  <a href="javascript:;" class="layui-icon-theme layui-icon">主题切换</a>
                   <dl class="layui-nav-child">
                     <dd><a href="javascript:;" onclick="switchTheme('default')">默认主题</a></dd>
                     <dd><a href="javascript:;" onclick="switchTheme('dark')">深邃夜空</a></dd>
@@ -539,61 +554,12 @@
             }
         }
 
-        // 添加显示/隐藏每日一言功能
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleDailyTextBtn = document.getElementById('toggleDailyText');
-            const headerText = document.getElementById('header-text');
-            
-            // 获取或初始化userInfo对象
-            let userInfo = {};
-            try {
-                const storedUserInfo = localStorage.getItem('userInfo');
-                userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
-            } catch (e) {
-                console.error('解析userInfo出错:', e);
-                userInfo = {};
-            }
-            
-            // 从userInfo对象中读取每日一言的显示状态
-            const isDailyTextHidden = userInfo.isDailyTextHidden === true;
-            
-            // 初始化显示状态
-            if (isDailyTextHidden) {
-                headerText.style.display = 'none';
-                toggleDailyTextBtn.textContent = '显示每日一言';
-            }
-            
-            // 添加点击事件监听器
-            toggleDailyTextBtn.addEventListener('click', function() {
-                // 获取当前显示状态
-                const isCurrentlyHidden = headerText.style.display === 'none';
-                
-                if (isCurrentlyHidden) {
-                    // 如果当前是隐藏状态，则显示
-                    headerText.style.display = '';
-                    toggleDailyTextBtn.textContent = '隐藏每日一言';
-                    
-                    // 更新userInfo对象
-                    userInfo.isDailyTextHidden = false;
-                } else {
-                    // 如果当前是显示状态，则隐藏
-                    headerText.style.display = 'none';
-                    toggleDailyTextBtn.textContent = '显示每日一言';
-                    
-                    // 更新userInfo对象
-                    userInfo.isDailyTextHidden = true;
-                }
-                
-                // 保存更新后的userInfo对象到localStorage
-                localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            });
-        });
-
     </script>
     
     <!-- 添加主题和倒计时脚本引用 -->
     <script src="./assets/js/theme.js"></script>
     <script src="./assets/js/countdown.js"></script>
+    <script src="./assets/js/messageBoard.js"></script>
 
     <!-- 添加每日一言内容 -->
     <script src="./assets/js/daily-sentence.js"></script>

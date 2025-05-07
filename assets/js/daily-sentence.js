@@ -1,4 +1,70 @@
+
+        // 添加显示/隐藏每日一言功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleDailyTextBtn = document.getElementById('toggleDailyText');
+            const headerText = document.getElementById('header-text');
+            
+            // 获取或初始化userInfo对象
+            let userInfo = {};
+            try {
+                const storedUserInfo = localStorage.getItem('userInfo');
+                userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
+            } catch (e) {
+                console.error('解析userInfo出错:', e);
+                userInfo = {};
+            }
+            
+            // 从userInfo对象中读取每日一言的显示状态
+            const isDailyTextHidden = userInfo.isDailyTextHidden === true;
+            
+            // 初始化显示状态
+            if (isDailyTextHidden) {
+                headerText.style.display = 'none';
+                toggleDailyTextBtn.textContent = '显示每日一言';
+            }else{
+                headerText.style.display = 'inline-block';
+                toggleDailyTextBtn.textContent = '隐藏每日一言';
+            }
+            
+            // 添加点击事件监听器
+            toggleDailyTextBtn.addEventListener('click', function() {
+                // 获取当前显示状态
+                const isCurrentlyHidden = headerText.style.display === 'none';
+                
+                if (isCurrentlyHidden) {
+                    // 如果当前是隐藏状态，则显示
+                    headerText.style.display = '';
+                    toggleDailyTextBtn.textContent = '隐藏每日一言';
+                    
+                    // 更新userInfo对象
+                    userInfo.isDailyTextHidden = false;
+                } else {
+                    // 如果当前是显示状态，则隐藏
+                    headerText.style.display = 'none';
+                    toggleDailyTextBtn.textContent = '显示每日一言';
+                    
+                    // 更新userInfo对象
+                    userInfo.isDailyTextHidden = true;
+                }
+                
+                // 保存更新后的userInfo对象到localStorage
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            });
+        });
+
 async function fetchDailyTextData() {
+    const headerText = document.getElementById('header-text');
+    let userInfo = {};
+            try {
+                const storedUserInfo = localStorage.getItem('userInfo');
+                userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
+            } catch (e) {
+                console.error('解析userInfo出错:', e);
+                userInfo = {};
+            }
+    if(userInfo.isDailyTextHidden){        
+        return
+    }
     // 请确保替换为您自己的有效 ID 和 KEY
     const apiKey = '0e8b0763210c6f7f19b175a6c177ca4f'; // 示例 Key，请替换
     const apiId = '10004465'; // 示例 ID，请替换
@@ -6,7 +72,6 @@ async function fetchDailyTextData() {
     let apiUrl = `https://cn.apihz.cn/api/yiyan/api.php?id=${apiId}&key=${apiKey}`;
   
 
-    const headerText = document.getElementById('header-text');
     headerText.innerHTML = '<div class="loading">正在加载数据...</div>'; 
 
     try {
