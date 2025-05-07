@@ -234,21 +234,19 @@
         }
 
         #header-text{
-            color: #ff7373;
+            max-width:450px;
+            color: #73ceff;
             padding-left: 20px;
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
             font-size: 0.8rem;
-            font-weight: bold;
             letter-spacing: 0.5px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
             white-space: nowrap;
             overflow-x: auto;
-            text-decoration: none;
-            scrollbar-width: 1px;
-            scrollbar-color: rgba(128, 128, 128, 0.5) transparent;
+            scrollbar-width: none;
+            scrollbar-color: rgba(128, 128, 128, 0.1) transparent;
         }
         #header-text::-webkit-scrollbar {
-            height: 6px;
+            height: 1px;
         }
         #header-text::-webkit-scrollbar-track {
             background: transparent;
@@ -257,8 +255,9 @@
             background-color: rgba(128, 128, 128, 0.5);
             border-radius: 3px;
         }
-        #header-text::-webkit-scrollbar-thumb:hover {
+        #header-text:hover ::-webkit-scrollbar{
             background-color: rgba(128, 128, 128, 0.7);
+            scrollbar-width: thin;
         }
     </style>
 </head>
@@ -316,14 +315,16 @@
         </div>
         <div id="main">
             <ul class="layui-nav nav layui-bg-gray">
-                <li id="header" style="line-height: 60px;">标题</li>
-                <li id="header-text" style="flex: 1;line-height: 60px;text-align: left;"></li>
+                <li id="header" style="line-height: 60px;padding-right: 16px;">标题</li>
+                <li id="header-text" style="line-height: 60px;text-align: left;"></li>
+                <li style="line-height: 60px;flex:1;"></li>
                 <li class="layui-nav-item layui-this"><a href="">暂无</a></li>
                 <li class="layui-nav-item"><a href="">暂无</a></li>
                 <li class="layui-nav-item">
                   <a href="javascript:;">设置</a>
                   <dl class="layui-nav-child">
                     <dd><a href="javascript:;" id="toggleCountdown">显示下班倒计时</a></dd>
+                    <dd><a href="javascript:;" id="toggleDailyText">隐藏每日一言</a></dd>
                   </dl>
                 </li>
                 <li class="layui-nav-item">
@@ -537,6 +538,56 @@
                 sessionStorage.setItem('cy_activeButton_current_index', index);
             }
         }
+
+        // 添加显示/隐藏每日一言功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleDailyTextBtn = document.getElementById('toggleDailyText');
+            const headerText = document.getElementById('header-text');
+            
+            // 获取或初始化userInfo对象
+            let userInfo = {};
+            try {
+                const storedUserInfo = localStorage.getItem('userInfo');
+                userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
+            } catch (e) {
+                console.error('解析userInfo出错:', e);
+                userInfo = {};
+            }
+            
+            // 从userInfo对象中读取每日一言的显示状态
+            const isDailyTextHidden = userInfo.isDailyTextHidden === true;
+            
+            // 初始化显示状态
+            if (isDailyTextHidden) {
+                headerText.style.display = 'none';
+                toggleDailyTextBtn.textContent = '显示每日一言';
+            }
+            
+            // 添加点击事件监听器
+            toggleDailyTextBtn.addEventListener('click', function() {
+                // 获取当前显示状态
+                const isCurrentlyHidden = headerText.style.display === 'none';
+                
+                if (isCurrentlyHidden) {
+                    // 如果当前是隐藏状态，则显示
+                    headerText.style.display = '';
+                    toggleDailyTextBtn.textContent = '隐藏每日一言';
+                    
+                    // 更新userInfo对象
+                    userInfo.isDailyTextHidden = false;
+                } else {
+                    // 如果当前是显示状态，则隐藏
+                    headerText.style.display = 'none';
+                    toggleDailyTextBtn.textContent = '显示每日一言';
+                    
+                    // 更新userInfo对象
+                    userInfo.isDailyTextHidden = true;
+                }
+                
+                // 保存更新后的userInfo对象到localStorage
+                localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            });
+        });
 
     </script>
     

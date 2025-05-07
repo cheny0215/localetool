@@ -14,7 +14,7 @@ async function fetchDailyTextData() {
         // 检查响应是否成功
         if (!response.ok) {
             // 如果响应状态码不是 2xx，尝试读取响应体以获取错误信息
-            let errorData = { msg: `HTTP error! status: ${response.status}` }; // 默认错误
+            let errorData = { msg: `暂无内容～～` }; // 默认错误
             try {
                 errorData = await response.json(); // 尝试解析 JSON 错误信息
             } catch (e) {
@@ -35,7 +35,7 @@ async function fetchDailyTextData() {
 
     } catch (error) {
         console.error('获取数据时出错:', error);
-        headerText.innerHTML = `<div class="error">加载数据失败: ${error.message}</div>`;
+        headerText.innerHTML = `暂无内容～～`;
     }
 }
 
@@ -52,17 +52,15 @@ function updateLocationDisplay(data) {
         // 设置滚动文本的样式以确保滚动效果正常
         scrollingText.style.display = 'inline-block';
         scrollingText.style.whiteSpace = 'nowrap';
-        
-        console.log('文本宽度:', scrollingText.offsetWidth, '容器宽度:', container.offsetWidth);
-        
+                
         // 检查文本是否需要滚动（内容宽度大于容器宽度）
         // 强制滚动以便于测试
         if (true) { // 确保滚动机制启动
             // 设置初始位置（从右侧开始）
             let position = 0;
-            let speed = 2; // 增加滚动速度，使效果更明显
+            let speed = 1; // 增加滚动速度，使效果更明显
             let direction = -1; // 向左滚动
-            let pauseDelay = 2000; // 滚动到两端后暂停时间（毫秒）
+            let pauseDelay = 3000; // 滚动到两端后暂停时间（毫秒）
             let isPaused = false;
             let pauseTimer;
             
@@ -79,7 +77,6 @@ function updateLocationDisplay(data) {
                 
                 if (direction < 0 && position <= -maxScrollLeft) {
                     isPaused = true;
-                    console.log('到达左侧边界，准备向右滚动');
                     // 暂停片刻后向右滚动
                     pauseTimer = setTimeout(() => {
                         direction = 1; // 改变方向为向右
@@ -90,7 +87,6 @@ function updateLocationDisplay(data) {
                 // 右侧边界检测（向右滚动到尽头）
                 if (direction > 0 && position >= 0) {
                     isPaused = true;
-                    console.log('到达右侧边界，准备向左滚动');
                     // 暂停片刻后向左滚动
                     pauseTimer = setTimeout(() => {
                         direction = -1; // 改变方向为向左

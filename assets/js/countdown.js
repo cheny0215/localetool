@@ -8,8 +8,17 @@ function initCountdown() {
     const saveSettings = document.getElementById('saveSettings');
     const toggleCountdown = document.getElementById('toggleCountdown');
     
+    // 获取或初始化userInfo对象
+    let userInfo = {};
+    try {
+        const storedUserInfo = localStorage.getItem('userInfo');
+        userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
+    } catch (e) {
+        console.error('解析userInfo出错:', e);
+        userInfo={}
+    }
     // 初始化倒计时显示状态
-    let isCountdownVisible = localStorage.getItem('countdownVisible') === 'true';
+    let isCountdownVisible = userInfo.countdownVisible === 'true';
     
     // 设置初始状态
     if (isCountdownVisible) {
@@ -23,7 +32,8 @@ function initCountdown() {
     // 切换倒计时显示/隐藏
     toggleCountdown.addEventListener('click', function() {
         isCountdownVisible = !isCountdownVisible;
-        localStorage.setItem('countdownVisible', isCountdownVisible);
+        userInfo.countdownVisible = isCountdownVisible + ''
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
         
         if (isCountdownVisible) {
             countdownCard.classList.add('visible');
@@ -68,9 +78,9 @@ function initCountdown() {
     };
     
     // 从本地存储加载时间设置
-    const savedSettings = localStorage.getItem('workTimeSettings');
+    const savedSettings = userInfo.workTimeSettings;
     if (savedSettings) {
-        timeSettings = JSON.parse(savedSettings);
+        timeSettings = savedSettings;
     }
     
     // 更新设置面板中的时间
@@ -111,8 +121,8 @@ function initCountdown() {
             lunchEnd: lunchEndTime.value,
             workEnd: workEndTime.value
         };
-        
-        localStorage.setItem('workTimeSettings', JSON.stringify(timeSettings));
+        userInfo.workTimeSettings = timeSettings
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
         updateSettingsDisplay();
         settingsPanel.style.display = 'none';
         
@@ -225,7 +235,8 @@ function initCountdown() {
     // 添加不再显示按钮的点击事件
     hideCountdown.addEventListener('click', function() {
         isCountdownVisible = false;
-        localStorage.setItem('countdownVisible', 'false');
+        userInfo.countdownVisible = 'false'
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
         countdownCard.classList.remove('visible');
         toggleCountdown.textContent = '显示下班倒计时';
         settingsPanel.style.display = 'none';
