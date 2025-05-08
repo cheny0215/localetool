@@ -117,11 +117,21 @@
     overflow-y: auto;
     box-sizing: border-box;
     flex: 1;
+    visibility: hidden;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1;
 }
 
 .board-tab-content.active {
     display: flex;
     flex-direction: column;
+    visibility: visible;
+    position: relative;
+    z-index: 1;
 }
 
 #viewContent {

@@ -1,4 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 动态设置正确的背景图路径
+    const backgroundImagePath = '../../assets/images/weather1.webp';
+    document.body.style.backgroundImage = `url('${backgroundImagePath}')`;
+    
     const provinceSelect = document.getElementById('province-select');
     const cityInput = document.getElementById('city-input');
     const countyInput = document.getElementById('county-input');
@@ -217,14 +221,20 @@ function renderWeatherChart(forecastData, {province, city, county}) {
     const option = {
         title: {
             text: '未来几日' + province + '-' + city + '-' + county + '气温趋势',
-            left: 'center'
+            left: 'center',
+            textStyle: {
+                color: '#ffffff'  // 修改标题颜色为白色
+            }
         },
         tooltip: {
             trigger: 'axis'
         },
         legend: {
             data: ['最高气温', '最低气温'],
-            top: 'bottom'
+            top: 'bottom',
+            textStyle: {
+                color: '#ffffff'  // 修改标题颜色为白色
+            }
         },
         grid: {
             left: '3%',
@@ -235,12 +245,16 @@ function renderWeatherChart(forecastData, {province, city, county}) {
         xAxis: {
             type: 'category',
             boundaryGap: false,
-            data: dates
+            data: dates,
+            axisLabel: {
+                color: '#ffffff'  // 修改横轴坐标值颜色为白色
+            }
         },
         yAxis: {
             type: 'value',
             axisLabel: {
-                formatter: '{value} °C'
+                formatter: '{value} °C',
+                color: '#ffffff'  // 修改纵轴坐标值颜色为白色
             }
         },
         series: [

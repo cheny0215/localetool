@@ -159,8 +159,10 @@ function setupMessageBoardEvents() {
             const tabName = this.getAttribute('data-tab');
             if (tabName === 'view') {
                 document.getElementById('viewContent').classList.add('active');
+                document.getElementById('postContent').classList.remove('active');
             } else {
                 document.getElementById('postContent').classList.add('active');
+                document.getElementById('viewContent').classList.remove('active');
             }
         });
     });
