@@ -1,0 +1,983 @@
+:root {
+  --bg-color: #f5f7fa;
+  --bg-color-rgb: 245, 247, 250; /* 用于半透明覆盖层 */
+  --text-color: #656d78; /* 深灰色 for light theme */
+  --title-color: #4a89dc;
+  --medium-gray-color: #aab2bd; /* 中灰色 for light theme */
+  --card-bg: #ffffff;
+  --card-back-gradient-start: #4a89dc;
+  --card-back-gradient-end: #5d9cec;
+  --card-front-border: rgba(0, 0, 0, 0.1);
+  --button-bg: #4a89dc;
+  --button-text: #ffffff;
+  --button-shadow: rgba(74, 137, 220, 0.3);
+  --button-hover-bg: #5d9cec;
+  --button-active-bg: #3875c5;
+  --stats-bg: #ffffff;
+  --stat-label-color: var(--medium-gray-color); /* 使用变量 */
+  --stat-value-color: #4a89dc;
+  --highlight-color: #e9573f;
+  --overlay-bg: rgba(0, 0, 0, 0.6);
+  --player-name-bg: rgba(74, 137, 220, 0.1);
+  --player-name-border: #4a89dc;
+}
+
+.dark-theme {
+  --bg-color: #2f3542;
+  --bg-color-rgb: 47, 53, 66; /* 用于半透明覆盖层 */
+  --text-color: #f5f7fa; /* 浅灰色 for dark theme text */
+  --title-color: #82a7e2;
+  --medium-gray-color: #8a919e; /* 中灰色 for dark theme */
+  --card-bg: #434a54;
+  --card-back-gradient-start: #3a539b;
+  --card-back-gradient-end: #4c6db3;
+  --card-front-border: rgba(255, 255, 255, 0.1);
+  --button-bg: #3a539b;
+  --button-text: #f5f7fa;
+  --button-shadow: rgba(58, 83, 155, 0.4);
+  --button-hover-bg: #4c6db3;
+  --button-active-bg: #2e447e;
+  --stats-bg: #3c424d;
+  --stat-label-color: var(--medium-gray-color); /* 使用变量 */
+  --stat-value-color: #82a7e2;
+  /* --highlight-color 保持 #E9573F */
+  --overlay-bg: rgba(0, 0, 0, 0.8);
+  --player-name-bg: rgba(58, 83, 155, 0.2);
+  --player-name-border: #4c6db3;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Microsoft YaHei', Roboto, 'PingFang SC', 'Helvetica Neue', Arial,
+    sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 20px;
+  color: var(--text-color);
+  font-size: 16px; /* 正文：16sp (px for web), 常规 */
+  font-weight: 400; /* 常规 */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.header-controls {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin-bottom: 0;
+  color: var(--title-color);
+  font-weight: 700; /* 主标题: 粗体 */
+  font-size: 24px; /* 主标题: 24sp (px for web) */
+  letter-spacing: 0.5px;
+}
+
+/* 玩家名称容器样式 */
+.player-name-container {
+  display: flex;
+  align-items: center;
+  background-color: var(--player-name-bg);
+  padding: 8px 15px;
+  border-radius: 24px;
+  border: 1px solid var(--player-name-border);
+  margin-left: auto;
+  margin-right: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.player-name-container:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+#current-player-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-color);
+  margin-right: 10px;
+}
+
+#change-player-name {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--button-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  width: 26px;
+  height: 26px;
+  background-color: rgba(255, 255, 255, 0.5);
+  transition: all 0.2s ease;
+}
+
+#change-player-name:hover {
+  transform: scale(1.15);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.dark-theme #change-player-name {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme #change-player-name:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+#settings-btn-placeholder {
+  /* 设置图标按钮的占位符 */
+  width: 40px;
+  height: 40px;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 20px;
+  box-shadow: 0 2px 4px var(--button-shadow);
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around; /* 更好的分布 */
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px; /* 减少边距 */
+  background-color: var(--stats-bg);
+  padding: 15px 20px;
+  border-radius: 16px; /* 增加边框圆角 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 14px; /* 辅助文字: 14sp (px for web) */
+  font-weight: 400; /* 辅助文字: 常规 */
+  margin-bottom: 5px;
+  color: var(--stat-label-color);
+}
+
+.stat-value {
+  font-size: 1.5rem; /* 稍微减小 */
+  font-weight: 600;
+  color: var(--stat-value-color);
+}
+
+.pairs-value {
+  display: flex;
+  align-items: center;
+}
+
+.game-container {
+  display: grid;
+  /* 默认：中等难度 4x5，可通过JS更改 */
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 12px; /* 卡片间距 */
+  width: 100%;
+  max-width: 600px; /* 大屏幕的最大宽度 */
+  margin-bottom: 20px;
+  perspective: 1000px;
+  transition: opacity 0.3s ease-out; /* 用于关卡/内容切换淡出效果 */
+}
+
+.card {
+  aspect-ratio: 2/3; /* 固定纵横比 */
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+  cursor: pointer;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card.flip {
+  transform: rotateY(180deg);
+}
+
+.card.matched {
+  transform: rotateY(180deg) scale(1.05);
+  animation: matchSuccess 0.5s ease forwards;
+  cursor: default;
+}
+
+@keyframes matchSuccess {
+  0% {
+    transform: rotateY(180deg) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: rotateY(180deg) scale(1.1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotateY(180deg) scale(1.05); /* 保持略微放大 */
+    opacity: 0.2; /* 略微淡出 */
+  }
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.5rem, 5vw, 2.5rem); /* 响应式字体大小 */
+  font-weight: normal;
+  transition: background-color 0.3s;
+}
+
+.card-front {
+  background-color: var(--card-bg);
+  transform: rotateY(180deg);
+  border: 1px solid var(--card-front-border);
+  color: var(--text-color); /* 确保暗色模式下正面的文字可见 */
+}
+
+.card-back {
+  background: linear-gradient(
+    135deg,
+    var(--card-back-gradient-start),
+    var(--card-back-gradient-end)
+  );
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-back::before {
+  content: ''; /* 简单几何图案占位符 */
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.card-back::after {
+  content: '★'; /* 使用星形作为更抽象的符号 */
+  font-size: clamp(1.8rem, 4vw, 2.2rem);
+  color: rgba(255, 255, 255, 0.7);
+  position: relative; /* 确保它在::before之上 */
+  z-index: 1;
+}
+
+.bottom-controls {
+  display: flex;
+  flex-direction: column; /* 堆叠按钮和占位符 */
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.control-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+button,
+.control-placeholder {
+  min-width: 120px;
+  height: 48px;
+  padding: 0 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+button {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  box-shadow: 0 3px 6px var(--button-shadow);
+  font-size: 16px; /* 按钮文字: 16sp (px for web) */
+  font-weight: 600; /* 按钮文字: 半粗体 */
+}
+
+button:hover {
+  background-color: var(--button-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px var(--button-shadow);
+}
+
+button:active {
+  background-color: var(--button-active-bg);
+  transform: translateY(0);
+  box-shadow: 0 2px 5px var(--button-shadow);
+}
+
+#restart-btn {
+  /* 使用默认按钮样式 */
+}
+
+.control-placeholder {
+  background-color: var(--stats-bg);
+  color: var(--medium-gray-color); /* 辅助文字: 中灰色 */
+  border: 1px dashed var(--stat-label-color);
+  font-size: 14px; /* 辅助文字: 14sp (px for web) */
+  font-weight: 400; /* 辅助文字: 常规 */
+}
+
+#difficulty-select-placeholder,
+#leaderboard-placeholder {
+  /* 使用control-placeholder样式 */
+}
+
+.win-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--overlay-bg); /* 半透明黑色 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.win-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.win-message {
+  background-color: var(--card-bg); /* 与卡片正面保持一致 */
+  color: var(--text-color);
+  padding: 30px 40px; /* 调整内边距 */
+  border-radius: 16px; /*弹窗圆角16dp */
+  text-align: center;
+  width: 90%;
+  max-width: 400px; /* 弹窗的最大宽度 */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transform: scale(0.9);
+  transition: transform 0.3s ease 0.1s, background-color 0.3s, color 0.3s;
+}
+
+.win-overlay.show .win-message {
+  transform: scale(1);
+}
+
+.win-title {
+  font-size: 20px; /* 次级标题: 20sp (px for web) */
+  font-weight: 600; /* 次级标题: 半粗体 */
+  color: var(--text-color); /* 次级标题: 深灰色 (随主题调整) */
+  margin-bottom: 15px;
+}
+
+.win-stats {
+  margin-bottom: 25px; /* 调整边距 */
+  font-size: 1.1rem;
+}
+
+.win-stats strong {
+  color: var(--highlight-color); /*强调色*/
+  font-weight: 600;
+}
+
+.win-button {
+  background-color: var(--highlight-color); /*强调色*/
+  box-shadow: 0 3px 6px rgba(233, 87, 63, 0.3);
+}
+
+.win-button:hover {
+  background-color: #fc6e51; /* 高亮色的较浅色调 */
+  box-shadow: 0 5px 10px rgba(233, 87, 63, 0.4);
+}
+
+.win-button:active {
+  background-color: #d54c3a; /* 高亮色的较深色调 */
+  box-shadow: 0 2px 5px rgba(233, 87, 63, 0.3);
+}
+
+.confetti-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none; /* 允许点击穿透 */
+}
+
+.confetti {
+  position: absolute;
+  width: 8px; /* 较小的彩色纸屑 */
+  height: 8px;
+  opacity: 0;
+  /* 颜色将由JS设置 */
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 20px;
+  }
+  
+  .header-controls {
+    flex-wrap: wrap;
+  }
+  
+  .player-name-container {
+    margin: 10px 0;
+    flex-basis: 100%;
+    justify-content: center;
+    order: 2;
+  }
+  
+  #settings-btn-placeholder {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+  }
+
+  .stats {
+    padding: 10px 15px;
+  }
+  .stat-item {
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .stat-label {
+    margin-bottom: 0;
+    font-size: 0.8rem;
+  }
+  .stat-value {
+    font-size: 1.3rem;
+  }
+  .game-container {
+    /* 例如'简单'难度 3x4，由JS管理 */
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 10px;
+  }
+  .card-face {
+    font-size: clamp(1.2rem, 6vw, 2rem);
+  }
+  .bottom-controls .control-group {
+    flex-direction: column; /* 在小屏幕上将组内按钮堆叠 */
+    width: 100%;
+  }
+  button,
+  .control-placeholder {
+    width: 100%; /* 小屏幕上按钮全宽 */
+  }
+  .win-message {
+    padding: 20px;
+  }
+  .win-title {
+    font-size: 1.5rem;
+  }
+  .win-stats {
+    font-size: 1rem;
+  }
+}
+/* 初始难度样式（中等 4x5） */
+.difficulty-medium .game-container {
+  grid-template-columns: repeat(4, 1fr); /* 暂时默认为4列 */
+}
+/* 这些将由JS扩展 */
+.difficulty-easy .game-container {
+  grid-template-columns: repeat(3, 1fr);
+} /* 3x4 总共12张卡片 = 6对 */
+.difficulty-hard .game-container {
+  grid-template-columns: repeat(5, 1fr);
+} /* 5x6 总共30张卡片 = 15对 */
+
+/* 响应式卡片尺寸 */
+@media (max-width: 359px) {
+  /* <360dp宽 */
+  .card {
+    width: 70px; /* 由于纵横比2/3，高度为105px */
+  }
+  .game-container {
+    grid-gap: 8px; /* 为较小的卡片调整间距 */
+  }
+  .card-face {
+    font-size: clamp(1rem, 5vw, 1.5rem); /* 调整非常小的卡片上的图标大小 */
+  }
+}
+
+@media (min-width: 769px) {
+  /* >768dp宽 */
+  .card {
+    width: 100px; /* 由于纵横比2/3，高度为150px */
+  }
+  .game-container {
+    grid-gap: 15px; /* 为较大的卡片/屏幕增加间距 */
+  }
+  .card-face {
+    font-size: clamp(2rem, 5vw, 3rem); /* 调整较大卡片的图标大小 */
+  }
+}
+
+/* 新增对话框样式 - 删除这部分，使用后面更完整的版本 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dialog-box {
+  background-color: #fff;
+  color: #333;
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #4A89DC;
+}
+
+.dialog-content {
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dialog-btn {
+  min-width: 80px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dialog-confirm {
+  background-color: #4A89DC;
+  color: white;
+}
+
+.dialog-cancel {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.dialog-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+/* 删除这两个部分，使用下面合并后的版本 */
+.difficulty-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.difficulty-btn {
+  padding: 12px;
+  border: 2px solid #4A89DC;
+  border-radius: 8px;
+  background-color: #f5f7fa;
+  color: #4A89DC;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.difficulty-btn:hover {
+  background-color: #4A89DC;
+  color: white;
+}
+
+/* 主题选择样式 - 删除这些，使用下面合并的版本 */
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.theme-btn {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 2px solid #4A89DC;
+  border-radius: 8px;
+  background-color: #f5f7fa;
+  color: #4A89DC;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-btn:hover {
+  background-color: #4A89DC;
+  color: white;
+}
+
+.theme-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.theme-name {
+  font-size: 16px;
+}
+
+/* 删除这些深色模式样式，使用下面合并版本 */
+.dark-theme .dialog-box {
+  background-color: #3C424D;
+  color: #F5F7FA;
+}
+
+.dark-theme .dialog-title {
+  color: #82A7E2;
+}
+
+.dark-theme .dialog-cancel {
+  background-color: #4A4F59;
+  color: #DDD;
+}
+
+.dark-theme .difficulty-btn {
+  border-color: #3A539B;
+  background-color: #434A54;
+  color: #82A7E2;
+}
+
+.dark-theme .difficulty-btn:hover {
+  background-color: #3A539B;
+  color: white;
+}
+
+.dark-theme .theme-btn {
+  border-color: #3A539B;
+  background-color: #434A54;
+  color: #82A7E2;
+}
+
+.dark-theme .theme-btn:hover {
+  background-color: #3A539B;
+  color: white;
+}
+
+/* 删除这些响应式样式，使用下面更完整的版本 */
+@media (max-width: 600px) {
+  .dialog-box {
+    padding: 20px;
+  }
+  
+  .difficulty-options,
+  .theme-options {
+    gap: 8px;
+  }
+  
+  .difficulty-btn,
+  .theme-btn {
+    padding: 10px;
+  }
+  
+  .theme-icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+}
+
+/* 排行榜样式 */
+.leaderboard-dialog {
+  max-width: 500px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 8px 0;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  background-color: #4A89DC;
+  color: white;
+}
+
+.leaderboard-container {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 16px;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.leaderboard-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.no-records {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+}
+
+/* 玩家名称输入框样式 */
+#player-name-input,
+#change-name-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--button-bg);
+  border-radius: 12px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-size: 16px;
+  margin-top: 12px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#player-name-input:focus,
+#change-name-input:focus {
+  border-color: var(--button-hover-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+#player-name-input::placeholder,
+#change-name-input::placeholder {
+  color: var(--medium-gray-color);
+  opacity: 0.8;
+}
+
+.dark-theme #player-name-input,
+.dark-theme #change-name-input {
+  background-color: #3c424d;
+  border-color: var(--button-bg);
+  color: #F5F7FA;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dark-theme #player-name-input:focus,
+.dark-theme #change-name-input:focus {
+  border-color: var(--button-hover-bg);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+}
+
+.dark-theme #player-name-input::placeholder,
+.dark-theme #change-name-input::placeholder {
+  opacity: 0.6;
+}
+
+/* 主题和难度选择共同样式 */
+.theme-options,
+.difficulty-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.theme-btn,
+.difficulty-btn {
+  padding: 12px;
+  border: 2px solid #4A89DC;
+  border-radius: 8px;
+  background-color: #f5f7fa;
+  color: #4A89DC;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.theme-btn:hover,
+.difficulty-btn:hover {
+  background-color: #4A89DC;
+  color: white;
+}
+
+/* 主题选择特殊样式 */
+.theme-btn {
+  display: flex;
+  align-items: center;
+}
+
+.theme-icon {
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.theme-name {
+  font-size: 16px;
+}
+
+/* 深色模式适配 */
+.dark-theme .dialog-box {
+  background-color: #3C424D;
+  color: #F5F7FA;
+}
+
+.dark-theme .dialog-title {
+  color: #82A7E2;
+}
+
+.dark-theme .dialog-cancel {
+  background-color: #4A4F59;
+  color: #DDD;
+}
+
+.dark-theme .tab-btn {
+  background-color: #434A54;
+  color: #AAB2BD;
+}
+
+.dark-theme .tab-btn.active {
+  background-color: #3A539B;
+  color: white;
+}
+
+.dark-theme .leaderboard-table th {
+  background-color: #434A54;
+  color: #DDD;
+}
+
+.dark-theme .leaderboard-table td {
+  border-bottom-color: #434A54;
+}
+
+.dark-theme .no-records {
+  color: #8A919E;
+}
+
+.dark-theme #player-name-input {
+  background-color: #434A54;
+  color: #F5F7FA;
+  border-color: #3A539B;
+}
+
+.dark-theme .theme-btn,
+.dark-theme .difficulty-btn {
+  border-color: #3A539B;
+  background-color: #434A54;
+  color: #82A7E2;
+}
+
+.dark-theme .theme-btn:hover,
+.dark-theme .difficulty-btn:hover {
+  background-color: #3A539B;
+  color: white;
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+  .dialog-box {
+    padding: 20px;
+  }
+  
+  .leaderboard-dialog {
+    padding: 16px;
+  }
+  
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 8px 4px;
+    font-size: 14px;
+  }
+  
+  .theme-icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+}
+
+
+/* 缩放提示样式 */
+.zoom-tip {
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--medium-gray-color);
+  margin-bottom: 6px;
+  padding: 4px;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.03);
+}

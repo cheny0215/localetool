@@ -1,165 +1,223 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工具使用演示</title>
-    <link rel="stylesheet" href="../css/index.css">
-    <link rel="stylesheet" href="../common/layui/css/layui.css"/>
+    <title>最近更新内容 - LOCALETOOL</title>
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f5f5f7;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f7f7f7;
-        }
-
-        .demo-section {
-            background: white;
+            background-color: white;
             border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
         }
 
-        .demo-title {
-            font-size: 24px;
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+        }
+
+        h1 {
+            font-size: 28px;
             color: #333;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eee;
+            margin-bottom: 10px;
         }
 
-        .tool-card {
-            background: #f9f9f9;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .tool-name {
-            font-size: 18px;
-            color: #1E9FFF;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-
-        .tool-desc {
+        .subtitle {
             color: #666;
-            line-height: 1.6;
-            margin-bottom: 16px;
+            font-size: 16px;
         }
 
-        .usage-steps {
-            background: #f5f5f5;
-            padding: 16px;
-            border-radius: 6px;
+        .update-info {
+            margin-bottom: 40px;
         }
 
-        .usage-steps li {
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-
-        .note {
-            color: #ff6b6b;
+        .date {
             font-size: 14px;
-            margin-top: 12px;
-            padding: 8px;
-            background: #fff5f5;
-            border-radius: 4px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .module-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #eaeaea;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .module-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-bottom: 1px solid #f0f0f0;
+            background-color: #f8f8f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module-image-fallback {
+            width: 64px;
+            height: 64px;
+            opacity: 0.6;
+        }
+
+        .module-info {
+            padding: 15px;
+        }
+
+        .module-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .module-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .module-link {
+            display: inline-block;
+            background-color: #0071e3;
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .module-link:hover {
+            background-color: #0062c3;
+        }
+
+        .back-button {
+            display: block;
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px 20px;
+            background-color: #f5f5f7;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .back-button:hover {
+            background-color: #e5e5e7;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
         }
     </style>
 </head>
+
 <body>
-    <div class="demo-section">
-        <h1 class="demo-title">工具使用说明</h1>
-        
-        <div class="tool-card">
-            <h2 class="tool-name">icCheckTool - IC平台书签检查工具</h2>
-            <div class="tool-desc">用于检查和验证IC平台相关的链接和内容。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>拖动IC书签检查按钮到浏览器书签栏</li>
-                    <li>进入到ic平台，点击对应的IC书签</li>
-                    <li>查看检查结果并进行相应修正</li>
-                </ol>
+    <div class="container">
+        <header>
+            <h1>LOCALETOOL 最近更新模块</h1>
+            <p class="subtitle">探索我们最新添加的功能和工具</p>
+        </header>
+
+        <section class="update-info">
+            <p class="date">更新日期: 2024年5月9日</p>
+            <p>我们很高兴地宣布，LOCALETOOL平台最近添加了几个实用的新模块。这些模块旨在提高您的工作效率并增强平台的功能性。</p>
+        </section>
+
+        <div class="modules">
+            <div class="module-card">
+                <div class="module-image">
+                    <img src="../assets/icons/run.png" alt="记忆翻牌游戏" class="module-image-fallback">
+                </div>
+                <div class="module-info">
+                    <h3 class="module-name">记忆翻牌游戏</h3>
+                    <p class="module-desc">一款有趣的记忆力训练游戏，翻开卡片配对相同图案，锻炼记忆力和专注力。</p>
+                    <a href="../game/memoryMatch/index.html" class="module-link">立即体验</a>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-image">
+                    <img src="../assets/icons/clock.png" alt="天气预报" class="module-image-fallback">
+                </div>
+                <div class="module-info">
+                    <h3 class="module-name">天气预报</h3>
+                    <p class="module-desc">实时查看各地天气情况，提供温度、湿度、风力等详细信息，帮助您合理安排日程。</p>
+                    <a href="../playApi/weather/index.html" class="module-link">查看天气</a>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-image">
+                    <img src="../assets/icons/work.png" alt="精美图库" class="module-image-fallback">
+                </div>
+                <div class="module-info">
+                    <h3 class="module-name">精美图库</h3>
+                    <p class="module-desc">收集高质量图片资源，提供多种分类和搜索功能，满足您的设计和参考需求。</p>
+                    <a href="../playApi/pictures/index.html" class="module-link">浏览图库</a>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-image">
+                    <img src="../assets/icons/set.png" alt="微博热搜榜" class="module-image-fallback">
+                </div>
+                <div class="module-info">
+                    <h3 class="module-name">微博热搜榜</h3>
+                    <p class="module-desc">实时展示微博热搜话题，随时了解热点资讯和社会动态。</p>
+                    <a href="../playApi/weibo/index.html" class="module-link">查看热搜</a>
+                </div>
             </div>
         </div>
 
-        <div class="tool-card">
-            <h2 class="tool-name">txtnowrap - 文本去除换行</h2>
-            <div class="tool-desc">将多行文本合并为单行，去除多余的换行符。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>将多行文本粘贴到输入框</li>
-                    <li>点击转换按钮</li>
-                    <li>获取转换后的无换行文本</li>
-                </ol>
-            </div>
-        </div>
+        <a href="../index.html" class="back-button">返回主页</a>
 
-        <div class="tool-card">
-            <h2 class="tool-name">formatUrl - URL格式化工具</h2>
-            <div class="tool-desc">格式化和提取文本中的URL链接。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>将包含URL的文本粘贴到输入框</li>
-                    <li>点击格式化按钮</li>
-                    <li>获取格式化后的URL列表</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="tool-card">
-            <h2 class="tool-name">nbspAdd - 英文前后添加空格</h2>
-            <div class="tool-desc">在英文单词前后自动添加HTML空格标记。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>输入包含英文的文本</li>
-                    <li>选择转换类型（&amp;nbsp;或:nbsp:）</li>
-                    <li>点击转换按钮获取结果</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="tool-card">
-            <h2 class="tool-name">codeDiff - 文本对比工具</h2>
-            <div class="tool-desc">对比两段文本的差异，高亮显示变更部分。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>在左右两个输入框分别粘贴要对比的文本</li>
-                    <li>点击对比按钮</li>
-                    <li>查看高亮显示的文本差异</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="tool-card">
-            <h2 class="tool-name">DMcompatible - 一键QA工具</h2>
-            <div class="tool-desc">自动处理HTML代码的兼容性问题。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>粘贴需要处理的HTML代码</li>
-                    <li>选择需要应用的兼容性选项</li>
-                    <li>点击一键添加QA按钮</li>
-                    <li>获取处理后的代码</li>
-                </ol>
-            </div>
-            <div class="note">注意：请确保输入的HTML代码格式正确</div>
-        </div>
-
-        <div class="tool-card">
-            <h2 class="tool-name">compressCode - 压缩JS代码为书签</h2>
-            <div class="tool-desc">将JavaScript代码压缩并转换为书签格式。</div>
-            <div class="usage-steps">
-                <ol>
-                    <li>粘贴JavaScript代码</li>
-                    <li>点击压缩代码按钮</li>
-                    <li>复制生成的书签代码</li>
-                </ol>
-            </div>
-        </div>
+        <footer>
+            <p>© 2024 LOCALETOOL - 所有模块更新内容</p>
+        </footer>
     </div>
 </body>
-</html> 
+
+</html>

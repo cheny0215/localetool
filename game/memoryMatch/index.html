@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="header-controls">
+        <h1>Memory Game</h1>
+        <div class="player-name-container">
+            <span id="current-player-name">玩家：匿名</span>
+            <button id="change-player-name" title="修改玩家名称">✏️</button>
+        </div>
+        <div id="settings-btn-placeholder" title="设置/切换主题">🌛</div>
+    </div>
+
+    <div class="zoom-tip">若画面显示不全，请自行缩放屏幕</div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-label">尝试次数</div>
+            <div class="stat-value" id="moves">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">匹配数</div>
+            <div class="stat-value pairs-value">
+                <span id="pairs">0</span>/<span id="total-pairs">0</span>
+            </div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">用时</div>
+            <div class="stat-value" id="timer">00:00</div>
+        </div>
+    </div>
+
+    <div class="game-container" id="game-board">
+        <!-- 卡片将由JavaScript生成 -->
+    </div>
+
+    <div class="bottom-controls">
+        <div class="control-group">
+            <button id="restart-btn">重新开始</button>
+            <button id="new-game-btn">卡牌主题设置</button> <!-- 更改标签使其更清晰 -->
+        </div>
+        <div class="control-group">
+            <button id="difficulty-select-placeholder">难度选择</button>
+            <button id="leaderboard-placeholder">排行榜</button>
+        </div>
+    </div>
+
+    <div class="win-overlay" id="win-overlay">
+        <div class="win-message">
+            <div class="confetti-container" id="confetti-container"></div>
+            <div class="win-title">太棒了！🎉</div>
+            <div class="win-stats">
+                你用了 <strong id="final-moves">0</strong> 次尝试，
+                耗时 <strong id="final-time">00:00</strong>！
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增提示对话框 -->
+    <div class="overlay" id="dialog-overlay">
+        <div class="dialog-box">
+            <div class="dialog-title" id="dialog-title">提示</div>
+            <div class="dialog-content" id="dialog-content">内容将动态设置</div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn dialog-confirm" id="dialog-confirm">确认</button>
+                <button class="dialog-btn dialog-cancel" id="dialog-cancel">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增难度选择对话框 -->
+    <div class="overlay" id="difficulty-overlay">
+        <div class="dialog-box">
+            <div class="dialog-title">选择难度</div>
+            <div class="difficulty-options">
+                <button class="difficulty-btn" data-difficulty="easy">简单 (3×4)</button>
+                <button class="difficulty-btn" data-difficulty="medium">中等 (4×5)</button>
+                <button class="difficulty-btn" data-difficulty="hard">困难 (5×6)</button>
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn" id="difficulty-close">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增主题选择对话框 -->
+    <div class="overlay" id="theme-overlay">
+        <div class="dialog-box">
+            <div class="dialog-title">选择主题</div>
+            <div class="theme-options">
+                <button class="theme-btn" data-theme="foods">
+                    <span class="theme-icon">🍎🍊🍋</span>
+                    <span class="theme-name">食物主题</span>
+                </button>
+                <button class="theme-btn" data-theme="animals">
+                    <span class="theme-icon">🐶🐱🐼</span>
+                    <span class="theme-name">动物主题</span>
+                </button>
+                <button class="theme-btn" data-theme="space">
+                    <span class="theme-icon">🚀🌌🪐</span>
+                    <span class="theme-name">太空主题</span>
+                </button>
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn" id="theme-close">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增排行榜对话框 -->
+    <div class="overlay" id="leaderboard-overlay">
+        <div class="dialog-box leaderboard-dialog">
+            <div class="dialog-title">排行榜</div>
+            <div class="tabs">
+                <button class="tab-btn active" data-difficulty="easy">简单</button>
+                <button class="tab-btn" data-difficulty="medium">中等</button>
+                <button class="tab-btn" data-difficulty="hard">困难</button>
+            </div>
+            <div class="leaderboard-container">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>玩家</th>
+                            <th>尝试次数</th>
+                            <th>用时</th>
+                            <th>得分</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- 排行榜数据将动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn" id="leaderboard-close">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增玩家名称输入对话框 -->
+    <div class="overlay" id="player-name-overlay">
+        <div class="dialog-box">
+            <div class="dialog-title">新记录！</div>
+            <div class="dialog-content">
+                <p>恭喜你取得了新的高分！请输入你的名字：</p>
+                <input type="text" id="player-name-input" maxlength="10" placeholder="请输入名字（最多10个字符）">
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn dialog-confirm" id="player-name-submit">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新增玩家名称修改对话框 -->
+    <div class="overlay" id="change-name-overlay">
+        <div class="dialog-box">
+            <div class="dialog-title">设置玩家名称</div>
+            <div class="dialog-content">
+                <p>请输入您的名字，它将用于游戏排行榜：</p>
+                <input type="text" id="change-name-input" maxlength="10" placeholder="请输入名字（最多10个字符）">
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn dialog-confirm" id="change-name-submit">保存</button>
+                <button class="dialog-btn dialog-cancel" id="change-name-cancel">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 排行榜数据
+            let leaderboardData = {
+                easy: [],
+                medium: [],
+                hard: []
+            };
+
+            // 玩家名称
+            let playerName = localStorage.getItem('memoryMatchPlayerName') || '匿名';
+
+            // DOM元素
+            const bodyElement = document.body;
+            const gameBoard = document.getElementById('game-board');
+            const movesElement = document.getElementById('moves');
+            const pairsElement = document.getElementById('pairs');
+            const totalPairsElement = document.getElementById('total-pairs');
+            const timerElement = document.getElementById('timer');
+            const winOverlay = document.getElementById('win-overlay');
+            const finalMovesElement = document.getElementById('final-moves');
+            const finalTimeElement = document.getElementById('final-time');
+            const restartBtn = document.getElementById('restart-btn');
+            const newGameBtn = document.getElementById('new-game-btn');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const settingsBtn = document.getElementById('settings-btn-placeholder');
+            const confettiContainer = document.getElementById('confetti-container');
+            const currentPlayerNameElement = document.getElementById('current-player-name');
+            const changePlayerNameBtn = document.getElementById('change-player-name');
+            const changeNameOverlay = document.getElementById('change-name-overlay');
+            const changeNameInput = document.getElementById('change-name-input');
+            const changeNameSubmit = document.getElementById('change-name-submit');
+            const changeNameCancel = document.getElementById('change-name-cancel');
+
+            // 新增对话框元素
+            const dialogOverlay = document.getElementById('dialog-overlay');
+            const dialogTitle = document.getElementById('dialog-title');
+            const dialogContent = document.getElementById('dialog-content');
+            const dialogConfirm = document.getElementById('dialog-confirm');
+            const dialogCancel = document.getElementById('dialog-cancel');
+
+            // 新增难度选择对话框元素
+            const difficultyOverlay = document.getElementById('difficulty-overlay');
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+            const difficultyClose = document.getElementById('difficulty-close');
+
+            // 新增主题选择对话框元素
+            const themeOverlay = document.getElementById('theme-overlay');
+            const themeBtns = document.querySelectorAll('.theme-btn');
+            const themeClose = document.getElementById('theme-close');
+
+            // 新增排行榜元素
+            const leaderboardOverlay = document.getElementById('leaderboard-overlay');
+            const leaderboardBody = document.getElementById('leaderboard-body');
+            const leaderboardClose = document.getElementById('leaderboard-close');
+            const tabBtns = document.querySelectorAll('.tab-btn');
+
+            // 新增玩家名称输入对话框元素
+            const playerNameOverlay = document.getElementById('player-name-overlay');
+            const playerNameInput = document.getElementById('player-name-input');
+            const playerNameSubmit = document.getElementById('player-name-submit');
+
+            // 游戏状态
+            let cards = [];
+            let flippedCards = [];
+            let isProcessing = false;
+            let moves = 0;
+            let matchedPairs = 0;
+            let totalPairs = 0;
+            let gameStarted = false;
+            let timerInterval = null;
+            let gameTime = 0;
+            let currentTheme = 'light'; // '亮色'或'暗色'
+            let currentDifficulty = 'easy'; // '简单'、'中等'、'困难'
+            let tempScore = 0; // 存储临时得分，用于添加到排行榜
+
+            // 卡片内容 - "食物主题"
+            const cardContentSets = {
+                foods: ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🥝', '🍍', '🥭', '🍑', '🥥', '🥑', '🍆'], // 15个项目，适用于5x6网格
+                // 如需添加其他主题，请在此处添加
+                animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐒'],
+                space: ['🚀', '🪐', '👽', '🌌', '☄️', '🛰️', '🛸', '🌠', '🌍', '🌕', '☀️', '👨‍🚀', '🔭', '👾', '✨']
+            };
+            let currentCardSetName = 'foods';
+
+            const difficultySettings = {
+                easy: { pairs: 6, gridClass: 'difficulty-easy', rows: 3, cols: 4, baseScore: 1000 },    // 3x4 = 12张卡片
+                medium: { pairs: 10, gridClass: 'difficulty-medium', rows: 4, cols: 5, baseScore: 2000 }, // 4x5 = 20张卡片
+                hard: { pairs: 15, gridClass: 'difficulty-hard', rows: 5, cols: 6, baseScore: 3000 }     // 5x6 = 30张卡片
+            };
+
+            // 请确保替换为您自己的有效 ID 和 KEY
+            const apiKey = '0e8b0763210c6f7f19b175a6c177ca4f'; // 示例 Key，请替换
+            const apiId = '10004465'; // 示例 ID，请替换
+
+            // 初始化游戏
+            initGame();
+
+            // 加载排行榜数据
+            loadLeaderboardData();
+
+            // 更新显示的玩家名称
+            updatePlayerNameDisplay();
+
+            // 初始化游戏函数
+            function initGame(cardSet = currentCardSetName, difficulty = currentDifficulty) {
+                currentCardSetName = cardSet;
+                currentDifficulty = difficulty;
+
+                gameBoard.innerHTML = ''; // 清空游戏板
+
+                // 重置游戏状态
+                stopTimer();
+                cards = [];
+                flippedCards = [];
+                isProcessing = false;
+                moves = 0;
+                matchedPairs = 0;
+                gameStarted = false;
+                gameTime = 0;
+
+                const diffConfig = difficultySettings[currentDifficulty];
+                totalPairs = diffConfig.pairs;
+
+                // 更新游戏板的难度class
+                Object.values(difficultySettings).forEach(d => gameBoard.classList.remove(d.gridClass));
+                gameBoard.classList.add(diffConfig.gridClass);
+                // 根据难度动态设置网格列数（适用于CSS可能无法识别或需要JS直接控制的情况）
+                gameBoard.style.gridTemplateColumns = `repeat(${diffConfig.cols}, 1fr)`;
+
+
+                const gamePairs = [];
+                const selectedContents = [...cardContentSets[currentCardSetName]];
+                shuffleArray(selectedContents);
+
+                for (let i = 0; i < totalPairs; i++) {
+                    gamePairs.push(selectedContents[i % selectedContents.length]); // 确保在对数大于项目数时不会用尽独特项目
+                    gamePairs.push(selectedContents[i % selectedContents.length]);
+                }
+                shuffleArray(gamePairs);
+
+                updateStats();
+                resetTimer();
+                winOverlay.classList.remove('show');
+                confettiContainer.innerHTML = ''; // 清除旧的彩色纸屑
+
+                gamePairs.forEach((content, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.dataset.cardId = index;
+                    card.dataset.content = content;
+
+                    const cardFront = document.createElement('div');
+                    cardFront.className = 'card-face card-front';
+                    cardFront.textContent = content;
+
+                    const cardBack = document.createElement('div');
+                    cardBack.className = 'card-face card-back';
+                    // 卡片背面内容现在通过CSS伪元素实现
+
+                    card.appendChild(cardFront);
+                    card.appendChild(cardBack);
+                    gameBoard.appendChild(card);
+                    card.addEventListener('click', flipCard);
+                    cards.push(card);
+                });
+            }
+
+            function flipCard() {
+                if (isProcessing || this.classList.contains('flip') || this.classList.contains('matched')) {
+                    return;
+                }
+                if (!gameStarted) {
+                    startTimer();
+                    gameStarted = true;
+                }
+                this.classList.add('flip');
+                flippedCards.push(this);
+
+                if (flippedCards.length === 2) {
+                    isProcessing = true;
+                    moves++;
+                    updateStats();
+
+                    if (flippedCards[0].dataset.content === flippedCards[1].dataset.content) {
+                        setTimeout(() => {
+                            flippedCards.forEach(card => card.classList.add('matched'));
+                            flippedCards = [];
+                            matchedPairs++;
+                            updateStats();
+                            isProcessing = false;
+                            if (matchedPairs === totalPairs) {
+                                gameComplete();
+                            }
+                        }, 500); // 调整匹配成功延迟以配合动画
+                    } else {
+                        setTimeout(() => {
+                            flippedCards.forEach(card => card.classList.remove('flip'));
+                            flippedCards = [];
+                            isProcessing = false;
+                        }, 1000);
+                    }
+                }
+            }
+
+            function gameComplete() {
+                stopTimer();
+                finalMovesElement.textContent = moves;
+                finalTimeElement.textContent = formatTime(gameTime);
+
+                // 计算得分
+                const diffConfig = difficultySettings[currentDifficulty];
+                const baseScore = diffConfig.baseScore;
+                // 得分计算公式：基础分 - 时间消耗 - 尝试次数消耗
+                tempScore = Math.max(0, baseScore - (gameTime * 5) - (moves * 10));
+
+                // 检查是否进入排行榜
+                const isNewRecord = checkNewRecord(tempScore);
+
+                setTimeout(() => {
+                    winOverlay.classList.add('show');
+                    createConfettiEffect();
+
+                    // 如果是新纪录，显示输入玩家名称对话框
+                    if (isNewRecord) {
+                        // 检查是否已经设置了玩家名称
+                        const savedPlayerName = localStorage.getItem('memoryMatchPlayerName');
+
+                        if (savedPlayerName && savedPlayerName !== '匿名') {
+                            // 如果已经设置了名称，直接使用该名称添加记录
+                            addNewRecord(savedPlayerName);
+
+                            // 显示排行榜
+                            setTimeout(() => {
+                                updateLeaderboardView(currentDifficulty);
+                                tabBtns.forEach(btn => {
+                                    btn.classList.toggle('active', btn.dataset.difficulty === currentDifficulty);
+                                });
+                                leaderboardOverlay.classList.add('show');
+                            }, 1500);
+                        } else {
+                            // 如果没有设置名称，显示输入框
+                            setTimeout(() => {
+                                playerNameOverlay.classList.add('show');
+                                playerNameInput.focus();
+                            }, 1000);
+                        }
+                    }
+                }, 300);
+            }
+
+            function createConfettiEffect() {
+                confettiContainer.innerHTML = ''; // 清除之前的彩色纸屑
+                const confettiCount = 100;
+                const confettiColors = ['#4A89DC', '#F6BB42', '#E9573F', '#8CC152', '#967ADC', '#FFFFFF'];
+
+                for (let i = 0; i < confettiCount; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    confetti.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+
+                    const x = Math.random() * 100; // 百分比
+                    const y = Math.random() * -50 - 50; // 从视图上方开始，百分比
+                    const rotation = Math.random() * 360;
+                    const fallDuration = Math.random() * 2 + 2; // 2-4秒
+                    const delay = Math.random() * 1;
+
+                    confetti.style.left = x + '%';
+                    confetti.style.top = y + '%'; // 从屏幕外开始
+                    confetti.style.transform = `rotate(${rotation}deg)`;
+
+                    // 简单的方形彩色纸屑，可以用不同形状增强
+                    const size = Math.random() * 6 + 4; // 4px到10px
+                    confetti.style.width = size + 'px';
+                    confetti.style.height = size + 'px';
+                    if (Math.random() > 0.5) { // 使一些成为圆形
+                        confetti.style.borderRadius = '50%';
+                    }
+
+                    confettiContainer.appendChild(confetti);
+
+                    confetti.animate([
+                        { transform: `translateY(0vh) rotate(${rotation}deg)`, opacity: 1 },
+                        { transform: `translateY(120vh) rotate(${rotation + Math.random() * 360}deg)`, opacity: 0 }
+                    ], {
+                        duration: fallDuration * 1000,
+                        delay: delay * 1000,
+                        easing: 'ease-out',
+                        fill: 'forwards'
+                    });
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, (fallDuration + delay + 0.5) * 1000);
+                }
+            }
+
+            function startTimer() {
+                stopTimer();
+                gameTime = 0;
+                updateTimer();
+                timerInterval = setInterval(() => {
+                    gameTime++;
+                    updateTimer();
+                }, 1000);
+            }
+
+            function stopTimer() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+
+            function resetTimer() {
+                gameTime = 0;
+                updateTimer();
+            }
+
+            function updateTimer() {
+                timerElement.textContent = formatTime(gameTime);
+            }
+
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+            }
+
+            function updateStats() {
+                movesElement.textContent = moves;
+                pairsElement.textContent = matchedPairs;
+                totalPairsElement.textContent = totalPairs;
+            }
+
+            function toggleTheme() {
+                if (currentTheme === 'light') {
+                    bodyElement.classList.add('dark-theme');
+                    settingsBtn.textContent = '☀️'; // 亮色模式的太阳图标
+                    currentTheme = 'dark';
+                } else {
+                    bodyElement.classList.remove('dark-theme');
+                    settingsBtn.textContent = '🌛'; // 暗色模式的齿轮图标
+                    currentTheme = 'light';
+                }
+            }
+
+            // 显示通用对话框
+            function showDialog(title, content, onConfirm, showCancel = true) {
+                dialogTitle.textContent = title;
+                dialogContent.textContent = content;
+
+                // 设置确认按钮事件
+                const confirmHandler = () => {
+                    dialogOverlay.classList.remove('show');
+                    dialogConfirm.removeEventListener('click', confirmHandler);
+                    if (onConfirm) onConfirm();
+                };
+
+                dialogConfirm.addEventListener('click', confirmHandler);
+
+                // 设置取消按钮
+                if (showCancel) {
+                    dialogCancel.style.display = 'block';
+                    const cancelHandler = () => {
+                        dialogOverlay.classList.remove('show');
+                        dialogCancel.removeEventListener('click', cancelHandler);
+                    };
+                    dialogCancel.addEventListener('click', cancelHandler);
+                } else {
+                    dialogCancel.style.display = 'none';
+                }
+
+                // 显示对话框
+                dialogOverlay.classList.add('show');
+            }
+
+            // 重新开始按钮点击事件
+            restartBtn.addEventListener('click', () => {
+                showDialog(
+                    "重新开始",
+                    "确定要重新开始游戏吗？当前进度将丢失。",
+                    () => initGame(currentCardSetName, currentDifficulty)
+                );
+            });
+
+            // 新主题游戏按钮点击事件
+            newGameBtn.addEventListener('click', () => {
+                themeOverlay.classList.add('show');
+            });
+
+            // 难度选择点击事件
+            document.getElementById('difficulty-select-placeholder').addEventListener('click', () => {
+                difficultyOverlay.classList.add('show');
+            });
+
+            // 设置难度按钮点击事件
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedDifficulty = btn.dataset.difficulty;
+                    if (selectedDifficulty !== currentDifficulty) {
+                        difficultyOverlay.classList.remove('show');
+                        showDialog(
+                            "更改难度",
+                            `将难度更改为${selectedDifficulty === 'easy' ? '简单' : selectedDifficulty === 'medium' ? '中等' : '困难'}并重新开始游戏。当前进度将丢失。`,
+                            () => {
+                                currentDifficulty = selectedDifficulty;
+                                initGame(currentCardSetName, currentDifficulty);
+                            }
+                        );
+                    } else {
+                        difficultyOverlay.classList.remove('show');
+                    }
+                });
+            });
+
+            // 难度选择关闭按钮
+            difficultyClose.addEventListener('click', () => {
+                difficultyOverlay.classList.remove('show');
+            });
+
+            // 主题选择按钮点击事件
+            themeBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const selectedTheme = btn.dataset.theme;
+                    if (selectedTheme !== currentCardSetName) {
+                        themeOverlay.classList.remove('show');
+
+                        // 获取可读的主题名称
+                        let themeName;
+                        if (selectedTheme === 'foods') themeName = '食物';
+                        else if (selectedTheme === 'animals') themeName = '动物';
+                        else if (selectedTheme === 'space') themeName = '太空';
+
+                        showDialog(
+                            "更改主题",
+                            `将主题更改为${themeName}并重新开始游戏。当前进度将丢失。`,
+                            () => {
+                                currentCardSetName = selectedTheme;
+                                initGame(currentCardSetName, currentDifficulty);
+                            }
+                        );
+                    } else {
+                        themeOverlay.classList.remove('show');
+                    }
+                });
+            });
+
+            // 主题选择关闭按钮
+            themeClose.addEventListener('click', () => {
+                themeOverlay.classList.remove('show');
+            });
+
+
+            settingsBtn.addEventListener('click', toggleTheme);
+
+            // 添加点击胜利遮罩事件，点击遮罩区域时关闭弹窗
+            winOverlay.addEventListener('click', (event) => {
+                // 只有当点击的是遮罩区域本身（不是其子元素）时才关闭
+                if (event.target === winOverlay) {
+                    winOverlay.classList.remove('show');
+                    // 可选：重新开始游戏
+                    // initGame(currentCardSetName, currentDifficulty);
+                }
+            });
+
+            // 检查是否是新纪录
+            function checkNewRecord(score) {
+                const records = leaderboardData[currentDifficulty];
+                // 如果排行榜不足5条记录，或者得分高于最低分，则是新纪录
+                return records.length < 5 || score > records[records.length - 1].score;
+            }
+
+            // 添加新记录到排行榜
+            function addNewRecord(playerName) {
+                const finalName = playerName || localStorage.getItem('memoryMatchPlayerName') || '匿名玩家';
+                const newRecord = {
+                    name: finalName,
+                    moves: moves,
+                    time: formatTime(gameTime),
+                    score: tempScore
+                };
+
+                // 检查当前难度排行榜中是否已存在同名记录
+                const existingRecordIndex = leaderboardData[currentDifficulty].findIndex(
+                    record => record.name === finalName
+                );
+
+                // 如果存在同名记录
+                if (existingRecordIndex !== -1) {
+                    const existingRecord = leaderboardData[currentDifficulty][existingRecordIndex];
+
+                    // 如果新记录的分数更高，则替换旧记录
+                    if (tempScore > existingRecord.score) {
+                        leaderboardData[currentDifficulty][existingRecordIndex] = newRecord;
+                    }
+                    // 如果新记录分数不高于旧记录，则保留旧记录，不做任何更改
+                } else {
+                    // 如果不存在同名记录，直接添加新记录
+                    leaderboardData[currentDifficulty].push(newRecord);
+                }
+
+                // 按分数从高到低排序
+                leaderboardData[currentDifficulty].sort((a, b) => b.score - a.score);
+
+                // 只保留前5名
+                if (leaderboardData[currentDifficulty].length > 5) {
+                    leaderboardData[currentDifficulty] = leaderboardData[currentDifficulty].slice(0, 5);
+                }
+
+                // 保存到服务器
+                saveLeaderboardData();
+
+                // 更新排行榜显示
+                updateLeaderboardView(currentDifficulty);
+            }
+
+            // 加载排行榜数据
+            function loadLeaderboardData() {
+                fetch(`https://cn.apihz.cn/api/cunchu/textcc.php?id=${apiId}&key=${apiKey}&type=2&numid=2`)
+                    .then(response => response.text())
+                    .then(data => {
+                        try {
+                            if (data && data !== "没有数据") {
+
+                                const datas = data && JSON.parse(data);
+                                leaderboardData = JSON.parse(datas.words);
+                                console.log("🚀 ~ loadLeaderboardData ~ leaderboardData:", leaderboardData)
+                                // 确保排行榜有所有难度类别
+                                if (!leaderboardData.easy) leaderboardData.easy = [];
+                                if (!leaderboardData.medium) leaderboardData.medium = [];
+                                if (!leaderboardData.hard) leaderboardData.hard = [];
+                            }
+                        } catch (e) {
+                            console.error("解析排行榜数据失败", e);
+                            // 确保有默认数据
+                            leaderboardData = { easy: [], medium: [], hard: [] };
+                        }
+                    })
+                    .catch(error => {
+                        console.error("加载排行榜数据失败", error);
+                        leaderboardData = { easy: [], medium: [], hard: [] };
+                    });
+            }
+
+            // 保存排行榜数据到服务器
+            function saveLeaderboardData() {
+                const leaderboardString = JSON.stringify(leaderboardData);
+                console.log("🚀 ~ 保存排行榜数据到服务器:", leaderboardString)
+
+                fetch(`https://cn.apihz.cn/api/cunchu/textcc.php?id=${apiId}&key=${apiKey}&type=1&numid=2&words=${leaderboardString}&title=记忆翻牌游戏排行榜`)
+                    .then(response => response.text())
+                    .then(data => {
+                        console.log("排行榜数据保存成功", data);
+                    })
+                    .catch(error => {
+                        console.error("保存排行榜数据失败", error);
+                    });
+            }
+
+            // 更新排行榜视图
+            function updateLeaderboardView(difficulty) {
+                const records = leaderboardData[difficulty] || [];
+                leaderboardBody.innerHTML = '';
+
+                if (records.length === 0) {
+                    const emptyRow = document.createElement('tr');
+                    emptyRow.innerHTML = `<td colspan="5" class="no-records">暂无记录</td>`;
+                    leaderboardBody.appendChild(emptyRow);
+                    return;
+                }
+
+                records.forEach((record, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${record.name}</td>
+                        <td>${record.moves}</td>
+                        <td>${record.time}</td>
+                        <td>${record.score}</td>
+                    `;
+                    leaderboardBody.appendChild(row);
+                });
+            }
+
+            // 排行榜按钮点击事件
+            document.getElementById('leaderboard-placeholder').addEventListener('click', () => {
+                updateLeaderboardView(currentDifficulty);
+                // 设置当前难度的选项卡为激活状态
+                tabBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.difficulty === currentDifficulty);
+                });
+                leaderboardOverlay.classList.add('show');
+            });
+
+            // 排行榜选项卡点击事件
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const difficulty = btn.dataset.difficulty;
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateLeaderboardView(difficulty);
+                });
+            });
+
+            // 排行榜关闭按钮
+            leaderboardClose.addEventListener('click', () => {
+                leaderboardOverlay.classList.remove('show');
+            });
+
+            // 玩家名称提交按钮事件
+            playerNameSubmit.addEventListener('click', () => {
+                const newPlayerName = playerNameInput.value.trim() || '匿名玩家';
+                addNewRecord(newPlayerName);
+                playerNameOverlay.classList.remove('show');
+                playerNameInput.value = '';
+
+                // 同时保存玩家名称到 localStorage
+                localStorage.setItem('memoryMatchPlayerName', newPlayerName);
+                updatePlayerNameDisplay();
+
+                // 显示排行榜
+                updateLeaderboardView(currentDifficulty);
+                tabBtns.forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.difficulty === currentDifficulty);
+                });
+                setTimeout(() => {
+                    leaderboardOverlay.classList.add('show');
+                }, 500);
+            });
+
+            // 更新显示的玩家名称
+            function updatePlayerNameDisplay() {
+                playerName = localStorage.getItem('memoryMatchPlayerName') || '匿名';
+                currentPlayerNameElement.textContent = `玩家：${playerName}`;
+            }
+
+            // 玩家名称修改按钮事件
+            changePlayerNameBtn.addEventListener('click', () => {
+                changeNameInput.value = localStorage.getItem('memoryMatchPlayerName') || '';
+                changeNameOverlay.classList.add('show');
+                changeNameInput.focus();
+            });
+
+            // 玩家名称修改确认按钮事件
+            changeNameSubmit.addEventListener('click', () => {
+                const newName = changeNameInput.value.trim() || '匿名';
+                localStorage.setItem('memoryMatchPlayerName', newName);
+                updatePlayerNameDisplay();
+                changeNameOverlay.classList.remove('show');
+            });
+
+            // 玩家名称修改取消按钮事件
+            changeNameCancel.addEventListener('click', () => {
+                changeNameOverlay.classList.remove('show');
+            });
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+        });
+    </script>
+
+    <!-- 清空排行榜的请求参数 -->
+    <!-- https://cn.apihz.cn/api/cunchu/textcc.php?id=10004465&key=0e8b0763210c6f7f19b175a6c177ca4f&type=1&numid=2&words={%20%22easy%22:%20[],%20%22medium%22:%20[],%20%22hard%22:%20[]%20}&title=%E8%AE%B0%E5%BF%86%E7%BF%BB%E7%89%8C%E6%B8%B8%E6%88%8F%E6%8E%92%E8%A1%8C%E6%A6%9C -->
+
+</body>
+
+</html>
