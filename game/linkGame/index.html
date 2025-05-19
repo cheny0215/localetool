@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>连连看 - 纯净版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game-wrapper">
+        <div class="header-controls">
+            <h1>连连看<span class="title-accent">游戏</span></h1>
+            <div class="player-name-container">
+                <div id="current-player-name">玩家：匿名</div>
+                <button id="change-player-name" title="修改玩家名称">👤</button>
+                <button id="theme-select-btn" title="切换明暗主题">🌚</button>
+            </div>
+        </div>
+
+        <div class="stats-wrapper">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-label">提示次数</div>
+                    <div class="stat-value" id="hints">3</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">已消除</div>
+                    <div class="stat-value"><span id="cleared-pairs">0</span>/<span id="total-pairs">24</span></div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">时间</div>
+                    <div class="stat-value" id="timer">00:00</div>
+                </div>
+            </div>
+            <div class="game-decoration">
+                <div class="decoration-dot"></div>
+                <div class="decoration-dot"></div>
+                <div class="decoration-dot"></div>
+            </div>
+        </div>
+
+        <div class="game-container" id="game-board"></div>
+
+        <div class="bottom-controls">
+            <div class="control-group">
+                <button id="restart-btn">重新开始</button>
+                <button id="hint-btn">提示</button>
+            </div>
+            <div class="control-group">
+                <button id="difficulty-select-btn">难度设置</button>
+                <button id="leaderboard-btn">排行榜</button>
+            </div>
+        </div>
+        <div class="footer-note">
+            <p>提示：使用提示功能或消除图标对时寻找配对</p>
+            <div class="decoration-bar"></div>
+        </div>
+    </div>
+
+    <!-- 赢得游戏覆盖层 -->
+    <div class="win-overlay" id="win-overlay">
+        <div class="win-message">
+            <h2 class="win-title">恭喜获胜！</h2>
+            <div class="win-stats">
+                您使用了 <strong><span id="final-hints">0</span></strong> 次提示<br>
+                用时 <strong><span id="final-time">00:00</span></strong> 
+            </div>
+            <button id="restart-after-win" class="dialog-confirm">再来一局</button>
+            <div class="win-decoration">
+                <span class="decoration-star">⭐</span>
+                <span class="decoration-star">⭐</span>
+                <span class="decoration-star">⭐</span>
+            </div>
+        </div>
+        <div id="confetti-container"></div>
+    </div>
+
+    <!-- 选择难度覆盖层 -->
+    <div class="overlay" id="difficulty-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title">选择难度</h3>
+            <div class="difficulty-options">
+                <button class="difficulty-btn" data-difficulty="easy"><span class="difficulty-icon">🟢</span> 简单 <span class="difficulty-desc">8×6 网格</span></button>
+                <button class="difficulty-btn" data-difficulty="medium"><span class="difficulty-icon">🟡</span> 中等 <span class="difficulty-desc">10×8 网格</span></button>
+                <button class="difficulty-btn" data-difficulty="hard"><span class="difficulty-icon">🔴</span> 困难 <span class="difficulty-desc">12×10 网格</span></button>
+            </div>
+            <button class="dialog-btn" id="difficulty-close">关闭</button>
+        </div>
+    </div>
+
+    <!-- 选择主题覆盖层 -->
+    <div class="overlay" id="theme-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title">选择图标主题</h3>
+            <div class="theme-options">
+                <button class="theme-btn" data-theme="fruits"><span class="theme-icon">🍎🍊🍋</span> <span class="theme-name">水果</span></button>
+                <button class="theme-btn" data-theme="animals"><span class="theme-icon">🐶🐱🐭</span> <span class="theme-name">动物</span></button>
+                <button class="theme-btn" data-theme="foods"><span class="theme-icon">🍔🍕🍩</span> <span class="theme-name">食物</span></button>
+            </div>
+            <button class="dialog-btn" id="theme-close">关闭</button>
+        </div>
+    </div>
+
+    <!-- 排行榜覆盖层 -->
+    <div class="overlay" id="leaderboard-overlay">
+        <div class="dialog-box leaderboard-dialog">
+            <h3 class="dialog-title">排行榜</h3>
+            <div class="tabs">
+                <button class="tab-btn active" data-difficulty="easy">简单</button>
+                <button class="tab-btn" data-difficulty="medium">中等</button>
+                <button class="tab-btn" data-difficulty="hard">困难</button>
+            </div>
+            <div class="leaderboard-container">
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>玩家</th>
+                            <th>提示</th>
+                            <th>时间</th>
+                            <th>分数</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                    </tbody>
+                </table>
+            </div>
+            <button class="dialog-btn" id="leaderboard-close">关闭</button>
+        </div>
+    </div>
+
+    <!-- 修改玩家名称覆盖层 -->
+    <div class="overlay" id="change-name-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title">修改玩家名称</h3>
+            <div class="dialog-content">
+                <input type="text" id="change-name-input" placeholder="输入您的名字" maxlength="10">
+            </div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn dialog-cancel" id="change-name-cancel">取消</button>
+                <button class="dialog-btn dialog-confirm" id="change-name-submit">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 输入玩家名称覆盖层 (新纪录用) -->
+    <div class="overlay" id="player-name-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title">新纪录！</h3>
+            <div class="dialog-content">
+                <p>恭喜您创造了新纪录！请输入您的名字：</p>
+                <input type="text" id="player-name-input" placeholder="输入您的名字" maxlength="10">
+            </div>
+            <button class="dialog-btn dialog-confirm" id="player-name-submit">确定</button>
+        </div>
+    </div>
+
+    <!-- 通用对话框覆盖层 -->
+    <div class="overlay" id="dialog-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title" id="dialog-title">提示</h3>
+            <div class="dialog-content" id="dialog-content">消息内容</div>
+            <div class="dialog-buttons">
+                <button class="dialog-btn dialog-cancel" id="dialog-cancel">取消</button>
+                <button class="dialog-btn dialog-confirm" id="dialog-confirm">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 装饰元素 -->
+    <div class="decoration-elements">
+        <div class="decoration-circle circle-1"></div>
+        <div class="decoration-circle circle-2"></div>
+        <div class="decoration-circle circle-3"></div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+
+</html>
+

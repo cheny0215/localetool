@@ -107,6 +107,22 @@
                     <span class="theme-icon">🚀🌌🪐</span>
                     <span class="theme-name">太空主题</span>
                 </button>
+                <button class="theme-btn" data-theme="vehicles">
+                    <span class="theme-icon">🚗🚕🚙</span>
+                    <span class="theme-name">交通工具主题</span>
+                </button>
+                <button class="theme-btn" data-theme="weather">
+                    <span class="theme-icon">☀️🌧️⛈️</span>
+                    <span class="theme-name">天气主题</span>
+                </button>
+                <button class="theme-btn" data-theme="sports">
+                    <span class="theme-icon">⚽🏀🏈</span>
+                    <span class="theme-name">运动主题</span>
+                </button>
+                <button class="theme-btn" data-theme="colors">
+                    <span class="theme-icon">🔴🔵🟡</span>
+                    <span class="theme-name">色彩主题</span>
+                </button>
             </div>
             <div class="dialog-buttons">
                 <button class="dialog-btn" id="theme-close">关闭</button>
@@ -256,7 +272,11 @@
                 foods: ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🥝', '🍍', '🥭', '🍑', '🥥', '🥑', '🍆'], // 15个项目，适用于5x6网格
                 // 如需添加其他主题，请在此处添加
                 animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐒'],
-                space: ['🚀', '🪐', '👽', '🌌', '☄️', '🛰️', '🛸', '🌠', '🌍', '🌕', '☀️', '👨‍🚀', '🔭', '👾', '✨']
+                space: ['🚀', '🪐', '👽', '🌌', '☄️', '🛰️', '🛸', '🌠', '🌍', '🌕', '☀️', '👨‍🚀', '🔭', '👾', '✨'],
+                vehicles: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏍️', '🚲', '✈️', '🚀', '🛳️', '🚢', '🚁', '🛩️', '🛴', '🦼'], // 交通工具
+                weather: ['☀️', '🌧️', '⛈️', '🌩️', '🌈', '❄️', '🌪️', '🌫️', '🌊', '🌞', '🌜', '🌟', '🌍', '🌏', '🌌'], // 天气
+                sports: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🪀', '🎮', '🎲', '⛸️', '🥊', '🏓', '🎱', '🎳', '🏆'], // 运动
+                colors: ['🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '🟤', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '🟫', '⚫'] // 颜色
             };
             let currentCardSetName = 'foods';
 
@@ -606,7 +626,10 @@
                         if (selectedTheme === 'foods') themeName = '食物';
                         else if (selectedTheme === 'animals') themeName = '动物';
                         else if (selectedTheme === 'space') themeName = '太空';
-
+                        else if (selectedTheme === 'vehicles') themeName = '交通工具';
+                        else if (selectedTheme === 'weather') themeName = '天气';
+                        else if (selectedTheme === 'sports') themeName = '运动';
+                        else if (selectedTheme === 'colors') themeName = '颜色';
                         showDialog(
                             "更改主题",
                             `将主题更改为${themeName}并重新开始游戏。当前进度将丢失。`,
