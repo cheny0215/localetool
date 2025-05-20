@@ -557,6 +557,10 @@
                         o.style.display = 'inline-block'
                         o.style.textAlign = 'center'
                         o.style.verticalAlign = 'middle'
+                        // 获取图片的第一个父元素并设置其行高为0
+                        if (o && o.parentElement) {
+                        o.parentElement.style.lineHeight = '0';
+                        }
                     } else if (computedImgDisplay == 'inline-block' && computedImgTextAlign == 'center') {
                         o.style.display = 'inline-block'
                         o.style.textAlign = 'center'
