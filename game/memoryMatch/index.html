@@ -299,6 +299,15 @@
             // 更新显示的玩家名称
             updatePlayerNameDisplay();
 
+            disableSelection()
+                // 禁用页面选择功能
+function disableSelection() {
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+}
+
             // 初始化游戏函数
             function initGame(cardSet = currentCardSetName, difficulty = currentDifficulty) {
                 currentCardSetName = cardSet;
