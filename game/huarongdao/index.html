@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数字华容道 - 益智游戏</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>数字华容道</h1>
+            <div class="game-info">
+                <div class="stat-box">
+                    <span>难度：</span>
+                    <span id="difficulty-display">简单</span>
+                </div>
+                <div class="stat-box">
+                    <span>移动步数：</span>
+                    <span id="move-count">0</span>
+                </div>
+                <div class="stat-box">
+                    <span>时间：</span>
+                    <span id="timer">00:00</span>
+                </div>
+                <div class="header-controls">
+                    <button id="theme-select-btn" title="切换主题">🌛</button>
+                    <button id="difficulty-select-btn" title="选择难度">🎮</button>
+                    <button id="restart-btn" title="重新开始">🔄</button>
+                    <button id="leaderboard-btn" title="排行榜">🏆</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏棋盘 -->
+        <div id="game-board"></div>
+
+        <!-- 底部控制栏 -->
+        <div class="controls">
+            <div class="player-info">
+                <span id="current-player-name">玩家：匿名</span>
+                <button id="change-player-name">修改</button>
+            </div>
+        </div>
+
+        <!-- 胜利弹窗 -->
+        <div id="win-overlay" class="overlay">
+            <div class="overlay-content win-content">
+                <div id="confetti-container"></div>
+                <h2>恭喜通关！</h2>
+                <div class="win-stats">
+                    <p>移动步数：<span id="final-moves">0</span></p>
+                    <p>用时：<span id="final-time">00:00</span></p>
+                </div>
+                <button id="restart-after-win">再来一局</button>
+            </div>
+        </div>
+
+        <!-- 难度选择弹窗 -->
+        <div id="difficulty-overlay" class="overlay">
+            <div class="overlay-content">
+                <h2>选择难度</h2>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn" data-difficulty="easy">简单 (3×3)</button>
+                    <button class="difficulty-btn" data-difficulty="medium">中等 (4×4)</button>
+                    <button class="difficulty-btn" data-difficulty="hard">困难 (5×5)</button>
+                </div>
+                <button id="difficulty-close" class="close-btn">✖</button>
+            </div>
+        </div>
+
+        <!-- 排行榜弹窗 -->
+        <div id="leaderboard-overlay" class="overlay">
+            <div class="overlay-content leaderboard-content">
+                <h2>排行榜</h2>
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-difficulty="easy">简单</button>
+                    <button class="tab-btn" data-difficulty="medium">中等</button>
+                    <button class="tab-btn" data-difficulty="hard">困难</button>
+                </div>
+                <div class="leaderboard">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>玩家</th>
+                                <th>步数</th>
+                                <th>时间</th>
+                                <th>得分</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <!-- 排行榜数据将通过JS动态填充 -->
+                        </tbody>
+                    </table>
+                </div>
+                <button id="leaderboard-close" class="close-btn">✖</button>
+            </div>
+        </div>
+
+        <!-- 修改玩家名称弹窗 -->
+        <div id="change-name-overlay" class="overlay">
+            <div class="overlay-content">
+                <h2>修改玩家名称</h2>
+                <input type="text" id="change-name-input" placeholder="请输入玩家名称" maxlength="12">
+                <div class="button-group">
+                    <button id="change-name-submit">确定</button>
+                    <button id="change-name-cancel">取消</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新纪录输入名称弹窗 -->
+        <div id="player-name-overlay" class="overlay">
+            <div class="overlay-content">
+                <h2>新纪录！</h2>
+                <p>请输入您的名称以记录在排行榜中</p>
+                <input type="text" id="player-name-input" placeholder="请输入玩家名称" maxlength="12">
+                <button id="player-name-submit">确定</button>
+            </div>
+        </div>
+
+        <!-- 通用对话框 -->
+        <div id="dialog-overlay" class="overlay">
+            <div class="overlay-content dialog-content">
+                <h2 id="dialog-title">提示</h2>
+                <p id="dialog-content">内容</p>
+                <div class="button-group">
+                    <button id="dialog-confirm">确定</button>
+                    <button id="dialog-cancel">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
