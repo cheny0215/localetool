@@ -1031,6 +1031,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePlayerNameDisplay();
     loadLeaderboardData(); // 加载排行榜数据
     initGame(); // 开始游戏
+    disableSelection(); // 禁用页面选择
     // toggleTheme(); // 如果需要默认暗黑主题
     
     // 添加窗口resize事件监听
@@ -1045,4 +1046,12 @@ document.addEventListener('DOMContentLoaded', () => {
             initGame(currentCardTheme, currentDifficulty);
         });
     }
+
+    // 禁用页面选择功能
+function disableSelection() {
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+}
 });

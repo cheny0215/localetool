@@ -692,4 +692,13 @@ document.addEventListener('DOMContentLoaded', () => {
     updatePlayerNameDisplay();
     loadLeaderboardData(); // 加载排行榜数据
     initGame(); // 开始游戏
+    disableSelection(); // 禁用页面选择
 });
+
+// 禁用页面选择功能
+function disableSelection() {
+    document.body.style.userSelect = 'none';
+    document.body.style.webkitUserSelect = 'none';
+    document.body.style.msUserSelect = 'none';
+    document.body.style.mozUserSelect = 'none';
+}
