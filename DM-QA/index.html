@@ -88,6 +88,10 @@
                 <div>
                     <iframe id="myIframe" src="" frameborder="0"
                         style="width: 100%;border: 1px solid #d8d8d8;margin-top: 10px;"></iframe>
+                    <div style="margin-top: 8px; color: #ff4d4f; font-size: 12px;">
+                        <i class="layui-icon layui-icon-notice" style="font-size: 14px;"></i>
+                        每使用一次后，请刷新页面防止缓存，再进行下一次使用
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,7 +148,7 @@
                 <button id="copyButton"
                     class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-file-b">复制代码</button>
                 <button id="resetButton"
-                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-refresh">重置所有数据</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-refresh">刷新页面</button>
             </div>
         </div>
     </div>
@@ -297,6 +301,14 @@
                 // localStorage.setItem('cy_outputButton_current_html', '')
                 LoadingModule.show()
                 html_doc = dataInput.value;
+                // 禁用输入框
+                dataInput.disabled = true;
+                dataInput.style.backgroundColor = '#f5f5f5';
+                dataInput.style.cursor = 'not-allowed';
+                // 禁用一键添加QA按钮
+                submitButton.disabled = true;
+                submitButton.style.setProperty('background', '#ccc', 'important');;
+                submitButton.style.cursor = 'not-allowed';
                 toPlaceholder()
                 handleOutput()
                 const html_doc_promise = await new Promise((resolve) => {
@@ -356,6 +368,11 @@
                 html_doc = html_doc_promise
             }
             outputButton.onclick = () => {
+                // 禁用生成Code按钮
+                outputButton.disabled = true;
+                outputButton.style.setProperty('background', '#ccc', 'important');
+                outputButton.style.cursor = 'not-allowed';
+                
                 // 去除tbody
                 const tbodies = iframeDoc.querySelectorAll('tbody');
                 tbodies.forEach(tbody => {
@@ -387,18 +404,35 @@
                 }
             }
             resetButton.onclick = () => {
-                localStorage.setItem('cy_outputButton_current_html', '')
+
+                
+                // 清空所有变量
                 hiddenPreContent = '';
                 hiddenFontContent = '';
-                hexColorObj = originalHexColorObj;
-                dataInput.value = dataOutput.value = ''
-                html_doc = ''
-                handleOutput()
-                const rightAlpineBox = document.querySelector('.rightAlpineBox')
-                let checkboxes = rightAlpineBox.querySelectorAll('input[type="checkbox"]');
+                hexColorObj = {...originalHexColorObj};
+                html_doc = '';
+                
+                // 清空输入输出框
+                dataInput.value = '';
+                dataOutput.value = '';
+                
+                // 启用输入框
+                dataInput.disabled = false;
+                dataInput.style.backgroundColor = '';
+                dataInput.style.cursor = '';
+                
+                // 重置所有复选框
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = true;
                 });
+                
+                // 刷新iframe
+                handleOutput();
+                
+                // 刷新页面
+                window.location.reload();
+                window.history.go(0);
             }
 
             // function

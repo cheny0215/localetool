@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>临时邮箱申请</title>
+    <link rel="stylesheet" href="../../common/layui/css/layui.css" />
+    <script src="../../common/layui/layui.js"></script>
+    <style>
+        body {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 16px;
+            background-color: #f7f7f7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex: 1;
+        }
+
+        .page-title {
+            font-size: 20px;
+            color: #333;
+            margin: 0 0 20px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .description {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #fcfcfc;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .result-card {
+            background: #fcfcfc;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .result-value {
+            color: #1890ff;
+            font-family: monospace;
+            padding: 4px 8px;
+            background: #f0f7ff;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .copy-btn {
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #e6f7ff;
+            border-color: #1890ff;
+            color: #1890ff;
+        }
+
+        .countdown {
+            color: #ff4d4f;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .mailbox-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .layui-btn-disabled {
+            background: #f5f5f5 !important;
+            border-color: #e0e0e0 !important;
+            color: #999 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+        }
+
+        .layui-btn-disabled:hover {
+            background: #f5f5f5 !important;
+            border-color: #e0e0e0 !important;
+            color: #999 !important;
+            transform: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="page-title">📮 临时邮箱申请</h1>
+        <div class="description">
+            快速获取临时邮箱地址，保护您的隐私。每次申请需要间隔5秒。邮箱有效期为10分钟。
+        </div>
+
+        <div class="button-group">
+            <button id="generateBtn" class="layui-btn layui-btn-normal">
+                <i class="layui-icon layui-icon-add-1"></i>生成临时邮箱
+            </button>
+            <span id="countdown" class="countdown"></span>
+        </div>
+
+        <div id="resultCard" class="result-card">
+            <div class="result-item">
+                <span class="result-label">邮箱地址：</span>
+                <div style="display: flex; align-items: center;">
+                    <span id="mailAddress" class="result-value"></span>
+                    <button class="copy-btn" onclick="copyToClipboard('mailAddress')">
+                        <i class="layui-icon layui-icon-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="result-item">
+                <span class="result-label">邮箱密码：</span>
+                <div style="display: flex; align-items: center;">
+                    <span id="mailPassword" class="result-value"></span>
+                    <button class="copy-btn" onclick="copyToClipboard('mailPassword')">
+                        <i class="layui-icon layui-icon-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="result-item">
+                <span class="result-label">过期时间：</span>
+                <span id="endTime" class="result-value"></span>
+            </div>
+            <a id="mailUrl" href="#" target="_blank" class="layui-btn layui-btn-normal mailbox-btn">
+                <i class="layui-icon layui-icon-website"></i>打开收件箱
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://cn.apihz.cn/api/mail/mailcache.php?id=10004465&key=0e8b0763210c6f7f19b175a6c177ca4f';
+        let canRequest = true;
+        let countdownInterval;
+        
+        function startCountdown() {
+            let seconds = 5;
+            const countdownElement = document.getElementById('countdown');
+            const generateBtn = document.getElementById('generateBtn');
+            canRequest = false;
+            
+            // 添加禁用样式
+            generateBtn.classList.add('layui-btn-disabled');
+            generateBtn.disabled = true;
+            
+            countdownInterval = setInterval(() => {
+                countdownElement.textContent = `${seconds}秒后可再次申请`;
+                seconds--;
+                
+                if (seconds < 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.textContent = '';
+                    canRequest = true;
+                    // 移除禁用样式
+                    generateBtn.classList.remove('layui-btn-disabled');
+                    generateBtn.disabled = false;
+                }
+            }, 1000);
+        }
+
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            if (!canRequest) return;
+            
+            // 显示加载中
+            const loadIndex = layer.load(2, {
+                shade: [0.2, '#000']
+            });
+            
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                // 关闭加载中
+                layer.close(loadIndex);
+                
+                if (data.code === 200) {
+                    document.getElementById('resultCard').style.display = 'block';
+                    document.getElementById('mailAddress').textContent = data.mail;
+                    document.getElementById('mailPassword').textContent = data.pwd;
+                    document.getElementById('endTime').textContent = data.endtime;
+                    document.getElementById('mailUrl').href = data.mailurl;
+                    
+                    startCountdown();
+                } else {
+                    layer.msg('获取临时邮箱失败，请稍后重试', {icon: 2});
+                }
+            } catch (error) {
+                // 关闭加载中
+                layer.close(loadIndex);
+                layer.msg('网络错误，请检查网络连接', {icon: 2});
+            }
+        });
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                layer.msg('复制成功！', {icon: 1});
+            }).catch(() => {
+                layer.msg('复制失败，请手动复制', {icon: 2});
+            });
+        }
+
+        // 初始化 layui
+        layui.use(['layer'], function(){
+            window.layer = layui.layer;
+        });
+    </script>
+</body>
+</html>
