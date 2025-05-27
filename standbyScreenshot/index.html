@@ -37,7 +37,8 @@
             </div>
             <div class="email-field">
                 <span class="field-name">Preview Text :</span>
-                <span class="field-value" contenteditable="false">这里是preview copy内容🦄🦄🦄拖入index.html文件这里就会自动读取~~🐶🐶🐶</span>
+                <span class="field-value" contenteditable="false">这里是preview
+                    copy内容🦄🦄🦄拖入index.html文件这里就会自动读取~~🐶🐶🐶</span>
             </div>
         </div>
         <div id="htmlPreview" class="html-preview">
@@ -93,7 +94,7 @@
                     'dragenter dragover': e => {
                         e.preventDefault();
                         this.zone.classList.add('drop-zone-active');
-                        
+
                     },
                     'dragleave drop': e => {
                         e.preventDefault();
@@ -129,33 +130,33 @@
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(content, 'text/html');
                     const hiddenDiv = doc.querySelector('div[style*="display: none"][style*="max-height: 0px"][style*="overflow: hidden"]');
-                    
-                        this.options.targetField.textContent = hiddenDiv ? hiddenDiv.textContent.trim() : '';
-                        
-                        // 获取 iframe 元素
-                        const iframe = document.getElementById('previewFrame');
-                        
-                        // 写入 HTML 内容到 iframe
-                        iframe.srcdoc = content;
-                        
-                        // 等待 iframe 加载完成后调整高度
-                        iframe.onload = () => {
-                            // 调整 iframe 高度以适应内容
-                            iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
-                            
-                            // 移除 iframe 中的脚本标签
-                            const scripts = iframe.contentWindow.document.querySelectorAll('script');
-                            scripts.forEach(script => script.remove());
-                            
-                            // 根据当前视图模式设置内容宽度
-                            const container = isMobileView ? 
-                                iframe.contentWindow.document.querySelector('.mobile-container') :
-                                iframe.contentWindow.document.querySelector('.desktop-container');
-                                
-                            if (container) {
-                                container.style.display = 'block';
-                            }
-                        };
+
+                    this.options.targetField.textContent = hiddenDiv ? hiddenDiv.textContent.trim() : '';
+
+                    // 获取 iframe 元素
+                    const iframe = document.getElementById('previewFrame');
+
+                    // 写入 HTML 内容到 iframe
+                    iframe.srcdoc = content;
+
+                    // 等待 iframe 加载完成后调整高度
+                    iframe.onload = () => {
+                        // 调整 iframe 高度以适应内容
+                        iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+
+                        // 移除 iframe 中的脚本标签
+                        const scripts = iframe.contentWindow.document.querySelectorAll('script');
+                        scripts.forEach(script => script.remove());
+
+                        // 根据当前视图模式设置内容宽度
+                        const container = isMobileView ?
+                            iframe.contentWindow.document.querySelector('.mobile-container') :
+                            iframe.contentWindow.document.querySelector('.desktop-container');
+
+                        if (container) {
+                            container.style.display = 'block';
+                        }
+                    };
 
                 } else {
                     this.options.targetField.textContent = content.trim();
@@ -178,7 +179,7 @@
         let isMobileView = false;
         elements.deviceSwitchButton.addEventListener('click', () => {
             isMobileView = !isMobileView;
-            
+
             // 更新按钮文本
             elements.deviceSwitchButton.textContent = isMobileView ? '切换为桌面端' : '切换为移动端';
             elements.deviceSwitchButton.classList.toggle('active', isMobileView);
@@ -195,18 +196,56 @@
                 const desktopContainer = doc.querySelector('.desktop-container');
                 const mobileContainer = doc.querySelector('.mobile-container');
                 const footerContent = doc.querySelector('.shared-footer');
-                
+                const verticalLine = doc.querySelectorAll('.sfnav span.vert');
+                const navP = doc.querySelectorAll('.sfnav p');
+                const keyline_custom = doc.querySelector('.sfnav.custom-keyline');
+
                 if (desktopContainer && mobileContainer) {
                     desktopContainer.setAttribute('style', `display: ${isMobileView ? 'none' : 'block'}`);
                     mobileContainer.setAttribute('style', `display: ${isMobileView ? 'block' : 'none'}`);
-                    
+
                     // 等待 DOM 更新后重新计算高度
                     setTimeout(() => {
                         iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
                     }, 300); // 等待过渡动画完成
-                    
+
+
+                    if (isMobileView) {
+                        console.log('mobile', verticalLine);
+
+                        verticalLine.forEach(item => {
+                            item.style.fontSize = '0';
+                            item.style.lineHeight = '0';
+                            item.style.display = 'block';
+                            item.style.borderTop = '1px solid #d2d2d7';
+                        })
+
+                        navP.forEach(item => {
+                            item.style.fontSize = '12px';
+                            item.style.lineHeight = '39px';
+                            item.style.padding = '0';
+                        })
+                        keyline_custom.style.setProperty('border-bottom-width', '0', 'important');
+                        keyline_custom.style.setProperty('padding', '0', 'important');
+                    } else {
+                        // 如果是桌面端，则设置为默认样式
+                        verticalLine.forEach(item => {
+                            item.style.fontSize = '14px';
+                            item.style.lineHeight = '18px';
+                            item.style.display = 'inline';
+                            item.style.borderTop = '0';
+                        })
+                        navP.forEach(item => {
+                            item.style.fontSize = '14px';
+                            item.style.lineHeight = '18px';
+                            item.style.padding = '0 20px';
+                        })
+                        keyline_custom.style.setProperty('border-bottom-width', '1px', 'important');
+                        keyline_custom.style.setProperty('padding', '16px 0', 'important');
+                    }
                     // 调整页脚宽度
                     if (footerContent) {
+
                         // 获取页脚中的所有表格
                         const footerTables = footerContent.querySelectorAll('table');
                         footerTables.forEach(table => {

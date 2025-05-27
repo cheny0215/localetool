@@ -119,6 +119,75 @@
             color: #999 !important;
             transform: none !important;
         }
+
+        .history-section {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .history-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.09);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .history-item-content {
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item-email {
+            color: #1890ff;
+            font-weight: 500;
+        }
+
+        .no-history {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
+        .clear-history {
+            color: #ff4d4f;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .clear-history:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -162,6 +231,17 @@
                 <i class="layui-icon layui-icon-website"></i>打开收件箱
             </a>
         </div>
+
+        <!-- 添加历史记录区域 -->
+        <div class="history-section">
+            <div class="history-title">
+                <span>📋 历史记录<span style="font-size: 12px; color: #999;">（只保留最近10条）</span></span>
+                <span class="clear-history" onclick="clearHistory()">清空历史</span>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- 历史记录将通过JavaScript动态插入 -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -169,6 +249,75 @@
         let canRequest = true;
         let countdownInterval;
         
+        // 添加邮箱历史记录管理
+        const STORAGE_KEY = 'temp_mail_history';
+        
+        function saveMailHistory(mailData) {
+            // 获取现有历史记录
+            let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            
+            // 创建新的记录对象
+            const newRecord = {
+                mail: mailData.mail,
+                pwd: mailData.pwd,
+                endtime: mailData.endtime,
+                mailurl: mailData.mailurl,
+                timestamp: new Date().getTime()
+            };
+            
+            // 添加新记录到开头
+            history.unshift(newRecord);
+            
+            // 只保留最近的10条记录
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+
+            // 更新显示
+            displayHistory();
+        }
+
+        function displayHistory() {
+            const historyList = document.getElementById('historyList');
+            const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="no-history">暂无历史记录</div>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div class="history-item-header">
+                        <span>创建时间：${new Date(item.timestamp).toLocaleString()}</span>
+                        <span>有效期至：${item.endtime}</span>
+                    </div>
+                    <div class="history-item-content">
+                        <div class="history-item-email">📧 ${item.mail}</div>
+                        <a href="${item.mailurl}" target="_blank" class="layui-btn layui-btn-primary layui-btn-sm">
+                            <i class="layui-icon layui-icon-website"></i>打开邮箱
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            layer.confirm('确定要清空所有历史记录吗？', {
+                btn: ['确定', '取消']
+            }, function() {
+                localStorage.removeItem(STORAGE_KEY);
+                displayHistory();
+                layer.msg('历史记录已清空');
+            });
+        }
+
+        // 页面加载时显示历史记录
+        document.addEventListener('DOMContentLoaded', displayHistory);
+
         function startCountdown() {
             let seconds = 5;
             const countdownElement = document.getElementById('countdown');
@@ -215,6 +364,9 @@
                     document.getElementById('mailPassword').textContent = data.pwd;
                     document.getElementById('endTime').textContent = data.endtime;
                     document.getElementById('mailUrl').href = data.mailurl;
+                    
+                    // 保存到历史记录
+                    saveMailHistory(data);
                     
                     startCountdown();
                 } else {
