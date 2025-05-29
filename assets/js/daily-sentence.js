@@ -1,4 +1,3 @@
-
         // 添加显示/隐藏每日一言功能
         document.addEventListener('DOMContentLoaded', function() {
             const toggleDailyTextBtn = document.getElementById('toggleDailyText');
@@ -55,13 +54,13 @@
 async function fetchDailyTextData() {
     const headerText = document.getElementById('header-text');
     let userInfo = {};
-            try {
-                const storedUserInfo = localStorage.getItem('userInfo');
-                userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
-            } catch (e) {
-                console.error('解析userInfo出错:', e);
-                userInfo = {};
-            }
+    try {
+        const storedUserInfo = localStorage.getItem('userInfo');
+        userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
+    } catch (e) {
+        console.error('解析userInfo出错:', e);
+        userInfo = {};
+    }
     if(userInfo.isDailyTextHidden){        
         return
     }
@@ -123,9 +122,8 @@ function updateLocationDisplay(data) {
         if (true) { // 确保滚动机制启动
             // 设置初始位置（从右侧开始）
             let position = 0;
-            let speed = 1; // 增加滚动速度，使效果更明显
-            let direction = -1; // 向左滚动
-            let pauseDelay = 3000; // 滚动到两端后暂停时间（毫秒）
+            let speed = 1; // 滚动速度
+            let pauseDelay = 2000; // 滚动到尽头后暂停时间（毫秒）
             let isPaused = false;
             let pauseTimer;
             
@@ -133,28 +131,19 @@ function updateLocationDisplay(data) {
             const scrollAnimation = setInterval(() => {
                 if (isPaused) return;
                 
-                // 移动文本
-                position += speed * direction;
+                // 向左移动文本
+                position -= speed;
                 scrollingText.style.transform = `translateX(${position}px)`;
                 
                 // 左侧边界检测（向左滚动到尽头）
                 const maxScrollLeft = scrollingText.offsetWidth - container.offsetWidth + 20; // 添加额外的边界空间
                 
-                if (direction < 0 && position <= -maxScrollLeft) {
+                if (position <= -maxScrollLeft) {
                     isPaused = true;
-                    // 暂停片刻后向右滚动
+                    // 暂停片刻后重置到起点
                     pauseTimer = setTimeout(() => {
-                        direction = 1; // 改变方向为向右
-                        isPaused = false;
-                    }, pauseDelay);
-                }
-                
-                // 右侧边界检测（向右滚动到尽头）
-                if (direction > 0 && position >= 0) {
-                    isPaused = true;
-                    // 暂停片刻后向左滚动
-                    pauseTimer = setTimeout(() => {
-                        direction = -1; // 改变方向为向左
+                        position = 0; // 重置到起点
+                        scrollingText.style.transform = `translateX(${position}px)`;
                         isPaused = false;
                     }, pauseDelay);
                 }

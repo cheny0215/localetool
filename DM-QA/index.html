@@ -20,12 +20,12 @@
 
         .leftAlpineBox {
             flex: 3;
-            padding: 8px;
+            padding: 20px;
             border-radius: 6px;
         }
 
         .centerAlpineBox {
-            padding: 8px;
+            padding: 20px;
             flex: 3;
             margin: 0 12px;
             border-radius: 6px;
@@ -36,7 +36,7 @@
         }
 
         .rightAlpineBox {
-            padding: 8px;
+            padding: 20px;
             flex: 3;
             border-radius: 6px;
         }
@@ -82,9 +82,9 @@
     <div class="alpineData">
         <div class="leftAlpineBox layui-panel">
             <div class="tweHtml">
-                <h4>原始html：</h4>
+                <h4 style="color: #0880ea;">原始html：</h4>
                 <hr>
-                <textarea id="dataInput" class="data_textarea layui-textarea" placeholder="请输入"></textarea>
+                <textarea id="dataInput" class="data_textarea layui-textarea" placeholder="ꚰꚰꚰ 将原始HTML代码粘贴到这里 ꚰꚰꚰ"></textarea>
                 <div>
                     <iframe id="myIframe" src="" frameborder="0"
                         style="width: 100%;border: 1px solid #d8d8d8;margin-top: 10px;"></iframe>
@@ -124,11 +124,11 @@
                 <hr>
                 <div>
                     <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
-                        title="sina邮箱移动端添加sup样式"><span class="layui-badge-rim layui-border-blue">sina邮箱</span>
+                        title="sina邮箱移动端添加sup样式"><span class="layui-badge-rim layui-border-blue">sina邮箱/CN</span>
                 </div>
                 <div>
                     <input type="checkbox" id="setNowrapSpanCheckbox" name="setNowrapSpan"
-                        title="mobile网易span设置nowrap属性"><span class="layui-badge-rim layui-border-blue">163邮箱</span>
+                        title="mobile网易span设置nowrap属性"><span class="layui-badge-rim layui-border-blue">163邮箱/CN</span>
                 </div>
                 <div>
                     <input type="checkbox" id="delUnderlineImportantCheckbox" name="delUnderlineImportant"
@@ -138,21 +138,21 @@
             </div>
             <div class="layui-btn-container">
                 <button id="submitButton"
-                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-component">一键添加QA</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-component"> 一键添加QA ➊</button>
                 <button id="outputButton"
-                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-fonts-code">生成Code</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-fonts-code"> 生成Code ➋</button>
             </div>
         </div>
         <div class="rightAlpineBox layui-panel">
-            <h4>QA后html：</h4>
+            <h4 style="color: #0880ea;">QA后html：</h4>
             <hr>
-            <textarea id="dataOutput" class="data_textarea layui-textarea" placeholder="待生成"></textarea>
+            <textarea id="dataOutput" class="data_textarea layui-textarea" placeholder="生成代码之后，点击 ☟☟下方按钮复制代码，并粘贴回原始html文件 ㊗︎㊗︎㊗︎"></textarea>
             <hr>
             <div class="layui-btn-container">
                 <button id="copyButton"
-                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-file-b">复制代码</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-file-b"> 复制代码 ➌</button>
                 <button id="resetButton"
-                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-refresh">刷新页面</button>
+                    class="layui-btn layui-btn-sm  layui-bg-blue layui-icon layui-icon-refresh"> 刷新页面 ➍</button>
             </div>
         </div>
     </div>

@@ -8,7 +8,7 @@
     --accent-blue: #3498db; /* 主题蓝色 */
     --day-bg: rgba(233, 245, 255, 0.7); /* 半透明日间天气背景 */
     --night-bg: rgba(212, 230, 241, 0.7); /* 半透明夜间天气背景 - 稍深 */
-    --today-border-color: #2980b9; /* 今日天气边框颜色 */
+    --today-border-color: #ffffff; /* 今日天气边框颜色 */
     --temp-max-color: #ff6b6b;
     --temp-min-color: #1e90ff;
     --glass-bg: rgba(255, 255, 255, 0.25); /* 玻璃效果背景色 */
@@ -48,7 +48,7 @@ header {
 
 header h1 {
     text-shadow: 2px 1px 6px #fff;
-    color: var(--accent-blue);
+    color: var(--today-border-color);
     margin-bottom: 15px;
     font-size: 2.2em;
     font-weight: 500;
@@ -140,7 +140,7 @@ header h1 {
 
 /* 今日天气突出显示 */
 .forecast-day.today {
-    border: 2px solid var(--today-border-color);
+    border: 3px solid var(--accent-blue);
     box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
 }
 .forecast-day.today .date-header h2 {
@@ -258,15 +258,14 @@ footer {
 
 .weather-chart-title{
     font-size: 1.2em;
-    color: var(--text-color);
-    font-weight: 500;
+    color: var(--today-border-color);
+    font-weight: 800;
     text-align: center;
     margin-top: 10px;
     margin-bottom: 10px;
     cursor: pointer;
-    color: var(--accent-blue);
     text-decoration:underline;
-    text-shadow: 2px 1px 6px #fff;
+    text-shadow: 2px 1px 5px #e3f0ff;
 }
 
 /* 响应式调整 */
@@ -315,7 +314,7 @@ footer {
 }
 
 .glass-effect {
-    background-color: var(--glass-bg);
+    /* background-color: var(--glass-bg); */
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 8px;

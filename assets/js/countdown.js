@@ -15,10 +15,10 @@ function initCountdown() {
         userInfo = storedUserInfo ? JSON.parse(storedUserInfo) : {};
     } catch (e) {
         console.error('解析userInfo出错:', e);
-        userInfo={}
+        userInfo = {}
     }
     // 初始化倒计时显示状态
-    let isCountdownVisible = userInfo.countdownVisible === 'true';
+    let isCountdownVisible = userInfo.countdownVisible === true;
     
     // 设置初始状态
     if (isCountdownVisible) {
@@ -32,7 +32,7 @@ function initCountdown() {
     // 切换倒计时显示/隐藏
     toggleCountdown.addEventListener('click', function() {
         isCountdownVisible = !isCountdownVisible;
-        userInfo.countdownVisible = isCountdownVisible + ''
+        userInfo.countdownVisible = isCountdownVisible;
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
         
         if (isCountdownVisible) {
@@ -235,7 +235,7 @@ function initCountdown() {
     // 添加不再显示按钮的点击事件
     hideCountdown.addEventListener('click', function() {
         isCountdownVisible = false;
-        userInfo.countdownVisible = 'false'
+        userInfo.countdownVisible = false;
         localStorage.setItem('userInfo', JSON.stringify(userInfo));
         countdownCard.classList.remove('visible');
         toggleCountdown.textContent = '显示下班倒计时';

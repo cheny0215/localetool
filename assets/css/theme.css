@@ -104,11 +104,11 @@
 
 /* 咖啡时光 - 温暖棕色 */
 [data-theme="coffee"] {
-    --sidebar-bg: linear-gradient(120deg, #603813, #b29f94);
+    --sidebar-bg: linear-gradient(120deg, #603813, #9a7c6b);
     --sidebar-text: rgba(255,255,255,.9);
     --sidebar-hover: rgba(255,255,255,.15);
     --active-color: #795548;
-    --header-bg: linear-gradient(to top,#f6f3f0, #e4cec3);
+    --header-bg: linear-gradient(135deg,#9a6633, #e4cec3);
     --header-text: #3E2723;
     --accent-color: #8BC34A;
 } 

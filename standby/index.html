@@ -11,8 +11,9 @@
 <body>
     <div class="copy-tip" id="copyTip">已复制到剪贴板</div>
     <div class="edit-button-container">
-        <button class="open-button">🧩 打开生成截图窗口进行拼图操作</button>
-        <div style="margin: 10px;text-align: center;color: #999;font-size: 12px;">打开新窗口的工具可以直接进行截图的拼接，控制台中直接截图</div>
+        <button class="open-button">🧩 去快速生成项目截图 ★★★</button>
+        <div style="margin: 10px;text-align: center;color: #1b5efd;font-size: 12px;">点击上方，可快速生成项目的Desktop/Mobile截图，并进行拼图操作，无需去starling截图以及使用PS</div>
+        <div style="text-align: center;color: #40b2f9;font-size: 12px;">下方，可快速生成备份项目的命名，以及Desktop/Mobile截图命名，点击即可复制</div>
     </div>
 
     <!-- 添加项目信息表单 -->
@@ -20,27 +21,31 @@
         <div class="form-group">
             <label>项目名称：</label>
             <input type="text" id="projectName" value="Holiday 2025 Still Time">
+            <span class="text-tip">格式参考: Holiday 2025 Still Time</span>
         </div>
         <div class="form-group">
             <label>项目年份编号：</label>
             <input type="text" id="projectYear" value="FY25 Q1">
+            <span class="text-tip">格式参考: FY25 Q1</span>
         </div>
         <div class="form-group">
             <label>项目日期：</label>
             <input type="text" id="projectDate" value="20251212">
+            <span class="text-tip">格式参考: 20251212</span>
         </div>
         <div class="form-group">
-            <label>项目负责人：</label>
+            <label>负责人名字：</label>
             <input type="text" id="projectManager" value="Ivan">
         </div>
         <div class="form-group">
             <label>项目语言：</label>
             <div class="checkbox-group">
-                <label><input type="checkbox" value="HKEN"> HKEN</label>
-                <label><input type="checkbox" value="HKTC"> HKTC</label>
-                <label><input type="checkbox" value="MOTC"> MOTC</label>
-                <label><input type="checkbox" value="CNSC"> CNSC</label>
-                <label><input type="checkbox" value="TWTC"> TWTC</label>
+                <label><input type="checkbox" value="HKEN" checked> HKEN</label>
+                <label><input type="checkbox" value="HKTC" checked> HKTC</label>
+                <label><input type="checkbox" value="MOTC" checked> MOTC</label>
+                <label><input type="checkbox" value="CNSC" checked> CNSC</label>
+                <label><input type="checkbox" value="TWTC" checked> TWTC</label>
+                <span class="text-tip">默认选中所有语言</span>
             </div>
         </div>
     </div>
@@ -78,6 +83,11 @@
             const projectDate = document.getElementById('projectDate').value;
             const projectManager = document.getElementById('projectManager').value;
             const selectedLanguages = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
+
+            // 保存项目负责人到本地存储
+            const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : {};
+            userInfo.username = projectManager;
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
 
             // 更新备份文件项目名称
             const backupFileName = `${projectDate}-${projectName}_${projectManager}`;
@@ -130,6 +140,14 @@
                 copyText(this.textContent);
             });
         });
+
+        // 从本地存储加载用户名
+        if (localStorage.getItem('userInfo')) {           
+            const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+            if (userInfo.username) {
+                document.getElementById('projectManager').value = userInfo.username;
+            }
+        }
 
         // 初始化显示
         updateNames();
