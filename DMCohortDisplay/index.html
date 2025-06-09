@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DM一键添加版本信息</title>
+    <link rel="stylesheet" href="../common/layui/css/layui.css" />
+    <link rel="stylesheet" href="../css/index.css">
+    <script src="../common/layui/layui.js"></script>
+    <script src="../common/components/ShowMessage.js" defer></script>
+    <script src="../common/components/Loading.js" defer></script>
+    <style>
+        .alpineData {
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            padding: 8px;
+        }
+
+        .leftAlpineBox {
+            flex: 3;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .centerAlpineBox {
+            padding: 20px;
+            flex: 3;
+            margin: 0 12px;
+            border-radius: 6px;
+        }
+
+        .centerAlpineBox .layui-form-checkbox {
+            margin-bottom: 4px;
+        }
+
+        .rightAlpineBox {
+            padding: 20px;
+            flex: 3;
+            border-radius: 6px;
+        }
+
+        .data_textarea {
+            resize: both;
+            border: 1px solid #c2c2c2;
+            border-radius: 4px;
+        }
+
+        .data_textarea::placeholder {
+            color: #ccc;
+        }
+
+        .layui-btn {
+            height: 36px;
+            line-height: 36px;
+            padding: 0 16px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: perspective(800px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .layui-btn-sm {
+            margin: 6px 0;
+            font-weight: 700;
+            border-radius: 8px;
+            /* background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%); */
+            border: none;
+            box-shadow: 0 4px 15px rgba(24, 144, 255, 0.3);
+        }
+
+        .laybox {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="alpineData">
+        <div class="leftAlpineBox layui-panel">
+            <div class="tweHtml">
+                <h4 style="color: #16baaa;">原始html：</h4>
+                <hr>
+                <textarea id="dataInput" class="data_textarea layui-textarea"
+                    placeholder="请将我们的原始HTML代码粘贴到这里"></textarea>
+                <div>
+                    <iframe id="myIframe" src="" frameborder="0"
+                        style="width: 100%;border: 1px solid #d8d8d8;margin-top: 100px;height: 0 !important;visibility: hidden;"></iframe>
+                    <div style="margin-top: 8px; color: #16a4ba; font-size: 12px;">
+                        <i class="layui-icon layui-icon-notice" style="font-size: 14px;"></i>
+                        每使用一次后，请刷新页面防止缓存，再进行下一次使用
+                    </div>
+                    <div style="margin-top: 4px; color: #16baaa; font-size: 12px;">
+                        <i class="layui-icon layui-icon-notice" style="font-size: 14px;"></i>
+                        添加版本信息之前一定要保留原始html
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="centerAlpineBox layui-panel">
+            <div class="layui-btn-container">
+                <button id="submitButton"
+                    class="layui-btn layui-btn-sm  layui-bg-green layui-icon layui-icon-component"> 一键添加版本信息样式代码
+                    ➊</button>
+                <button id="outputButton"
+                    class="layui-btn layui-btn-sm  layui-bg-green layui-icon layui-icon-fonts-code"> 生成Code ➋</button>
+            </div>
+        </div>
+        <div class="rightAlpineBox layui-panel">
+            <h4 style="color: #16baaa;">添加版本信息后html：</h4>
+            <hr>
+            <textarea id="dataOutput" class="data_textarea layui-textarea"
+                placeholder="带有版本信息样式的代码会展示在这里，点击下方按钮即可复制到剪贴板～"></textarea>
+            <hr>
+            <div class="layui-btn-container">
+                <button id="copyButton" class="layui-btn layui-btn-sm  layui-bg-green layui-icon layui-icon-file-b">
+                    复制代码 ➌</button>
+                <button id="resetButton" class="layui-btn layui-btn-sm  layui-bg-green layui-icon layui-icon-refresh">
+                    刷新页面 ➍</button>
+            </div>
+        </div>
+    </div>
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const dataInput = document.getElementById('dataInput');
+            const dataOutput = document.getElementById('dataOutput');
+            const iframe = document.getElementById('myIframe');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+            // Checkbox element
+
+            const submitButton = document.getElementById('submitButton');
+            const outputButton = document.getElementById('outputButton');
+            const copyButton = document.getElementById('copyButton');
+            const resetButton = document.getElementById('resetButton');
+
+            let html_doc = '';
+            let hiddenPreContent = '';
+            let hiddenFontContent = '';
+            let dynamicContent = '';
+            const originalHexColorObj = {
+                addMargin: [],
+                delUnderline: [],
+                delUnderlineImportant: [],
+                appStoreNowrap: [],
+            };
+            let hexColorObj = originalHexColorObj
+            const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
+            const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
+            const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
+            const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';
+
+            // input事件
+            dataInput.addEventListener('input', function () {
+                html_doc = dataInput.value;
+                toPlaceholder()
+                handleOutput()
+            });
+
+            // 占位符
+            function toPlaceholder() {
+                html_doc = html_doc.replace(/<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/, (match, content) => {
+                    console.log("🚀 ~ html_doc=html_doc.replace ~ match:", match)
+                    hiddenPreContent = match; // 存储内容
+                    return pre_placeholder; // 替换为占位符
+                });
+                html_doc = html_doc.replace(/\<!--\[if gte mso 9\]\>([\s\S]*)\<!\[endif\]--\>/, (match, content) => {
+                    hiddenFontContent = match; // 存储内容
+                    return font_placeholder; // 替换为占位符
+                });
+                html_doc = html_doc.replace(/&zwnj;/g, zwnj_placeholder)
+                // 存储<!DOCTYPE前面的所有内容
+                html_doc = html_doc.replace(/^[\s\S]*?(?=<!DOCTYPE)/i, (match) => {
+                    dynamicContent = match; // 存储匹配到的内容
+                    return dynamic_placeholder; // 替换为占位符
+                });
+            }
+            function delPlaceholder(iframehtml) {
+                iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
+
+                // 在<!--[if gte mso 9]>前面添加style样式
+                const styleToAdd = `<style>
+        table {
+                border-collapse: collapse !important;
+            }
+
+      .isv {
+				position: relative;
+				border: 2px dashed red;
+				box-sizing: border-box;
+				margin-left: -2px;
+				margin-right: -2px;
+			}
+			
+			.isv::after {
+				content: attr(version-label);
+				position: absolute;
+				bottom: 0px;
+				right: 0px;
+				transform: translate(50%, 50%);
+				height: 36px;
+                padding:0 16px;
+				background: #ff6b6b;
+				color: white;
+				font-size: 12px;
+				font-weight: bold;
+                border-radius: 18px;
+				
+				display: flex;
+				align-items: center;
+				justify-content: center;
+                z-index: 9999;
+				transition: opacity 0.3s ease 0.3s;
+                cursor: pointer;
+			}
+                .isv:hover::after{
+                opacity:0;
+            }
+    </style>\n`
+                    ;
+
+                iframehtml = iframehtml.replace(font_placeholder, styleToAdd + hiddenFontContent);
+
+                console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
+
+
+                
+                iframehtml = iframehtml.replace(/(cornflowerblue|mediumspringgreen|lightgoldenrodyellow|blanchedalmond)/g, 
+                    (match) => {
+                        const [prop, index] = placeholders[match];
+                        placeholders[match][1]++; // 更新索引计数
+                        return hexColorObj[prop][index];
+                    }
+                );
+                iframehtml = iframehtml.replace(new RegExp(escapeRegExp(zwnj_placeholder), 'g'), '&zwnj;')
+                return iframehtml
+            }
+            // 工具函数-转义正则中的特殊字符
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // 转义特殊字符
+            }
+
+            // 按钮点击事件
+            submitButton.onclick = async () => {
+                LoadingModule.show()
+                html_doc = dataInput.value;
+                // 禁用输入框
+                dataInput.disabled = true;
+                dataInput.style.backgroundColor = '#f5f5f5';
+                dataInput.style.cursor = 'not-allowed';
+                // 禁用一键添加版本信息按钮
+                submitButton.disabled = true;
+                submitButton.style.setProperty('background', '#ccc', 'important');;
+                submitButton.style.cursor = 'not-allowed';
+                toPlaceholder()
+                handleOutput()
+                const html_doc_promise = await new Promise((resolve) => {
+                    setTimeout(() => {
+                        console.log('iframe加载完成');
+                    //    执行代码>>>>>>>>>>>>>>>>>
+                        addVersionInfo()
+                        addVersionInfo_sosumi()
+                        addVersionInfo_custom()
+                        // showMessage({ msg: '版本信息添加完成！', type: 'success' })
+                        LoadingModule.hide()
+                        resolve(html_doc)
+                    }, 0)
+                })
+                html_doc = html_doc_promise
+            }
+            outputButton.onclick = () => {
+                // 禁用生成Code按钮
+                outputButton.disabled = true;
+                outputButton.style.setProperty('background', '#ccc', 'important');
+                outputButton.style.cursor = 'not-allowed';
+                
+                // 去除tbody
+                const tbodies = iframeDoc.querySelectorAll('tbody');
+                tbodies.forEach(tbody => {
+                    while (tbody.firstChild) {
+                        tbody.parentNode.insertBefore(tbody.firstChild, tbody);
+                    }
+                    tbody.parentNode.removeChild(tbody);
+                });
+                // 去除占位符
+                let iframeOutHtml = iframeDoc.documentElement.outerHTML
+                iframeOutHtml = delPlaceholder(iframeOutHtml)
+                // 恢复<!DOCTYPE前面的内容
+                dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
+                console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
+
+
+            }
+            copyButton.onclick = async () => {
+                try {
+                    await navigator.clipboard.writeText(dataOutput.value);
+                    showMessage({ msg: '复制成功！', type: 'success' })
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+            resetButton.onclick = () => {
+
+                
+                // 清空所有变量
+                hiddenPreContent = '';
+                hiddenFontContent = '';
+                hexColorObj = { ...originalHexColorObj };
+                html_doc = '';
+                
+                // 清空输入输出框
+                dataInput.value = '';
+                dataOutput.value = '';
+                
+                // 启用输入框
+                dataInput.disabled = false;
+                dataInput.style.backgroundColor = '';
+                dataInput.style.cursor = '';
+                
+
+                
+                // 刷新iframe
+                handleOutput();
+                
+                // 刷新页面
+                window.location.reload();
+                window.history.go(0);
+            }
+
+            // function
+            function handleOutput() {
+                iframeDoc.open();
+                iframeDoc.write(html_doc);
+                iframeDoc.close();
+            }
+        
+            // 给含有动态版本信息的元素添加边框样式以及版本标识
+            function addVersionInfo() {
+                // 获取iframe中的HTML内容
+                let htmlContent = iframeDoc.documentElement.outerHTML;
+                
+                // 正则表达式匹配动态版本信息
+                // 匹配格式: <!-- <dmc-dynamic>#if ( $cohort == "x" || $cohort == "y" || ... ) </dmc-dynamic> --> 元素 <!-- <dmc-dynamic>#end</dmc-dynamic> -->
+                const dmcRegex = /<!--\s*<dmc-dynamic>#if\s*\(\s*((?:\$cohort\s*==\s*"[^"]+"\s*(?:\|\|\s*)?)+).*?<\/dmc-dynamic>\s*-->([\s\S]*?)<!--\s*<dmc-dynamic>#end<\/dmc-dynamic>\s*-->/g;
+                
+                // 提取cohort值的正则表达式
+                const cohortValueRegex = /\$cohort\s*==\s*"([^"]+)"/g;
+                
+                // 匹配元素标签的正则表达式
+                const elementRegex = /<([a-zA-Z][a-zA-Z0-9]*)\s+([^>]*)>/;
+                
+                // 匹配tr标签的正则表达式
+                const trRegex = /<tr\s*([^>]*)>([\s\S]*?)<\/tr>/i;
+                
+                // 匹配td标签的正则表达式
+                const firstTdRegex = /<td\s*([^>]*)>/i;
+                
+                // 替换匹配到的内容
+                htmlContent = htmlContent.replace(dmcRegex, (match, cohortCondition, elementContent) => {
+                    // 提取所有cohort值（排除"all"）
+                    const cohorts = [];
+                    let cohortMatch;
+                    while ((cohortMatch = cohortValueRegex.exec(cohortCondition)) !== null) {
+                        if (cohortMatch[1] !== "all") {
+                            cohorts.push(cohortMatch[1]);
+                        }
+                    }
+                    
+                    // 如果没有找到有效的cohort值，直接返回原内容
+                    if (cohorts.length === 0) {
+                        return match;
+                    }
+                    
+                    // 生成version-label值
+                    const versionLabel = cohorts.join(' | ');
+                    
+                    // 检查元素是否是tr标签
+                    const trMatch = elementContent.match(trRegex);
+                    if (trMatch) {
+                        // 如果是tr标签，找到第一个td标签
+                        const trContent = trMatch[2]; // tr标签内的内容
+                        const tdMatch = trContent.match(firstTdRegex);
+                        
+                        if (tdMatch) {
+                            // 获取td的属性部分
+                            let tdAttrs = tdMatch[1] || '';
+                            
+                            // 添加isv类名
+                            if (tdAttrs.includes('class="')) {
+                                // 如果已有class属性，检查是否已包含isv类
+                                if (!tdAttrs.includes('class="isv"') && !tdAttrs.includes(' isv"') && !tdAttrs.includes(' isv ')) {
+                                    // 添加isv类到现有class属性
+                                    tdAttrs = tdAttrs.replace(/class="([^"]*)"/g, 'class="$1 isv"');
+                                }
+                            } else {
+                                // 没有class属性，添加一个
+                                tdAttrs += ' class="isv"';
+                            }
+                            
+                            // 添加version-label属性
+                            if (!tdAttrs.includes('version-label="')) {
+                                tdAttrs += ` version-label="${versionLabel}"`;
+                            }
+                            
+                            // 替换第一个td标签
+                            const modifiedTrContent = trContent.replace(firstTdRegex, `<td ${tdAttrs}>`);
+                            const modifiedElementContent = elementContent.replace(trRegex, `<tr ${trMatch[1]}>${modifiedTrContent}</tr>`);
+                            
+                            // 返回修改后的内容，删除动态代码注释
+                            return modifiedElementContent;
+                        }
+                    }
+                    
+                    // 对于非tr元素或没有td子元素的tr，使用原来的处理方式
+                    const elemMatch = elementContent.match(elementRegex);
+                    if (elemMatch) {
+                        const tagName = elemMatch[1];
+                        let attributes = elemMatch[2];
+                        
+                        // 检查是否已有class属性
+                        if (attributes.includes('class="')) {
+                            // 如果已有class属性，检查是否已包含isv类
+                            if (attributes.includes('class="isv"') || attributes.includes(' isv"') || attributes.includes(' isv ')) {
+                                // 已有isv类，不需要添加
+                            } else {
+                                // 添加isv类到现有class属性
+                                attributes = attributes.replace(/class="([^"]*)"/g, 'class="$1 isv"');
+                            }
+                        } else {
+                            // 没有class属性，添加一个
+                            attributes += ' class="isv"';
+                        }
+                        
+                        // 添加version-label属性
+                        if (!attributes.includes('version-label="')) {
+                            attributes += ` version-label="${versionLabel}"`;
+                        }
+                        
+                        // 替换开始标签，保留其余部分
+                        const modifiedElementContent = elementContent.replace(elementRegex, `<${tagName} ${attributes}>`);
+                        
+                        // 返回修改后的内容，删除动态代码注释
+                        return modifiedElementContent;
+                    }
+                    
+                    // 如果没有找到匹配的元素标签，直接返回元素内容
+                    return elementContent;
+                });
+                
+                // 更新html_doc并重新渲染
+                html_doc = htmlContent;
+                handleOutput();
+                
+                console.log("版本信息添加完成，动态代码已删除");
+            }
+
+            function addVersionInfo_sosumi() {
+                // 获取iframe中的HTML内容
+                let htmlContent = iframeDoc.documentElement.outerHTML;
+                
+                // 正则表达式匹配含有条件判断的p标签
+                // 将p标签分为开始标签、条件判断部分、内容部分、结束标签和结束p标签
+                const sosumiRegex = /(<p\s+[^>]*>)(#if\s*\(\s*(?:\$cohort\s*==\s*"[^"]+"\s*(?:\|\|\s*)?)+\s*\))([\s\S]*?)(#end)(<\/p>)/g;
+                
+                // 提取cohort值的正则表达式
+                const cohortValueRegex = /\$cohort\s*==\s*"([^"]+)"/g;
+                
+                // 替换匹配到的内容
+                htmlContent = htmlContent.replace(sosumiRegex, (match, pOpen, ifCondition, content, endTag, pClose) => {
+                    // 提取所有cohort值（排除"all"）
+                    const cohorts = [];
+                    let cohortMatch;
+                    const cohortCondition = ifCondition;
+                    
+                    while ((cohortMatch = cohortValueRegex.exec(cohortCondition)) !== null) {
+                        if (cohortMatch[1] !== "all") {
+                            cohorts.push(cohortMatch[1]);
+                        }
+                    }
+                    
+                    // 如果没有找到有效的cohort值，直接返回原内容
+                    if (cohorts.length === 0) {
+                        console.log("🚀 ~ sosumi - 没有找到有效的cohort值，直接返回原内容");
+                        return match;
+                    }
+                    
+                    // 生成version-label值
+                    const versionLabel = cohorts.join(' | ');
+                    
+                    // 检查p标签是否已有class属性
+                    if (pOpen.includes('class="')) {
+                        // 如果已有class属性，检查是否已包含isv类
+                        if (pOpen.includes('class="isv"') || pOpen.includes(' isv"') || pOpen.includes(' isv ')) {
+                            // 已有isv类，不需要添加
+                        } else {
+                            // 添加isv类到现有class属性
+                            pOpen = pOpen.replace(/class="([^"]*)"/g, 'class="$1 isv"');
+                        }
+                    } else {
+                        // 没有class属性，添加一个
+                        pOpen = pOpen.replace(/<p\s+/, '<p class="isv" ');
+                    }
+                    
+                    // 添加version-label属性
+                    if (!pOpen.includes('version-label="')) {
+                        pOpen = pOpen.replace(/<p\s+/, `<p version-label="${versionLabel}" `);
+                    }
+                    // 返回修改后的标签
+                    // return pOpen + ifCondition + content + endTag + pClose;
+                    // 返回修改后的标签，删除动态代码（#if到#end），只保留内容部分
+                    return pOpen + content.trim() + pClose;
+                });
+                
+                // 更新html_doc并重新渲染
+                html_doc = htmlContent;
+                handleOutput();
+                
+                console.log("sosumi版本信息添加完成，动态代码已删除");
+            }
+
+            function addVersionInfo_custom() {
+                // 如果代码中的h1,h2,h3,h4,h5,h6,p标签中含有类似#if( $cohort == "2" || $cohort == "3" || $cohort == "4" || $cohort == "12" || $cohort == "13" || $cohort == "17" || $cohort == "18") 并且以#end结尾的动态代码，则将动态代码的内部添加一个span标签，包裹动态代码的内部内容，span标签的class为isv，version-label为动态代码中的cohort值
+                
+                // 获取iframe中的HTML内容
+                let htmlContent = iframeDoc.documentElement.outerHTML;
+                
+                // 先找出所有的h1-h6和p标签
+                const headingParaTagRegex = /(<(h[1-6]|p)\s*[^>]*>)([\s\S]*?)(<\/\2>)/gi;
+                
+                // 提取cohort值的正则表达式
+                const cohortValueRegex = /\$cohort\s*==\s*"([^"]+)"/g;
+                
+                // 替换匹配到的标签内容
+                htmlContent = htmlContent.replace(headingParaTagRegex, (match, openTag, tagName, content, closeTag) => {
+                    // 检查标签内容是否包含动态代码
+                    if (!content.includes('#if') || !content.includes('#end')) {
+                        return match; // 不包含动态代码，直接返回原内容
+                    }
+                    
+                    console.log("处理标签:", tagName, "内容长度:", content.length);
+                    
+                    // 创建一个函数来处理动态代码
+                    function processContent(text) {
+                        // 匹配动态代码的正则表达式 - 修改为处理连续的动态代码块
+                        // 格式: #if( $cohort == "x" )内容#end 可能紧跟着 #if( $cohort == "y" )内容#end
+                        const dynamicCodeRegex = /#if\s*\(\s*(\$cohort\s*==\s*"[^"]+")[\s\S]*?\)([\s\S]*?)#end/g;
+                        
+                        let result = text;
+                        let matches = [];
+                        let match;
+                        
+                        // 收集所有匹配项
+                        while ((match = dynamicCodeRegex.exec(text)) !== null) {
+                            matches.push({
+                                fullMatch: match[0],
+                                cohortCondition: match[1],
+                                dynamicContent: match[2],
+                                index: match.index,
+                                length: match[0].length
+                            });
+                        }
+                        
+                        // 从后向前替换，避免索引变化问题
+                        for (let i = matches.length - 1; i >= 0; i--) {
+                            const m = matches[i];
+                            
+                            // 提取cohort值
+                            const cohortMatch = m.cohortCondition.match(/\$cohort\s*==\s*"([^"]+)"/);
+                            if (!cohortMatch) continue;
+                            
+                            const cohortValue = cohortMatch[1];
+                            if (cohortValue === "all") continue;
+                            
+                            // 创建包裹内容的span标签
+                            const wrappedContent = `<span class="isv" style="display: inline-block;" version-label="${cohortValue}">${m.dynamicContent}</span><br>`;
+                            
+                            // 替换动态代码
+                            result = result.substring(0, m.index) + wrappedContent + result.substring(m.index + m.length);
+                        }
+                        
+                        return result;
+                    }
+                    
+                    // 处理标签内容中的动态代码
+                    const modifiedContent = processContent(content);
+                    
+                    // 返回修改后的标签
+                    return openTag + modifiedContent + closeTag;
+                });
+                
+                // 更新html_doc并重新渲染
+                html_doc = htmlContent;
+                handleOutput();
+                
+                console.log("标题和段落中的所有动态代码处理完成");
+            }
+        });
+    </script>
+</body>
+
+</html>
