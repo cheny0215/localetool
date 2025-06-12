@@ -75,6 +75,9 @@
             display: flex;
             flex-direction: column;
         }
+        #cohortVarInput {
+        color:cornflowerblue;
+        }
     </style>
 </head>
 
@@ -101,6 +104,11 @@
             </div>
         </div>
         <div class="centerAlpineBox layui-panel">
+            <div style="margin-top: 12px;">
+                <label for="cohortVarInput" style="color: #16baaa;">版本变量名(默认：$cohort)：</label>
+                <input id="cohortVarInput" type="text" value="$cohort" style="width: 120px; border: 1px solid #ccc; border-radius: 4px; padding: 2px 6px;">
+            </div>
+            <hr>
             <div class="layui-btn-container">
                 <button id="submitButton"
                     class="layui-btn layui-btn-sm  layui-bg-green layui-icon layui-icon-component"> 一键添加版本信息样式代码
@@ -155,6 +163,24 @@
             const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
             const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';
 
+            // 新增：变量名输入框
+            const cohortVarInput = document.getElementById('cohortVarInput');
+            let cohortVarName = cohortVarInput.value.trim() || '$cohort';
+
+            cohortVarInput.addEventListener('input', function () {
+                cohortVarName = cohortVarInput.value.trim() || '$cohort';
+            });
+
+            // 工具函数：生成变量名相关的正则
+            function getCohortValueRegex() {
+                // 匹配 变量名 == "xxx"
+                return new RegExp(cohortVarName.replace(/\$/g, '\\$') + '\\s*==\\s*"([^"]+)"', 'g');
+            }
+            function getIfConditionRegex() {
+                // 匹配 #if ( $cohort == "x" || $cohort == "y" ... )
+                return new RegExp('#if\\s*\\(\\s*((?:' + cohortVarName.replace(/\$/g, '\\$') + '\\s*==\\s*"[^"]+"\\s*(?:\\|\\|\\s*)?)+).*?\\)', 'g');
+            }
+
             // input事件
             dataInput.addEventListener('input', function () {
                 html_doc = dataInput.value;
@@ -183,8 +209,10 @@
             function delPlaceholder(iframehtml) {
                 iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
 
-                // 在<!--[if gte mso 9]>前面添加style样式
-                const styleToAdd = `<style>
+                // 判断是否已存在 style 标签
+                if (!iframehtml.includes('<style name="dmc-cohort-display">')) {
+                    // 在<!--[if gte mso 9]>前面添加style样式
+                    const styleToAdd = `<style name="dmc-cohort-display">
         table {
                 border-collapse: collapse !important;
             }
@@ -205,7 +233,7 @@
 				transform: translate(0, 0);
 				height: 16px;
                 padding:0 16px;
-				background: #f6a0a0;
+				background: #ff6b6b;
 				color: white;
 				font-size: 12px;
 				font-weight: bold;
@@ -224,7 +252,11 @@
     </style>\n`
                     ;
 
-                iframehtml = iframehtml.replace(font_placeholder, styleToAdd + hiddenFontContent);
+                    iframehtml = iframehtml.replace(font_placeholder, styleToAdd + hiddenFontContent);
+                } else {
+                    // 已有style标签，直接恢复原内容
+                    iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent);
+                }
 
                 console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
 
@@ -346,10 +378,10 @@
                 
                 // 正则表达式匹配动态版本信息
                 // 匹配格式: <!-- <dmc-dynamic>#if ( $cohort == "x" || $cohort == "y" || ... ) </dmc-dynamic> --> 元素 <!-- <dmc-dynamic>#end</dmc-dynamic> -->
-                const dmcRegex = /<!--\s*<dmc-dynamic>#if\s*\(\s*((?:\$cohort\s*==\s*"[^"]+"\s*(?:\|\|\s*)?)+).*?<\/dmc-dynamic>\s*-->([\s\S]*?)<!--\s*<dmc-dynamic>#end<\/dmc-dynamic>\s*-->/g;
+                const dmcRegex = new RegExp('<!--\\s*<dmc-dynamic>#if\\s*\\(\\s*((?:' + cohortVarName.replace(/\$/g, '\\$') + '\\s*==\\s*"[^"]+"\\s*(?:\\|\\|\\s*)?)+).*?<\\/dmc-dynamic>\\s*-->([\\s\\S]*?)<!--\\s*<dmc-dynamic>#end<\\/dmc-dynamic>\\s*-->', 'g');
                 
                 // 提取cohort值的正则表达式
-                const cohortValueRegex = /\$cohort\s*==\s*"([^"]+)"/g;
+                const cohortValueRegex = getCohortValueRegex();
                 
                 // 匹配元素标签的正则表达式
                 const elementRegex = /<([a-zA-Z][a-zA-Z0-9]*)\s+([^>]*)>/;
@@ -468,7 +500,7 @@
                 const sosumiRegex = /(<p\s+[^>]*>)(#if\s*\(\s*(?:\$cohort\s*==\s*"[^"]+"\s*(?:\|\|\s*)?)+\s*\))([\s\S]*?)(#end)(<\/p>)/g;
                 
                 // 提取cohort值的正则表达式
-                const cohortValueRegex = /\$cohort\s*==\s*"([^"]+)"/g;
+                const cohortValueRegex = getCohortValueRegex();
                 
                 // 替换匹配到的内容
                 htmlContent = htmlContent.replace(sosumiRegex, (match, pOpen, ifCondition, content, endTag, pClose) => {
@@ -533,7 +565,7 @@
                 const headingParaTagRegex = /(<(h[1-6]|p)\s*[^>]*>)([\s\S]*?)(<\/\2>)/gi;
                 
                 // 提取cohort值的正则表达式
-                const cohortValueRegex = /\$cohort\s*==\s*"([^"]+)"/g;
+                const cohortValueRegex = getCohortValueRegex();
                 
                 // 替换匹配到的标签内容
                 htmlContent = htmlContent.replace(headingParaTagRegex, (match, openTag, tagName, content, closeTag) => {
