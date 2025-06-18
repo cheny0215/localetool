@@ -205,6 +205,7 @@
             let html_doc = '';
             let hiddenPreContent = '';
             let hiddenFontContent = '';
+            let dynamicContent = '';
             const originalHexColorObj = {
                 addMargin: [],
                 delUnderline: [],
@@ -215,6 +216,8 @@
             const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
             const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
             const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
+            const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';
+
 
             // layui的一些方法
             layui.use(function () {
@@ -260,6 +263,11 @@
                     return font_placeholder; // 替换为占位符
                 });
                 html_doc = html_doc.replace(/&zwnj;/g, zwnj_placeholder)
+                // 存储<!DOCTYPE前面的所有内容
+                html_doc = html_doc.replace(/^[\s\S]*?(?=<!DOCTYPE)/i, (match) => {
+                    dynamicContent = match; // 存储匹配到的内容
+                    return dynamic_placeholder; // 替换为占位符
+                });
             }
             function delPlaceholder(iframehtml) {
                 iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
@@ -388,7 +396,7 @@
                 // 去除占位符
                 let iframeOutHtml = iframeDoc.documentElement.outerHTML
                 iframeOutHtml = delPlaceholder(iframeOutHtml)
-                dataOutput.value = '<!DOCTYPE html>' + iframeOutHtml;
+                dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
 
                 // 存储到会话存储

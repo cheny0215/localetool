@@ -50,7 +50,7 @@ const LoadingModule = (function() {
     loaderContainer.appendChild(dot1);
     loaderContainer.appendChild(dot2);
     overlay.appendChild(loaderContainer);
-    document.body.appendChild(overlay);
+    document.body?.appendChild(overlay);
 
     // 添加 CSS 动画样式
     const style = document.createElement('style');
