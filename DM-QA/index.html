@@ -213,10 +213,17 @@
                 appStoreNowrap: [],
             };
             let hexColorObj = originalHexColorObj
-            const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';
-            const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';
-            const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';
-            const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';
+            const placeholdersRepository = {
+                    'cornflowerblue': ['addMargin', 0],
+                    'mediumspringgreen': ['delUnderline', 0],
+                    'lightgoldenrodyellow': ['delUnderlineImportant', 0],
+                    'blanchedalmond': ['appStoreNowrap', 0]
+                };
+            const generateColorPlaceholder = Object.keys(placeholdersRepository)
+            const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';        // preview copy部分 预处理
+            const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';      // 暂存注释的那一大段内容
+            const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';        // 零宽空格
+            const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';     // 动态内容
 
 
             // layui的一些方法
@@ -274,18 +281,11 @@
                 iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent);
 
                 console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
-
-                const placeholders = {
-                    'cornflowerblue': ['addMargin', 0],
-                    'mediumspringgreen': ['delUnderline', 0],
-                    'lightgoldenrodyellow': ['delUnderlineImportant', 0],
-                    'blanchedalmond': ['appStoreNowrap', 0]
-                };
                 
-                iframehtml = iframehtml.replace(/(cornflowerblue|mediumspringgreen|lightgoldenrodyellow|blanchedalmond)/g, 
+                iframehtml = iframehtml.replace(new RegExp(Object.keys(placeholdersRepository   ).join('|'), 'g'), 
                     (match) => {
-                        const [prop, index] = placeholders[match];
-                        placeholders[match][1]++; // 更新索引计数
+                        const [prop, index] = placeholdersRepository[match];
+                        placeholdersRepository[match][1]++; // 更新索引计数
                         return hexColorObj[prop][index];
                     }
                 );
@@ -461,7 +461,7 @@
                     if (!dom.style.margin && !dom.style.marginTop && !dom.style.marginRight && !dom.style.marginBottom && !dom.style.marginLeft) {
                         console.log('加 margin');
                         dom.style.margin = '0';
-                        if (dom.style.color) {
+                        if (dom.style.color && !generateColorPlaceholder.includes(dom.style.color)) {
                             const hexColor = rgbToHex(dom.style.color)
                             dom.style.color = 'cornflowerblue'
                             hexColorObj.addMargin.push(hexColor)
@@ -478,7 +478,7 @@
                         const computedTextDecoration = window.getComputedStyle(a).textDecorationLine
                         console.log('a标签计算样式', computedTextDecoration, 'a标签行内样式', a.style.textDecoration);
                         a.style.textDecoration = computedTextDecoration
-                        if (a.style.color) {
+                        if (a.style.color && !generateColorPlaceholder.includes(a.style.color)) {
                             const hexColor = rgbToHex(a.style.color)
                             a.style.color = 'mediumspringgreen'
                             hexColorObj.delUnderline.push(hexColor)
@@ -598,7 +598,7 @@
                     const computedImgMarginLeft = window.getComputedStyle(o).marginLeft
                     const computedImgMarginRight = window.getComputedStyle(o).marginRight
                     const computedImgTextAlign = window.getComputedStyle(o).textAlign
-                    console.log("🚀 ~ imgToCenter ~ 图片display:", computedImgDisplay)
+                    // console.log("🚀 ~ imgToCenter ~ 图片display:", computedImgDisplay)
                     if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginLeft != '0' && computedImgMarginRight != '0px' && computedImgMarginRight != '0') {
                         o.style.display = 'inline-block'
                         o.style.textAlign = 'center'
@@ -645,7 +645,7 @@
 
                     if (o.href.includes("clicks.get('BNAV_APP')")) {
                         o.style.setProperty('white-space', 'nowrap');
-                        if (o.style.color) {
+                        if (o.style.color && !generateColorPlaceholder.includes(o.style.color)) {
                             const hexColor = rgbToHex(o.style.color)
                             console.log("🚀 ~ appStoreNowrap ~ hexColor:", hexColor)
                             o.style.color = 'blanchedalmond'
@@ -693,9 +693,11 @@
                 a_href.forEach(a => {
                     if (!a.className.includes('btn')) {
                         a.style.textDecoration = 'none';
-                        if (a.style.color) {
+                        if (a.style.color && !generateColorPlaceholder.includes(a.style.color)) {
+                            console.log("🚀 ~ delUnderlineImportant ~ a.style.color:", a.style.color)
                             const hexColor = rgbToHex(a.style.color)
                             a.style.color = 'lightgoldenrodyellow'
+                            console.log("🚀 看看颜色变成啥~ delUnderlineImportant ~ hexColor:", hexColor)
                             hexColorObj.delUnderlineImportant.push(hexColor)
                         }
                     }

@@ -236,16 +236,41 @@
         }
 
         #header-text{
-            max-width:450px;
-            color: #73ceff;
+            line-height: 60px;
+            max-width: 450px;
+            color: var(--header-text);
             padding-left: 20px;
             font-size: 0.8rem;
             letter-spacing: 0.5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
             white-space: nowrap;
             overflow-x: auto;
             scrollbar-width: none;
             scrollbar-color: rgba(128, 128, 128, 0.1) transparent;
+            animation: textGlow 2s ease-in-out infinite alternate;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.03) 20%,
+                rgba(255,255,255,0.08) 50%, 
+                rgba(255,255,255,0.03) 80%,
+                rgba(255,255,255,0) 100%);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            border-radius: 22px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes textGlow {
+            from {
+                text-shadow: 0 0 5px rgba(255,255,255,0.04),
+                           0 0 10px rgba(255,255,255,0.04),
+                           0 0 15px var(--header-text);
+            }
+            to {
+                text-shadow: 0 0 10px rgba(255,255,255,0.1),
+                           0 0 15px rgba(255,255,255,0.1),
+                           0 0 20px var(--header-text);
+            }
         }
         #header-text::-webkit-scrollbar {
             height: 1px;
@@ -336,8 +361,8 @@
         </div>
         <div id="main">
             <ul class="layui-nav nav layui-bg-gray">
-                <li id="header" style="line-height: 60px;padding-right: 16px;">标题</li>
-                <li id="header-text" style="line-height: 60px;text-align: left;display: none;">暂无内容～</li>
+                <li id="header" style="line-height: 60px;padding-right: 16px;font-weight: 700;">标题</li>
+                <li id="header-text" style="text-align: left;display: none;">暂无内容～</li>
                 <li style="line-height: 60px;flex:1;"></li>
                 <li class="layui-nav-item layui-this"><a href="">暂无</a></li>
                 <li class="layui-nav-item"><a href="" aria-label="留言板">留言板</a></li>

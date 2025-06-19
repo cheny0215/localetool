@@ -26,7 +26,7 @@
 
 /* 显示状态 */
 .countdown-card.visible {
-    opacity: 1;
+    opacity: 0.9;
     visibility: visible;
     transform: translateY(0);
 }
