@@ -1420,7 +1420,7 @@
             editableDiv.addEventListener('click', (event) => {
                 if (editableDiv.getAttribute('contenteditable') === 'false' && !editableDiv.classList.contains('expanded')) {
                     // 只有在未展开状态下点击才复制，避免展开时误触
-                     upDateClipboard(editableDiv.textContent.replace(/\s+/g, ''));
+                     upDateClipboard(editableDiv.textContent);
                 } else if (editableDiv.classList.contains('expanded')) {
                      // 如果已展开，阻止冒泡，防止点击内容区域也触发复制（如果需要展开后仍能复制，移除此else if）
                      event.stopPropagation();
