@@ -97,10 +97,16 @@ body {
 }
 
 /* 添加移动端样式 */
-.email-box[style*="max-width: 414px"] .field-name,
+.email-box[style*="max-width: 414px"] .field-name {
+  font-size: 6px;
+  margin-right: 4px;
+  padding: 0;
+}
+
 .email-box[style*="max-width: 414px"] .field-value {
-  font-size: 10px;
-  margin-right: 5px;
+  font-size: 6px;
+  margin-right: 2px;
+  padding: 0;
 }
 
 /* 按钮样式 */

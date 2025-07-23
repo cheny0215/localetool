@@ -4,84 +4,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apple 邮件预览</title>
+    <title>项目工具箱</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
 </head>
 
 <body>
-    <div class="copy-tip" id="copyTip">已复制到剪贴板</div>
-    <div class="edit-button-container">
-        <button class="open-button">🧩 去快速生成项目截图 ★★★</button>
-        <div style="margin: 10px;text-align: center;color: #1b5efd;font-size: 12px;">点击上方，可快速生成项目的Desktop/Mobile截图，并进行拼图操作，无需去starling截图以及使用PS</div>
-        <div style="text-align: center;color: #40b2f9;font-size: 12px;">下方，可快速生成备份项目的命名，以及Desktop/Mobile截图命名，点击即可复制</div>
-    </div>
-
-    <!-- 添加项目信息表单 -->
-    <div class="project-form">
-        <div class="form-group">
-            <label>项目名称：</label>
-            <input type="text" id="projectName" value="Holiday 2025 Still Time">
-            <span class="text-tip">格式参考: Holiday 2025 Still Time</span>
+    <div class="app-container">
+        
+        <div class="copy-tip" id="copyTip">
+            <i class="ri-check-line"></i> 已复制到剪贴板
         </div>
-        <div class="form-group">
-            <label>项目年份编号：</label>
-            <input type="text" id="projectYear" value="FY25 Q1">
-            <span class="text-tip">格式参考: FY25 Q1</span>
-        </div>
-        <div class="form-group">
-            <label>项目日期：</label>
-            <input type="text" id="projectDate" value="20251212">
-            <span class="text-tip">格式参考: 20251212</span>
-        </div>
-        <div class="form-group">
-            <label>负责人名字：</label>
-            <input type="text" id="projectManager" value="Ivan">
-        </div>
-        <div class="form-group">
-            <label>项目语言：</label>
-            <div class="checkbox-group">
-                <label><input type="checkbox" value="HKEN" checked> HKEN</label>
-                <label><input type="checkbox" value="HKTC" checked> HKTC</label>
-                <label><input type="checkbox" value="MOTC" checked> MOTC</label>
-                <label><input type="checkbox" value="CNSC" checked> CNSC</label>
-                <label><input type="checkbox" value="TWTC" checked> TWTC</label>
-                <span class="text-tip">默认选中所有语言</span>
+        
+        <div class="tools-container">
+            <div class="tool-card screenshot-tool">
+                <div class="tool-icon">
+                    <i class="ri-screenshot-2-line"></i>
+                </div>
+                <div class="tool-content">
+                    <h2>项目截图工具</h2>
+                    <p>快速生成Desktop/Mobile截图，无需使用Starling和PS</p>
+                    <button class="primary-button" id="openScreenshotTool">
+                        <i class="ri-external-link-line"></i> 打开截图工具
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- 添加生成的名称显示区域 -->
-    <div class="generated-names">
-        <div class="name-group">
-            <h3>备份文件项目名称(点击复制)：</h3>
-            <div class="copyable" id="backupFileName"></div>
+        <div class="tools-divider">
+            <div class="divider-line"></div>
+            <div class="divider-text"><i class="ri-arrow-down-line"></i> 命名生成器 <i class="ri-arrow-down-line"></i></div>
+            <div class="divider-line"></div>
         </div>
-        <div class="name-group">
-            <h3>备份截图项目名称(点击复制)：</h3>
-            <div class="copyable" id="backupScreenshotName"></div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h2 class="section-title"><i class="ri-edit-line"></i> 填写项目信息</h2>
+                <p class="section-description">填写以下信息，生成标准的截图和文件夹命名格式</p>
+                <div class="project-form">
+                    <div class="form-group">
+                        <label>请填写项目名称：</label>
+                        <div class="input-container">
+                            <input type="text" id="projectName" value="这里就填你的项目名称">
+                            <span class="text-tip">例如: Holiday 2025 Still Time</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>请填写项目年份编号：</label>
+                        <div class="input-container">
+                            <input type="text" id="projectYear" value="FY25 Q1">
+                            <span class="text-tip">格式参考: FY25 Q1</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>请填写项目日期：</label>
+                        <div class="input-container">
+                            <input type="text" id="projectDate" value="20251212">
+                            <span class="text-tip">格式参考: 20251212</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>请填写负责人名字：</label>
+                        <div class="input-container">
+                            <input type="text" id="projectManager" value="Ivan">
+                        </div>
+                    </div>
+                    <div class="form-group language-selection">
+                        <label>请选择项目语言（默认全选）：</label>
+                        <div class="checkbox-container">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label"><input type="checkbox" value="HKEN" checked><span>HKEN</span></label>
+                                <label class="checkbox-label"><input type="checkbox" value="HKTC" checked><span>HKTC</span></label>
+                                <label class="checkbox-label"><input type="checkbox" value="MOTC" checked><span>MOTC</span></label>
+                                <label class="checkbox-label"><input type="checkbox" value="CNSC" checked><span>CNSC</span></label>
+                                <label class="checkbox-label"><input type="checkbox" value="TWTC" checked><span>TWTC</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2 class="section-title"><i class="ri-file-list-3-line"></i> 生成的命名</h2>
+                <p class="section-description">下方显示自动生成的命名格式，点击任意文本即可复制</p>
+                <div class="generated-names">
+                    <div class="name-group">
+                        <div class="name-label">
+                            <i class="ri-folder-line"></i>
+                            <h3>备份文件项目文件夹名称</h3>
+                        </div>
+                        <div class="copyable" id="backupFileName"></div>
+                    </div>
+                    <div class="name-group">
+                        <div class="name-label">
+                            <i class="ri-image-line"></i>
+                            <h3>备份截图项目文件夹名称</h3>
+                        </div>
+                        <div class="copyable" id="backupScreenshotName"></div>
+                    </div>
+                    <div class="name-group screenshot-names">
+                        <div class="name-label">
+                            <i class="ri-screenshot-line"></i>
+                            <h3>截图名称</h3>
+                        </div>
+                        <div id="screenshotNames"></div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="name-group">
-            <h3>截图名称(点击复制)：</h3>
-            <div id="screenshotNames"></div>
-        </div>
+        
+        <footer class="app-footer">
+            <p>项目工具箱 © <script>document.write(new Date().getFullYear())</script> Ivan</p>
+        </footer>
     </div>
 
     <script>
-        // 只保留必要的 DOM 元素
+        // DOM 元素
         const elements = {
-            openButton: document.querySelector('.open-button')
+            openButton: document.getElementById('openScreenshotTool'),
+            projectName: document.getElementById('projectName'),
+            projectYear: document.getElementById('projectYear'),
+            projectDate: document.getElementById('projectDate'),
+            projectManager: document.getElementById('projectManager'),
+            backupFileName: document.getElementById('backupFileName'),
+            backupScreenshotName: document.getElementById('backupScreenshotName'),
+            screenshotNames: document.getElementById('screenshotNames'),
+            copyTip: document.getElementById('copyTip')
         };
 
-        // 只保留打开新标签页的功能
+        // 打开截图工具
         elements.openButton.addEventListener('click', () => {
             window.open('../standbyScreenshot/index.html', '_blank');
         });
 
+        // 更新所有名称
         function updateNames() {
-            const projectName = document.getElementById('projectName').value;
-            const projectYear = document.getElementById('projectYear').value;
-            const projectDate = document.getElementById('projectDate').value;
-            const projectManager = document.getElementById('projectManager').value;
+            const projectName = elements.projectName.value;
+            const projectYear = elements.projectYear.value;
+            const projectDate = elements.projectDate.value;
+            const projectManager = elements.projectManager.value;
             const selectedLanguages = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
 
             // 保存项目负责人到本地存储
@@ -91,39 +152,44 @@
 
             // 更新备份文件项目名称
             const backupFileName = `${projectDate}-${projectName}_${projectManager}`;
-            document.getElementById('backupFileName').textContent = backupFileName;
+            elements.backupFileName.textContent = backupFileName;
 
             // 更新备份截图项目名称
             const backupScreenshotName = `${projectYear}-${projectName}`;
-            document.getElementById('backupScreenshotName').textContent = backupScreenshotName;
+            elements.backupScreenshotName.textContent = backupScreenshotName;
 
             // 更新截图名称
-            const screenshotNamesContainer = document.getElementById('screenshotNames');
-            screenshotNamesContainer.innerHTML = '';
+            elements.screenshotNames.innerHTML = '';
 
             selectedLanguages.forEach(lang => {
                 const desktopName = `${projectYear} ${projectName}_Desktop_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}.png`;
                 const mobileName = `${projectYear} ${projectName}_Mobile_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}.png`;
 
                 const langGroup = document.createElement('div');
+                langGroup.className = 'language-group';
                 langGroup.innerHTML = `
-                    <div class="language-group">
-                        <h4>${lang}:</h4>
-                        <div class="screenshot-name" onclick="copyText('${desktopName}')">${desktopName}</div>
-                        <div class="screenshot-name" onclick="copyText('${mobileName}')">${mobileName}</div>
-                    </div>
+                    <h4><i class="ri-global-line"></i> ${lang}</h4>
+                    <div class="screenshot-name" data-copy="${desktopName}">${desktopName}</div>
+                    <div class="screenshot-name" data-copy="${mobileName}">${mobileName}</div>
                 `;
-                screenshotNamesContainer.appendChild(langGroup);
+                elements.screenshotNames.appendChild(langGroup);
+            });
+
+            // 为新生成的元素添加点击事件
+            document.querySelectorAll('.screenshot-name').forEach(element => {
+                element.addEventListener('click', function() {
+                    copyText(this.dataset.copy);
+                });
             });
         }
 
+        // 复制文本到剪贴板
         function copyText(text) {
             navigator.clipboard.writeText(text).then(() => {
-                const tip = document.getElementById('copyTip');
-                tip.classList.add('show');
+                elements.copyTip.classList.add('show');
                 setTimeout(() => {
-                    tip.classList.remove('show');
-                }, 1000);
+                    elements.copyTip.classList.remove('show');
+                }, 1500);
             }).catch(err => {
                 console.error('复制失败：', err);
             });
@@ -145,7 +211,7 @@
         if (localStorage.getItem('userInfo')) {           
             const userInfo = JSON.parse(localStorage.getItem('userInfo'));
             if (userInfo.username) {
-                document.getElementById('projectManager').value = userInfo.username;
+                elements.projectManager.value = userInfo.username;
             }
         }
 
