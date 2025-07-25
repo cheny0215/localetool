@@ -50,8 +50,7 @@ const LoadingModule = (function() {
     loaderContainer.appendChild(dot1);
     loaderContainer.appendChild(dot2);
     overlay.appendChild(loaderContainer);
-    document.body?.appendChild(overlay);
-
+    
     // 添加 CSS 动画样式
     const style = document.createElement('style');
     style.innerHTML = `
@@ -65,6 +64,16 @@ const LoadingModule = (function() {
         }
     `;
     document.head.appendChild(style);
+    
+    // 确保在DOM加载完成后添加到body
+    document.addEventListener('DOMContentLoaded', function() {
+        document.body.appendChild(overlay);
+    });
+    
+    // 如果DOM已经加载完成，直接添加
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        document.body.appendChild(overlay);
+    }
 
     return {
         show: function() {

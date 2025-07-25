@@ -1,4 +1,5 @@
-// 留言板功能
+(function () {
+    // 留言板功能
 document.addEventListener('DOMContentLoaded', function() {
     const messageBoardLink = document.querySelector('a[href=""][aria-label="留言板"]');
     if (messageBoardLink) {
@@ -543,3 +544,5 @@ function showToast(message) {
         }
     }, 3000);
 }
+
+})()

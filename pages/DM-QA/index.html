@@ -5,11 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>一键QA</title>
-    <link rel="stylesheet" href="../common/layui/css/layui.css" />
-    <link rel="stylesheet" href="../css/index.css">
-    <script src="../common/layui/layui.js"></script>
-    <script src="../common/components/ShowMessage.js" defer></script>
-    <script src="../common/components/Loading.js" defer></script>
+    <link rel="stylesheet" href="../../common/layui/css/layui.css" />
+    <link rel="stylesheet" href="../../css/index.css">
+    <script src="../../common/layui/layui.js"></script>
+    <script src="../../common/components/ShowMessage.js" defer></script>
+    <script src="../../common/components/Loading.js" defer></script>
     <style>
         .alpineData {
             font-size: 14px;
@@ -84,17 +84,26 @@
             <div class="tweHtml">
                 <h4 style="color: #0880ea;">原始html：</h4>
                 <hr>
-                <textarea id="dataInput" class="data_textarea layui-textarea" placeholder="ꚰꚰꚰ 将原始HTML代码粘贴到这里 ꚰꚰꚰ"></textarea>
+                <textarea id="dataInput" class="data_textarea layui-textarea" placeholder="🥰第一步请先将原始HTML代码粘贴到这里🥰"></textarea>
                 <div>
                     <iframe id="myIframe" src="" frameborder="0"
                         style="width: 100%;border: 1px solid #d8d8d8;margin-top: 10px;"></iframe>
-                    <div style="margin-top: 8px; color: #ff4d50ca; font-size: 12px;">
-                        <i class="layui-icon layui-icon-notice" style="font-size: 14px;"></i>
-                        每使用一次后，请刷新页面防止缓存，再进行下一次使用
-                    </div>
-                    <div style="margin-top: 4px; color: #ff7847d3; font-size: 12px;">
-                        <i class="layui-icon layui-icon-notice" style="font-size: 14px;"></i>
-                        建议QA之前备份原始html，代码添加后进行页面对比，确保一致
+                    <div style="margin-top: 12px; padding: 10px; border-left: 3px solid #0880ea; background: #f8f9fa;">
+                        <div style="margin-bottom: 8px;">
+                            <i class="layui-icon layui-icon-tips" style="color: #0880ea;"></i>
+                            <span style="color: #0880ea; font-weight: 500;">使用方法：</span>
+                            <span style="font-size: 13px;">左边框框粘贴HTML → 勾选需要的QA复选框 → 点击 ➊ ➋ 按钮 → 复制结果 → 粘贴回原始文件</span>
+                        </div>
+                        <div style="margin-bottom: 8px;">
+                            <i class="layui-icon layui-icon-notice" style="color: #ff7847;"></i>
+                            <span style="color: #ff7847; font-weight: 500;">注意：</span>
+                            <span style="font-size: 13px;">建议QA前备份原始html文件，添加后对比两个页面确保一致</span>
+                        </div>
+                        <div>
+                            <i class="layui-icon layui-icon-notice" style="color: #ff4d50;"></i>
+                            <span style="color: #ff4d50; font-weight: 500;">提醒：</span>
+                            <span style="font-size: 13px;">每次使用后请刷新页面，再进行下一次操作</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -112,28 +121,31 @@
                     checked>
                 <input type="checkbox" id="replacePreNbspCheckbox" name="replacePreNbsp" title="替换preview-copy中的nbsp"
                     checked>
-                <input type="checkbox" id="delNbspCheckbox" name="delNbsp" title="替换footer的最后两个nbsp" checked>
-                <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked>
-                <input type="checkbox" id="legalPackageCheckbox" name="legalPackage" title="包裹legal末尾防止单字" checked>
-                <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
+                    <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked>
+                    <input type="checkbox" id="legalPackageCheckbox" name="legalPackage" title="包裹legal末尾防止单字" checked>
+                    <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
                     checked>
-                <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
-                <input type="checkbox" id="addDateZwnjCheckbox" name="addDateZwnj" title="日期间添加zwnj" checked>
-                <input type="checkbox" id="appStoreNowrapCheckbox" name="addDateZwnj" title="footer下载appStore不换行"
+                    <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
+                    <input type="checkbox" id="addDateZwnjCheckbox" name="addDateZwnj" title="日期间添加zwnj" checked>
+                    <input type="checkbox" id="appStoreNowrapCheckbox" name="addDateZwnj" title="footer下载appStore不换行"
                     checked>
-                <hr>
-                <div>
-                    <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
+                    <hr>
+                    <div>
+                        <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
                         title="sina邮箱移动端添加sup样式"><span class="layui-badge-rim layui-border-blue">sina邮箱/CN</span>
-                </div>
-                <div>
-                    <input type="checkbox" id="setNowrapSpanCheckbox" name="setNowrapSpan"
+                    </div>
+                    <div>
+                        <input type="checkbox" id="layoutNotCenterCheckbox" name="layoutNotCenter"
+                        title="sina邮箱移动端布局不局中"><span class="layui-badge-rim layui-border-blue">sina邮箱/CN</span>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="setNowrapSpanCheckbox" name="setNowrapSpan"
                         title="mobile网易span设置nowrap属性"><span class="layui-badge-rim layui-border-blue">163邮箱/CN</span>
-                </div>
-                <div>
-                    <input type="checkbox" id="delUnderlineImportantCheckbox" name="delUnderlineImportant"
+                    </div>
+                    <div>
+                        <input type="checkbox" id="delUnderlineImportantCheckbox" name="delUnderlineImportant"
                         title="desktop去除下划线的!important"><span class="layui-badge-rim layui-border-blue">CN</span>
-                </div>
+                    </div>
                 <hr>
             </div>
             <div class="layui-btn-container">
@@ -146,7 +158,7 @@
         <div class="rightAlpineBox layui-panel">
             <h4 style="color: #0880ea;">QA后html：</h4>
             <hr>
-            <textarea id="dataOutput" class="data_textarea layui-textarea" placeholder="生成代码之后，点击 ☟☟下方按钮复制代码，并粘贴回原始html文件 ㊗︎㊗︎㊗︎"></textarea>
+            <textarea id="dataOutput" class="data_textarea layui-textarea" placeholder="🥳生成后这里会出现QA完成后的html代码🥳"></textarea>
             <hr>
             <div class="layui-btn-container">
                 <button id="copyButton"
@@ -157,6 +169,8 @@
         </div>
     </div>
     <script>
+        
+        // #region
         // 数据库
         const langArr = [
             { lang: 'zh-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang HK', 'STHeiti', 'Helvetica Neue', Helvetica, '微軟正黑體Microsoft JhengHei', '微軟正黑體 Microsoft JhengHei', 'Microsoft JhengHei', '微軟正黑體', 'MingLiU', Arial, sans-serif, 'SF Pro Icons'!important;" },
@@ -164,8 +178,6 @@
             { lang: 'zh-CN', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang SC', 'STHeiti', 'Helvetica Neue', Helvetica, 'Microsoft yahei', '微软雅黑', Arial, sans-serif, 'SF Pro Icons'!important;" },
             { lang: 'en-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'SF Pro Icons'!important;" },
         ]
-
-        // #region
         const preCopyNbsp = `
         &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp;‌‌‌&nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp;‌‌‌
         `
@@ -184,7 +196,6 @@
             const replaceFontFamilyCheckbox = document.getElementById('replaceFontFamilyCheckbox');
             const tableFontFamilyCheckbox = document.getElementById('tableFontFamilyCheckbox');
             const replacePreNbspCheckbox = document.getElementById('replacePreNbspCheckbox');
-            const delNbspCheckbox = document.getElementById('delNbspCheckbox');
             const del414MediaCheckbox = document.getElementById('del414MediaCheckbox');
             const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
             const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
@@ -193,6 +204,7 @@
             const appStoreNowrapCheckbox = document.getElementById('appStoreNowrapCheckbox');
 
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
+            const layoutNotCenterCheckbox = document.getElementById('layoutNotCenterCheckbox');
             const setNowrapSpanCheckbox = document.getElementById('setNowrapSpanCheckbox');
             const delUnderlineImportantCheckbox = document.getElementById('delUnderlineImportantCheckbox');
             // Checkbox element
@@ -206,25 +218,11 @@
             let hiddenPreContent = '';
             let hiddenFontContent = '';
             let dynamicContent = '';
-            const originalHexColorObj = {
-                addMargin: [],
-                delUnderline: [],
-                delUnderlineImportant: [],
-                appStoreNowrap: [],
-            };
-            let hexColorObj = originalHexColorObj
-            const placeholdersRepository = {
-                    'cornflowerblue': ['addMargin', 0],
-                    'mediumspringgreen': ['delUnderline', 0],
-                    'lightgoldenrodyellow': ['delUnderlineImportant', 0],
-                    'blanchedalmond': ['appStoreNowrap', 0]
-                };
-            const generateColorPlaceholder = Object.keys(placeholdersRepository)
+
             const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';        // preview copy部分 预处理
             const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';      // 暂存注释的那一大段内容
             const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';        // 零宽空格
             const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';     // 动态内容
-
 
             // layui的一些方法
             layui.use(function () {
@@ -241,7 +239,6 @@
                     replaceFontFamilyCheckbox.checked = elem.checked
                     tableFontFamilyCheckbox.checked = elem.checked
                     replacePreNbspCheckbox.checked = elem.checked
-                    delNbspCheckbox.checked = elem.checked
                     del414MediaCheckbox.checked = elem.checked
                     replacepSelectorCheckbox.checked = elem.checked
                     legalPackageCheckbox.checked = elem.checked
@@ -279,16 +276,6 @@
             function delPlaceholder(iframehtml) {
                 iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
                 iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent);
-
-                console.log("🚀 ~  ~ hexColorObj!!:", hexColorObj)
-                
-                iframehtml = iframehtml.replace(new RegExp(Object.keys(placeholdersRepository   ).join('|'), 'g'), 
-                    (match) => {
-                        const [prop, index] = placeholdersRepository[match];
-                        placeholdersRepository[match][1]++; // 更新索引计数
-                        return hexColorObj[prop][index];
-                    }
-                );
                 iframehtml = iframehtml.replace(new RegExp(escapeRegExp(zwnj_placeholder), 'g'), '&zwnj;')
                 return iframehtml
             }
@@ -307,8 +294,19 @@
                     return hex;
                 }).join('');
             }
+            // 替换rgb颜色为hex颜色
+            function replaceAllColorToHex(iframehtml) {
+                // 正则表达式匹配RGB颜色格式，如rgb(255, 255, 255)或rgba(255, 255, 255, 0.5)
+                const rgbRegex = /rgb\((\d+),\s*(\d+),\s*(\d+)\)|rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/g;
+                
+                return iframehtml.replace(rgbRegex, (match) => {
+                    // 使用已有的rgbToHex函数转换颜色
+                    const hexColor = rgbToHex(match);
+                    return hexColor || match; // 如果转换失败，保留原始值
+                });
+            }
 
-            // 按钮点击事件
+            // 一键添加事件
             submitButton.onclick = async () => {
                 // localStorage.setItem('cy_outputButton_current_html', '')
                 LoadingModule.show()
@@ -325,53 +323,22 @@
                 handleOutput()
                 const html_doc_promise = await new Promise((resolve) => {
                     setTimeout(() => {
-                        console.log('iframe加载完成');
-                        if (addMarginCheckbox.checked) {
-                            addMargin();
-                        }
-                        if (delUnderlineCheckbox.checked) {
-                            delUnderline();
-                        }
-                        if (replaceFontFamilyCheckbox.checked) {
-                            replaceFontFamily();
-                        }
-                        if (tableFontFamilyCheckbox.checked) {
-                            tableFontFamily();
-                        }
-                        if (replacePreNbspCheckbox.checked) {
-                            replacePreNbsp();
-                        }
-                        if (delNbspCheckbox.checked) {
-                            delNbsp();
-                        }
-                        if (del414MediaCheckbox.checked) {
-                            del414Media();
-                        }
-                        if (legalPackageCheckbox.checked) {
-                            legalPackage();
-                        }
-                        if (replacepSelectorCheckbox.checked) {
-                            replacepSelector();
-                        }
-                        if (imgToCenterCheckbox.checked) {
-                            imgToCenter();
-                        }
-                        if (addDateZwnjCheckbox.checked) {
-                            addDateZwnj();
-                        }
-                        if (appStoreNowrapCheckbox.checked) {
-                            appStoreNowrap();
-                        }
-
-                        if (supNormalSizeCheckbox.checked) {
-                            supNormalSize();
-                        }
-                        if (setNowrapSpanCheckbox.checked) {
-                            setNowrapSpan();
-                        }
-                        if (delUnderlineImportantCheckbox.checked) {
-                            delUnderlineImportant();
-                        }
+                        //使用三元运算符链式调用
+                        addMarginCheckbox.checked && addMargin();
+                        delUnderlineCheckbox.checked && delUnderline();
+                        replaceFontFamilyCheckbox.checked && replaceFontFamily();
+                        tableFontFamilyCheckbox.checked && tableFontFamily();
+                        replacePreNbspCheckbox.checked && replacePreNbsp();
+                        del414MediaCheckbox.checked && del414Media();
+                        legalPackageCheckbox.checked && legalPackage();
+                        replacepSelectorCheckbox.checked && replacepSelector();
+                        imgToCenterCheckbox.checked && imgToCenter();
+                        addDateZwnjCheckbox.checked && addDateZwnj();
+                        appStoreNowrapCheckbox.checked && appStoreNowrap();
+                        supNormalSizeCheckbox.checked && supNormalSize();
+                        layoutNotCenterCheckbox.checked && layoutNotCenter();
+                        setNowrapSpanCheckbox.checked && setNowrapSpan();
+                        delUnderlineImportantCheckbox.checked && delUnderlineImportant();
                         showMessage({ msg: 'QA添加完成！', type: 'success' })
                         LoadingModule.hide()
                         resolve(html_doc)
@@ -379,6 +346,7 @@
                 })
                 html_doc = html_doc_promise
             }
+            // 生成code按钮点击事件
             outputButton.onclick = () => {
                 // 禁用生成Code按钮
                 outputButton.disabled = true;
@@ -396,6 +364,7 @@
                 // 去除占位符
                 let iframeOutHtml = iframeDoc.documentElement.outerHTML
                 iframeOutHtml = delPlaceholder(iframeOutHtml)
+                iframeOutHtml = replaceAllColorToHex(iframeOutHtml)
                 dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
 
@@ -421,7 +390,6 @@
                 // 清空所有变量
                 hiddenPreContent = '';
                 hiddenFontContent = '';
-                hexColorObj = {...originalHexColorObj};
                 html_doc = '';
                 
                 // 清空输入输出框
@@ -461,11 +429,6 @@
                     if (!dom.style.margin && !dom.style.marginTop && !dom.style.marginRight && !dom.style.marginBottom && !dom.style.marginLeft) {
                         console.log('加 margin');
                         dom.style.margin = '0';
-                        if (dom.style.color && !generateColorPlaceholder.includes(dom.style.color)) {
-                            const hexColor = rgbToHex(dom.style.color)
-                            dom.style.color = 'cornflowerblue'
-                            hexColorObj.addMargin.push(hexColor)
-                        }
                     }
                 });
             }
@@ -477,12 +440,7 @@
                     if (!a.style.textDecoration) {
                         const computedTextDecoration = window.getComputedStyle(a).textDecorationLine
                         console.log('a标签计算样式', computedTextDecoration, 'a标签行内样式', a.style.textDecoration);
-                        a.style.textDecoration = computedTextDecoration
-                        if (a.style.color && !generateColorPlaceholder.includes(a.style.color)) {
-                            const hexColor = rgbToHex(a.style.color)
-                            a.style.color = 'mediumspringgreen'
-                            hexColorObj.delUnderline.push(hexColor)
-                        }
+                        a.style.textDecoration = computedTextDecoration;
                     }
                 });
             }
@@ -531,21 +489,20 @@
                 handleOutput()
             }
             // 删除末尾footer部分nbsp
-            function delNbsp() {
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                const pattern = /(&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp;&nbsp;)/g;
-                let matches = htmlContent.match(pattern);
-                console.log("🚀 ~ delNbsp ~ matches:", matches)
-                if (matches.length == 4) {
-                    let count = 0; // 用于计数替换次数
-                    const modifiedString = htmlContent.replace(pattern, (match) => {
-                        count++;
-                        return (count > 2) ? '&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp; ' : match;
-                    });
-                    html_doc = modifiedString
-                    handleOutput()
-                }
-            }
+            // function delNbsp() {
+            //     let htmlContent = iframeDoc.documentElement.outerHTML
+            //     const pattern = /(&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp;&nbsp;)/g;
+            //     let matches = htmlContent.match(pattern);
+            //     if (matches.length == 4) {
+            //         let count = 0; // 用于计数替换次数
+            //         const modifiedString = htmlContent.replace(pattern, (match) => {
+            //             count++;
+            //             return (count > 2) ? '&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp; ' : match;
+            //         });
+            //         html_doc = modifiedString
+            //         handleOutput()
+            //     }
+            // }
             // 删除414媒体查询
             function del414Media() {
                 let htmlContent = iframeDoc.documentElement.outerHTML
@@ -645,12 +602,6 @@
 
                     if (o.href.includes("clicks.get('BNAV_APP')")) {
                         o.style.setProperty('white-space', 'nowrap');
-                        if (o.style.color && !generateColorPlaceholder.includes(o.style.color)) {
-                            const hexColor = rgbToHex(o.style.color)
-                            console.log("🚀 ~ appStoreNowrap ~ hexColor:", hexColor)
-                            o.style.color = 'blanchedalmond'
-                            hexColorObj.appStoreNowrap.push(hexColor)
-                        }
                     }
                 })
             }
@@ -665,6 +616,21 @@
                     o.style.verticalAlign = 'super'
                 })
             }
+
+            // mobile的整体布局不居中（sina邮箱）
+            function layoutNotCenter() {
+                const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
+                if (desktopContainer && desktopContainer.length > 0) {
+                    const rowTrs = desktopContainer[0].querySelectorAll('tr.row');
+                    rowTrs.forEach(tr => {
+                        const tables = tr.querySelectorAll('table[width="660"]');
+                        if (tables && tables.length > 0) {
+                            tables[0].style.margin = '0 auto';
+                        }
+                    });
+                }
+            }
+
             // mobile的span标签如果设置了white-space:nowrap,设置class类名nowrap，并且nowrap加important（163邮箱）
             function setNowrapSpan() {
 
@@ -693,13 +659,6 @@
                 a_href.forEach(a => {
                     if (!a.className.includes('btn')) {
                         a.style.textDecoration = 'none';
-                        if (a.style.color && !generateColorPlaceholder.includes(a.style.color)) {
-                            console.log("🚀 ~ delUnderlineImportant ~ a.style.color:", a.style.color)
-                            const hexColor = rgbToHex(a.style.color)
-                            a.style.color = 'lightgoldenrodyellow'
-                            console.log("🚀 看看颜色变成啥~ delUnderlineImportant ~ hexColor:", hexColor)
-                            hexColorObj.delUnderlineImportant.push(hexColor)
-                        }
                     }
                 });
             }

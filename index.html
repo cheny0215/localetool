@@ -7,12 +7,14 @@
     <title>DM开发工具</title>
     <link rel="icon" href="./assets/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./css/index.css">
-    <link rel="stylesheet" href="./common/layui/css/layui.css"/>
+    <link rel="stylesheet" href="./common/layui/css/layui.css" />
     <link rel="stylesheet" href="./assets/css/theme.css">
     <link rel="stylesheet" href="./assets/css/countdown.css">
     <link rel="stylesheet" href="./assets/css/messageBoard.css">
     <script src="./common/layui/layui.js"></script>
     <script src="./common/components/Loading.js"></script>
+    <script src="./common/components/animationLoading.js"></script>
+
     <style>
         /* 基本样式 */
         #layout {
@@ -35,7 +37,7 @@
             padding: 15px 20px;
             display: flex;
             align-items: center;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
             height: 60px;
             box-sizing: border-box;
         }
@@ -69,11 +71,11 @@
             display: none;
         }
 
-        #sidebar.collapsed .menu-item > a.menu-header {
+        #sidebar.collapsed .menu-item>a.menu-header {
             font-size: 0;
         }
 
-        #sidebar.collapsed .menu-item > a.menu-header:before {
+        #sidebar.collapsed .menu-item>a.menu-header:before {
             content: '•';
             font-size: 16px;
         }
@@ -116,17 +118,19 @@
             flex-direction: column;
             transition: margin-left 0.3s;
         }
-        
-        .nav{
+
+        .nav {
             display: flex;
-            border-radius:0%;
+            border-radius: 0%;
             color: var(--header-text) !important;
             background: var(--header-bg) !important;
         }
-        .layui-nav-item a{
+
+        .layui-nav-item a {
             color: var(--header-text);
         }
-        .layui-nav-child a{
+
+        .layui-nav-child a {
             color: #333 !important;
         }
 
@@ -157,7 +161,7 @@
         /* 活跃按钮样式优化 */
         .activeButton {
             background: var(--active-color) !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .activeButton a {
@@ -171,7 +175,9 @@
         }
 
         /* 添加主题切换时的过渡效果 */
-        #sidebar, .nav, .activeButton {
+        #sidebar,
+        .nav,
+        .activeButton {
             transition: all 0.4s ease;
         }
 
@@ -183,8 +189,9 @@
             transition: max-height 0.3s ease;
         }
 
-        #sidebar .menu-item.active > ul.submenu {
-            max-height: 500px; /* 足够大的高度以容纳所有子菜单项 */
+        #sidebar .menu-item.active>ul.submenu {
+            max-height: 500px;
+            /* 足够大的高度以容纳所有子菜单项 */
         }
 
         #sidebar .menu-header {
@@ -206,18 +213,18 @@
             transition: transform 0.3s ease;
         }
 
-        #sidebar .menu-item.active > .menu-header:after {
+        #sidebar .menu-item.active>.menu-header:after {
             transform: rotate(90deg);
         }
 
-        #sidebar .menu-item.active > .menu-header {
+        #sidebar .menu-item.active>.menu-header {
             color: #fff;
-            background: rgba(255,255,255,.1);
+            background: rgba(255, 255, 255, .1);
         }
 
         /* 添加子菜单悬停渐变效果 */
         #sidebar ul.submenu li:hover a {
-            background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
             color: #fff;
             transform: translateX(4px);
             border-radius: 4px;
@@ -236,7 +243,7 @@
             background: transparent;
         }
 
-        #header-text{
+        #header-text {
             line-height: 60px;
             max-width: 450px;
             color: var(--header-text);
@@ -257,14 +264,17 @@
         #header-text::-webkit-scrollbar {
             height: 1px;
         }
+
         #header-text::-webkit-scrollbar-track {
             background: transparent;
         }
+
         #header-text::-webkit-scrollbar-thumb {
             background-color: rgba(128, 128, 128, 0.5);
             border-radius: 3px;
         }
-        #header-text:hover ::-webkit-scrollbar{
+
+        #header-text:hover ::-webkit-scrollbar {
             background-color: rgba(128, 128, 128, 0.7);
             scrollbar-width: thin;
         }
@@ -349,31 +359,31 @@
                 <li class="layui-nav-item layui-this"><a href="">暂无</a></li>
                 <li class="layui-nav-item"><a href="" aria-label="留言板">留言板</a></li>
                 <li class="layui-nav-item">
-                  <a href="javascript:;" class="layui-icon-set-fill layui-icon">设置</a>
-                  <dl class="layui-nav-child">
-                    <dd><a href="javascript:;" id="toggleCountdown">显示下班倒计时</a></dd>
-                    <dd><a href="javascript:;" id="toggleDailyText">显示每日一言</a></dd>
-                  </dl>
+                    <a href="javascript:;" class="layui-icon-set-fill layui-icon">设置</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" id="toggleCountdown">显示下班倒计时</a></dd>
+                        <dd><a href="javascript:;" id="toggleDailyText">显示每日一言</a></dd>
+                    </dl>
                 </li>
                 <li class="layui-nav-item">
-                  <a href="javascript:;" class="layui-icon-theme layui-icon">主题切换</a>
-                  <dl class="layui-nav-child">
-                    <dd><a href="javascript:;" onclick="switchTheme('default')">默认主题</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('dark')">深邃夜空</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('green')">清新森林</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('purple')">优雅紫罗</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('ocean')">海洋之心</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('sunset')">晚霞橘暮</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('cherry')">樱花粉韵</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('mint')">薄荷清晨</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('tech')">科技蓝调</a></dd>
-                    <dd><a href="javascript:;" onclick="switchTheme('coffee')">咖啡时光</a></dd>
-                  </dl>
+                    <a href="javascript:;" class="layui-icon-theme layui-icon">主题切换</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" onclick="switchTheme('default')">默认主题</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('dark')">深邃夜空</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('green')">清新森林</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('purple')">优雅紫罗</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('ocean')">海洋之心</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('sunset')">晚霞橘暮</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('cherry')">樱花粉韵</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('mint')">薄荷清晨</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('tech')">科技蓝调</a></dd>
+                        <dd><a href="javascript:;" onclick="switchTheme('coffee')">咖啡时光</a></dd>
+                    </dl>
                 </li>
                 <li class="layui-nav-item">
-                    <a style="cursor: pointer;" onclick="window.open('./demo/index.html')">最近更新内容</a>
+                    <a style="cursor: pointer;" onclick="window.open('./pages/demo/index.html')">最近更新内容</a>
                 </li>
-              </ul>
+            </ul>
             <div id="content">
                 <!-- 移除所有静态 iframe 标签 -->
             </div>
@@ -398,27 +408,27 @@
             <div class="settings-title">工作时间设置</div>
             <div class="close-settings" id="closeSettings">×</div>
         </div>
-        
+
         <div class="time-input-group">
             <label for="workStartTime">上班时间</label>
             <input type="time" id="workStartTime" class="time-input">
         </div>
-        
+
         <div class="time-input-group">
             <label for="lunchStartTime">午休开始时间</label>
             <input type="time" id="lunchStartTime" class="time-input">
         </div>
-        
+
         <div class="time-input-group">
             <label for="lunchEndTime">午休结束时间</label>
             <input type="time" id="lunchEndTime" class="time-input">
         </div>
-        
+
         <div class="time-input-group">
             <label for="workEndTime">下班时间</label>
             <input type="time" id="workEndTime" class="time-input">
         </div>
-        
+
         <div class="current-schedule">
             <h4>当前时间表</h4>
             <div class="schedule-item">
@@ -434,7 +444,7 @@
                 <span id="currentWorkEnd">18:30</span>
             </div>
         </div>
-        
+
         <div class="settings-footer">
             <button class="settings-btn hide-btn" id="hideCountdown" title="不再显示下班倒计时，可在导航栏设置中开启">不再显示</button>
             <button class="settings-btn cancel-btn" id="cancelSettings">取消</button>
@@ -444,7 +454,7 @@
 
     <script>
 
-        
+
         // 获取侧边栏和按钮
         const header = document.getElementById('header')
         const sidebar = document.getElementById('sidebar');
@@ -452,7 +462,7 @@
         const toggleBtn = document.querySelectorAll('#toggleBtn li')
         const cBTN = document.querySelectorAll('.cBTN')
         const iframeBox = document.querySelectorAll('.iframeBox')
-        
+
         // 初始化状态
         let isCollapsed = false;
 
@@ -469,18 +479,18 @@
 
         // 获取所有菜单头部
         const menuHeaders = document.querySelectorAll('.menu-header');
-        
+
         // 为每个菜单头部添加点击事件
         menuHeaders.forEach(header => {
-            header.addEventListener('click', function(e) {
+            header.addEventListener('click', function (e) {
                 // 阻止事件冒泡，避免触发父元素的点击事件
                 e.stopPropagation();
-                
+
                 const menuItem = this.parentElement;
-                
+
                 // 切换当前菜单项的活动状态
                 menuItem.classList.toggle('active');
-                
+
                 // 如果侧边栏处于折叠状态，展开它
                 if (sidebar.classList.contains('collapsed')) {
                     sidebar.classList.remove('collapsed');
@@ -494,8 +504,38 @@
             const iframe = document.createElement('iframe');
             iframe.className = 'iframeBox';
             iframe.style.display = 'block';
-            iframe.src = `./${path}/index.html`;
+            iframe.src = `./pages/${path}/index.html`;
             iframe.setAttribute('data-name', name);
+
+            const loadingContainer = animationLoading.loaddingAnimation()
+
+            try {
+
+                // 监听iframe加载完成事件，隐藏加载动画
+                iframe.onload = function () {
+                    setTimeout(() => {
+                        // 设置进度为100%
+                        if (loadingContainer.setProgress) {
+                            loadingContainer.setProgress(100);
+                        }
+
+                        // 调用清理函数
+                        if (loadingContainer.cleanup) {
+                            loadingContainer.cleanup();
+                        }
+
+                        // 添加淡出效果
+                        loadingContainer.classList.add('fade-out');
+                        loadingContainer.style.display = 'none';
+                    }, 0);
+                };
+            } catch (error) {
+                console.log('iframe加载失败', error);
+                // 添加淡出效果
+                loadingContainer.classList.add('fade-out');
+                loadingContainer.style.display = 'none';
+            }
+
             return iframe;
         }
 
@@ -514,7 +554,7 @@
 
             // 检查是否已存在对应的 iframe
             let targetIframe = content.querySelector(`iframe[data-name="${name}"]`);
-            
+
             if (!targetIframe) {
                 // 动态生成 pathMap
                 const pathMap = {};
@@ -540,10 +580,10 @@
             document.querySelectorAll('.activeButton').forEach(item => {
                 item.classList.remove('activeButton');
             });
-            
+
             // 为当前点击的菜单项添加活动状态
             clickedBtn.parentElement.classList.add('activeButton');
-            
+
             // 展开包含当前菜单项的父菜单
             const parentMenuItem = clickedBtn.closest('.menu-item');
             if (parentMenuItem) {
@@ -557,18 +597,22 @@
 
         // 为每个菜单项添加点击事件
         for (let index = 0; index < cBTN.length; index++) {
-            cBTN[index].onclick = function(e) {
+            cBTN[index].onclick = function (e) {
                 // 阻止事件冒泡
                 e.stopPropagation();
-                
+
                 // 激活当前点击的菜单项
                 activeButton(index);
                 sessionStorage.setItem('cy_activeButton_current_index', index);
             }
         }
 
+
+        // 加载动画
+
+
     </script>
-    
+
     <!-- 添加主题和倒计时脚本引用 -->
     <script src="./assets/js/theme.js"></script>
     <script src="./assets/js/countdown.js"></script>
@@ -576,6 +620,8 @@
 
     <!-- 添加每日一言内容 -->
     <script src="./assets/js/daily-sentence.js"></script>
+
+
 </body>
 
 </html>

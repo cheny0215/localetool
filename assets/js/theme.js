@@ -1,4 +1,5 @@
-// 主题切换功能
+(function () {
+    // 主题切换功能
 function initTheme() {
     // 主题切换函数
     window.switchTheme = function(themeName) {
@@ -67,3 +68,4 @@ function initTheme() {
 document.addEventListener('DOMContentLoaded', function() {
     initTheme();
 }); 
+})();

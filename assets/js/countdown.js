@@ -1,4 +1,5 @@
-// 倒计时功能
+(function () {
+    // 倒计时功能
 function initCountdown() {
     // 获取DOM元素
     const countdownCard = document.getElementById('countdownCard');
@@ -254,3 +255,4 @@ function initCountdown() {
 document.addEventListener('DOMContentLoaded', function() {
     initCountdown();
 }); 
+})()

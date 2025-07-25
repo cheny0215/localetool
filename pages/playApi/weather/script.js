@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 动态设置正确的背景图路径
-    const backgroundImagePath = '../../assets/images/weather1.webp';
+    const backgroundImagePath = '../../../assets/images/weather1.webp';
     document.body.style.backgroundImage = `url('${backgroundImagePath}')`;
     
     const provinceSelect = document.getElementById('province-select');
