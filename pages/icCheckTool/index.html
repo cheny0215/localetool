@@ -384,7 +384,27 @@
             <a class="layui-btn layui-btn-primary layui-border-blue layui-btn-radius"
             href="javascript:(function(){let url_cur = window.location.href; let is_cn = false; if (url_cur.includes('.com/cn') || url_cur.includes('.com.cn')) { is_cn = true; } let reg = /\.com(\/hk\/en|\/hk|\/tw|\/mo|\/cn|\.cn)?/; url_cur = reg.test(url_cur) ? url_cur.replace(reg, '.com/cn') : url_cur.replace(/\.com(\/.*)?/, '.com/cn'); let new_Window = ''; if (is_cn) { changeImgSrc(window); } else { new_Window = window.open(url_cur, '_blank'); } function changeImgSrc(newWindow) { let iframewindow_des = newWindow.document.getElementById('iframe_0').contentWindow; let iframewindow_mob = newWindow.document.getElementById('iframe_1').contentWindow; const images_des = iframewindow_des.document.getElementsByTagName('img'); const images_mob = iframewindow_mob.document.getElementsByTagName('img'); function changeImgEach(images) { for (let img of images) { img.src = img.src ? img.src.replace(/\.com\.cn/g, '.com/cn') : ''; } } changeImgEach(images_des); changeImgEach(images_mob); } new_Window.onload = function () { changeImgSrc(new_Window); };})()
 ">
-            To /CN Url</a>
+            Change img Url</a>
+
+            <a class="layui-btn layui-btn-primary layui-border-blue layui-btn-radius"
+            href="javascript:(function()%7Blet%20url=window.location.href;let%20reg=/%5C.com(%5C/hk%5C/en%7C%5C/hk%7C%5C/tw%7C%5C/mo%7C%5C/cn%7C%5C.cn)?/;url=reg.test(url)?url.replace(reg,%27.com/hk/en%27):url.replace(/%5C.com(%5C/.*)?/,%27%5C.com/hk/en%27);window.open(url,%27_blank%27);%7D)();">
+            To HKEN</a>
+
+            <a class="layui-btn layui-btn-primary layui-border-blue layui-btn-radius"
+            href="javascript:(function()%7Blet%20url=window.location.href;let%20reg=/%5C.com(%5C/hk%5C/en%7C%5C/hk%7C%5C/tw%7C%5C/mo%7C%5C/cn%7C%5C.cn)?/;url=reg.test(url)?url.replace(reg,%27.com/hk%27):url.replace(/%5C.com(%5C/.*)?/,%27%5C.com/hk%27);window.open(url,%27_blank%27);%7D)();">
+            To HK</a>
+
+            <a class="layui-btn layui-btn-primary layui-border-blue layui-btn-radius"
+            href="javascript:(function()%7Blet%20url=window.location.href;let%20reg=/%5C.com(%5C/hk%5C/en%7C%5C/hk%7C%5C/tw%7C%5C/mo%7C%5C/cn%7C%5C.cn)?/;url=reg.test(url)?url.replace(reg,%27.com/mo%27):url.replace(/%5C.com(%5C/.*)?/,%27%5C.com/mo%27);window.open(url,%27_blank%27);%7D)();">
+            To MO</a>
+
+            <a class="layui-btn layui-btn-primary layui-border-blue layui-btn-radius"
+            href="javascript:(function()%7Blet%20url=window.location.href;let%20reg=/%5C.com(%5C/hk%5C/en%7C%5C/hk%7C%5C/tw%7C%5C/mo%7C%5C/cn%7C%5C.cn)?/;url=reg.test(url)?url.replace(reg,%27.com/cn%27):url.replace(/%5C.com(%5C/.*)?/,%27%5C.com/cn%27);window.open(url,%27_blank%27);%7D)();">
+            To CN</a>
+
+            <a class="layui-btn layui-btn-primary layui-border-blue layui-btn-radius"
+            href="javascript:(function()%7Blet%20url=window.location.href;let%20reg=/%5C.com(%5C/hk%5C/en%7C%5C/hk%7C%5C/tw%7C%5C/mo%7C%5C/cn%7C%5C.cn)?/;url=reg.test(url)?url.replace(reg,%27.com/tw%27):url.replace(/%5C.com(%5C/.*)?/,%27%5C.com/tw%27);window.open(url,%27_blank%27);%7D)();">
+            To TW</a>
         </div>
         <hr>
         <div class="a-box">
