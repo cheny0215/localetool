@@ -32,7 +32,7 @@
             </div>
             <div class="email-field">
                 <span class="field-name">Subject Line :</span>
-                <span class="field-value" contenteditable="false">＜广告＞</span>
+                <span class="field-value ad-language" contenteditable="false">＜AD＞</span>
                 <span class="field-value" contenteditable="false"><span style="color: #c3c3c3;">##还没有内容##</span></span>
             </div>
             <div class="email-field">
@@ -131,6 +131,15 @@
                     const hiddenDiv = doc.querySelector('div[style*="display: none"][style*="max-height: 0px"][style*="overflow: hidden"]');
 
                     this.options.targetField.textContent = hiddenDiv ? hiddenDiv.textContent.trim() : '';
+
+                    // 检查是否包含 lang="zh-CN" 属性
+                    const htmlElement = doc.documentElement;
+                    if (htmlElement && htmlElement.getAttribute('lang') === 'zh-CN') {
+                        // 将class="ad-language"的文本内容变为＜广告＞
+                        document.querySelectorAll('.ad-language')[0].textContent = '＜广告＞';
+                    }else{
+                        document.querySelectorAll('.ad-language')[0].textContent = '＜AD＞';
+                    }
 
                     // 获取 iframe 元素
                     const iframe = document.getElementById('previewFrame');
