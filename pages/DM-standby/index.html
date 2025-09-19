@@ -22,10 +22,9 @@
                     <i class="ri-screenshot-2-line"></i>
                 </div>
                 <div class="tool-content">
-                    <h2>项目截图工具</h2>
                     <p>快速生成Desktop/Mobile截图，无需使用Starling和PS</p>
                     <button class="primary-button" id="openScreenshotTool">
-                        <i class="ri-external-link-line"></i> 打开截图工具
+                        <i class="ri-external-link-line"></i>点击打开截图工具
                     </button>
                 </div>
             </div>
@@ -40,37 +39,37 @@
         <div class="main-content">
             <div class="form-section">
                 <h2 class="section-title"><i class="ri-edit-line"></i> 填写项目信息</h2>
-                <p class="section-description">填写以下信息，生成标准的截图和文件夹命名格式</p>
+                <p class="section-description"><i class="ri-alert-line" style="vertical-align: bottom;padding-right: 4px;"></i>先在左侧边栏填写完所有项目信息</p>
                 <div class="project-form">
                     <div class="form-group">
-                        <label>请填写项目名称：</label>
+                        <label>请填写DM项目名称：</label>
                         <div class="input-container">
-                            <input type="text" id="projectName" value="这里就填你的项目名称">
+                            <input type="text" id="projectName" value="项目名字">
                             <span class="text-tip">例如: Holiday 2025 Still Time</span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>请填写项目年份编号：</label>
+                        <label>请填写DM项目年份编号：</label>
                         <div class="input-container">
                             <input type="text" id="projectYear" value="FY25 Q1">
                             <span class="text-tip">格式参考: FY25 Q1</span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>请填写项目日期：</label>
+                        <label>请填写DM项目发布日期：</label>
                         <div class="input-container">
                             <input type="text" id="projectDate" value="20251212">
                             <span class="text-tip">格式参考: 20251212</span>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>请填写负责人名字：</label>
+                        <label>请填写DM负责人名字：</label>
                         <div class="input-container">
                             <input type="text" id="projectManager" value="Ivan">
                         </div>
                     </div>
                     <div class="form-group language-selection">
-                        <label>请选择项目语言（默认全选）：</label>
+                        <label>请选择DM项目语言（默认全选）：</label>
                         <div class="checkbox-container">
                             <div class="checkbox-group">
                                 <label class="checkbox-label"><input type="checkbox" value="HKEN" checked><span>HKEN</span></label>
@@ -86,26 +85,26 @@
 
             <div class="results-section">
                 <h2 class="section-title"><i class="ri-file-list-3-line"></i> 生成的命名</h2>
-                <p class="section-description">下方显示自动生成的命名格式，点击任意文本即可复制</p>
+                <p class="section-description"><i class="ri-alert-line" style="vertical-align: bottom;padding-right: 4px;"></i>左侧填好后这里同步生成标准命名，点击即可复制使用</p>
                 <div class="generated-names">
                     <div class="name-group">
                         <div class="name-label">
                             <i class="ri-folder-line"></i>
-                            <h3>备份文件项目文件夹名称</h3>
+                            <h3>备份文件夹命名</h3>
                         </div>
                         <div class="copyable" id="backupFileName"></div>
                     </div>
                     <div class="name-group">
                         <div class="name-label">
                             <i class="ri-image-line"></i>
-                            <h3>备份截图项目文件夹名称</h3>
+                            <h3>截图文件夹命名</h3>
                         </div>
                         <div class="copyable" id="backupScreenshotName"></div>
                     </div>
                     <div class="name-group screenshot-names">
                         <div class="name-label">
                             <i class="ri-screenshot-line"></i>
-                            <h3>截图名称</h3>
+                            <h3>五个语言截图命名</h3>
                         </div>
                         <div id="screenshotNames"></div>
                     </div>

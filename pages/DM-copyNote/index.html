@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目信息生成器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success-color: #059669;
+            --note-color: #0892a7;
+            --background-color: #f8fafc;
+            --card-background: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --selected-background: #eff6ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--background-color);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 250px 0.8fr 1fr;
+            gap: 1rem;
+            height: 100vh;
+            padding: 1rem;
+        }
+
+        /* 项目列表面板 */
+        .projects-panel {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .projects-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .projects-header h2 {
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .new-project-btn {
+            width: 100%;
+            padding: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .projects-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .project-item {
+            font-size: 0.875rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-item:hover {
+            background: var(--background-color);
+        }
+
+        .project-item.active {
+            background: var(--selected-background);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .delete-project {
+            opacity: 0;
+            color: #ef4444;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.25rem;
+        }
+
+        .project-item:hover .delete-project {
+            opacity: 1;
+        }
+
+        /* 表单面板 */
+        .form-panel {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            overflow-y: auto;
+            visibility: hidden;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: flex;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            gap: 2px;
+            margin-right: 10px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+
+        /* 生成结果面板 */
+        .result-panel {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .result-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--note-color);
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+        }
+
+        .result-value {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-left: 1rem;
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        #language-checkboxes{
+            display: flex;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- 项目列表 -->
+        <div class="projects-panel">
+            <div class="projects-header">
+                <h2>项目列表</h2>
+                <div style="padding-bottom:0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                    项目中经常使用到的文本或者提交信息，都可以根据已有信息自动拼好，直接点击复制
+                </div>
+                <button class="new-project-btn" onclick="createNewProject()">新建项目</button>
+            </div>
+            <div class="projects-list" id="projectsList">
+                <!-- 项目列表将在这里动态生成 -->
+            </div>
+        </div>
+
+        <!-- 表单 -->
+        <div class="form-panel">
+            <div style="padding-bottom:0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                在下方一次性设置好你的项目的相关信息（数据不会丢失，保存在本地），需要的时候直接在右边点击复制
+            </div>
+            <div class="form-group">
+                <label>项目名称</label>
+                <input type="text" id="projectName" placeholder="输入项目名称">
+            </div>
+            <div class="form-group">
+                <label>项目开发人员</label>
+                <input type="text" id="developer" placeholder="输入开发人员姓名">
+            </div>
+            <div class="form-group">
+                <label>项目PM</label>
+                <input type="text" id="pm" placeholder="输入项目PM">
+            </div>
+            <div class="form-group">
+                <label>IC服务器</label>
+                <input type="text" id="icServer" placeholder="输入服务器地址">
+            </div>
+            <div class="form-group">
+                <label>uuid</label>
+                <input type="text" id="uuid" placeholder="输入项目的uuid">
+            </div>
+            <div class="form-group">
+                <label>项目语言</label>
+                <div id="language-checkboxes">
+                    <label><input type="checkbox" name="language" value="HKEN"> HKEN</label><br>
+                    <label><input type="checkbox" name="language" value="HKTC"> HKTC</label><br>
+                    <label><input type="checkbox" name="language" value="MOTC"> MOTC</label><br>
+                    <label><input type="checkbox" name="language" value="TWTC"> TWTC</label><br>
+                    <label><input type="checkbox" name="language" value="CNSC"> CNSC</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>radar</label>
+                <input type="text" id="radar" placeholder="输入merge图时的radar">
+            </div>
+            <div class="form-group">
+                <label>trunk提交号</label>
+                <input type="text" id="revision" placeholder="输入merge提交号">
+            </div>
+        </div>
+
+        <!-- 生成结果 -->
+        <div class="result-panel" id="generatedResults">
+            <!-- 生成的结果将在这里显示 -->
+        </div>
+    </div>
+
+    <script>
+        const formPanel = document.querySelector('.form-panel');
+        // 项目数据存储
+        let projects = JSON.parse(localStorage.getItem('DM-copyNote')) || {};
+        let currentProjectId = localStorage.getItem('DM-copyNote-currentProjectId');
+
+        if (projects && JSON.stringify(projects) != '{}') {
+            formPanel.style.visibility = 'visible';
+        }
+        // 创建新项目
+        function createNewProject() {
+            formPanel.style.visibility = 'visible';
+            const projectId = 'project_' + Date.now();
+            projects[projectId] = {
+                name: '新项目',
+                data: {
+                    projectName: '',
+                    developer: '',
+                    pm: '',
+                    icServer: '',
+                    uuid: '',
+                    language: '',
+                    radar: '',
+                    revision: '',
+                }
+            };
+            currentProjectId = projectId;
+            saveData();
+            renderProjects();
+            loadProject(projectId);
+        }
+
+        // 修改 deleteProject 函数和项目列表渲染部分
+
+        // 渲染项目列表
+        function renderProjects() {
+
+            const list = document.getElementById('projectsList');
+            list.innerHTML = '';
+
+            Object.entries(projects).forEach(([id, project]) => {
+                const div = document.createElement('div');
+                div.className = `project-item ${id === currentProjectId ? 'active' : ''}`;
+                div.innerHTML = `
+            <span>${project.name}</span>
+            <button class="delete-project" data-id="${id}">×</button>
+        `;
+                // 分别添加点击事件
+                div.querySelector('span').onclick = () => loadProject(id);
+                div.querySelector('.delete-project').onclick = (e) => {
+                    e.stopPropagation();
+                    deleteProject(id);
+                };
+                list.appendChild(div);
+            });
+        }
+
+        // 删除项目
+        function deleteProject(id) {
+            if (!confirm('确定要删除这个项目吗？')) return;
+
+            delete projects[id];
+            if (currentProjectId === id) {
+                currentProjectId = Object.keys(projects)[0];
+                if (currentProjectId) {
+                    loadProject(currentProjectId);
+                } else {
+                    clearForm();
+                }
+            }
+            saveData();
+            renderProjects();
+
+            if (!projects || JSON.stringify(projects) == '{}') {
+                formPanel.style.visibility = 'hidden';
+            }
+        }
+
+        // 添加清空表单函数
+        function clearForm() {
+            document.getElementById('projectName').value = '';
+            document.getElementById('developer').value = '';
+            document.getElementById('pm').value = '';
+            document.getElementById('icServer').value = '';
+            document.getElementById('uuid').value = '';
+            document.getElementById('language').value = '';
+            document.getElementById('radar').value = '';
+            document.getElementById('revision').value = '';
+            document.getElementById('generatedResults').innerHTML = '';
+            currentProjectId = null;
+        }
+
+        // 加载项目
+        function loadProject(id) {
+            currentProjectId = id;
+            const project = projects[id].data;
+
+            document.getElementById('projectName').value = project.projectName;
+            document.getElementById('developer').value = project.developer;
+            document.getElementById('pm').value = project.pm;
+            document.getElementById('icServer').value = project.icServer;
+            document.getElementById('uuid').value = project.uuid;
+            document.getElementById('radar').value = project.radar;
+            document.getElementById('revision').value = project.revision;
+
+            // 处理语言多选
+            // 清除所有复选框的选中状态
+            document.querySelectorAll('input[name="language"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // 设置选中的语言
+            if (Array.isArray(project.language)) {
+                project.language.forEach(lang => {
+                    const checkbox = document.querySelector(`input[name="language"][value="${lang}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            } else if (project.language) {
+                // 兼容旧数据格式
+                const checkbox = document.querySelector(`input[name="language"][value="${project.language}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            }
+
+            localStorage.setItem('DM-copyNote-currentProjectId', id);
+            renderProjects();
+            generateResults();
+        }
+
+
+
+        // 保存数据
+        function saveData() {
+            localStorage.setItem('DM-copyNote', JSON.stringify(projects));
+        }
+
+        // 生成结果
+        function generateResults() {
+            if (!currentProjectId) return;
+
+            const project = projects[currentProjectId].data;
+            const results = document.getElementById('generatedResults');
+            results.innerHTML = '';
+
+            // 处理语言显示
+            const languages = Array.isArray(project.language) ? project.language.join('&') : project.language;
+
+            const names = {
+                'svn提交信息': `Update ${project.projectName} code By ${project.developer}`,
+                '项目ic预览平台地址' : `https://${project.icServer}.preview.apple.com/hk/dm/?id=${project.uuid.substring(0, 8)}`,
+                '项目ic预览平台img的src' : `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${project.uuid}/i`,
+                '项目merge到trunk提交信息': `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}`,
+                'radar回复信息': `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}`,
+                'Merge List 文件名': `Merge List_${project.projectName}_${languages}_r${project.revision}.txt`,
+                'Contact Sheet 文件名': `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html`,
+            };
+
+            Object.entries(names).forEach(([label, value]) => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                div.innerHTML = `
+                    <div class="result-content">
+                        <div class="result-label">${label}</div>
+                        <div class="result-value">${value.replace(/\n/g, '<br>')}</div>
+                    </div>
+                    <button class="copy-btn" onclick="copyText('${value.replace(/\n/g, '\\n')}', this)">复制</button>
+                `;
+                results.appendChild(div);
+            });
+        }
+
+        // 复制文本
+        function copyText(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '已复制';
+                button.style.background = 'var(--success-color)';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'var(--primary-color)';
+                }, 1500);
+            });
+        }
+
+        // 监听表单变化
+        ['projectName', 'developer', 'pm', 'icServer', 'radar','uuid','revision'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                updateProjectData();
+            });
+        });
+
+        // 为语言复选框添加事件监听
+        document.querySelectorAll('input[name="language"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                updateProjectData();
+            });
+        });
+
+        // 更新项目数据的函数
+        function updateProjectData() {
+            if (!currentProjectId) return;
+
+            // 获取选中的语言
+            const selectedLanguages = Array.from(document.querySelectorAll('input[name="language"]:checked'))
+                                          .map(cb => cb.value);
+
+            const formData = {
+                projectName: document.getElementById('projectName').value,
+                developer: document.getElementById('developer').value,
+                pm: document.getElementById('pm').value,
+                icServer: document.getElementById('icServer').value,
+                language: selectedLanguages, // 保存为数组
+                radar: document.getElementById('radar').value,
+                uuid: document.getElementById('uuid').value,
+                revision: document.getElementById('revision').value,
+            };
+
+            projects[currentProjectId].data = formData;
+            projects[currentProjectId].name = formData.projectName || '未命名项目';
+
+            saveData();
+            renderProjects();
+            generateResults();
+        }
+
+        // 初始化
+        if (currentProjectId && projects[currentProjectId]) {
+            loadProject(currentProjectId);
+        } else if (Object.keys(projects).length > 0) {
+            loadProject(Object.keys(projects)[0]);
+        }
+        renderProjects();
+    </script>
+</body>
+
+</html>

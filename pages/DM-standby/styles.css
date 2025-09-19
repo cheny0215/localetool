@@ -145,7 +145,8 @@ body {
 }
 
 .section-description {
-  color: #6e6e73;
+  color: #0071e3;
+  /* color: #6e6e73; */
   font-size: 14px;
   margin: 0 0 20px 0;
 }
