@@ -436,13 +436,13 @@
             const languages = Array.isArray(project.language) ? project.language.join('&') : project.language;
 
             const names = {
-                'svn提交信息': `Update ${project.projectName} code By ${project.developer}`,
-                '项目ic预览平台地址' : `https://${project.icServer}.preview.apple.com/hk/dm/?id=${project.uuid.substring(0, 8)}`,
-                '项目ic预览平台img的src' : `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${project.uuid}/i`,
-                '项目merge到trunk提交信息': `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}`,
-                'radar回复信息': `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}`,
-                'Merge List 文件名': `Merge List_${project.projectName}_${languages}_r${project.revision}.txt`,
-                'Contact Sheet 文件名': `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html`,
+                '《SVN提交》svn提交信息': `Update ${project.projectName} code By ${project.developer}`,
+                '《IC平台》项目ic预览平台地址' : `https://${project.icServer}.preview.apple.com/hk/dm/?id=${project.uuid.substring(0, 8)}`,
+                '《IC平台》项目ic预览平台img的src' : `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${project.uuid}/i`,
+                '《跑图&SVN提交》图片merge到trunk提交信息': `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}`,
+                '《跑图》radar回复信息': `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}`,
+                '《跑图》Merge List 文件名': `Merge List_${project.projectName}_${languages}_r${project.revision}.txt`,
+                '《跑图》Contact Sheet 文件名': `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html`,
             };
 
             Object.entries(names).forEach(([label, value]) => {
