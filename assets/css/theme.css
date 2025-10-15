@@ -10,6 +10,7 @@
     --accent-color: #FF4081;
     --content-bg: #f5f5f5;
     --card-bg: #ffffff;
+    --loading-bg: linear-gradient(135deg, #4c585e 0%, rgba(48, 67, 87, 0.5) 100%);
 }
 
 /* 深邃夜空 - 深蓝渐变 */
@@ -23,6 +24,7 @@
     --accent-color: #FF5252;
     --content-bg: #f5f5f5;
     --card-bg: #ffffff;
+    --loading-bg: linear-gradient(135deg, #2a5c72 0%, rgba(32, 58, 67, 0.5) 100%);
 }
 
 /* 清新森林 - 保持不变 */
@@ -34,6 +36,7 @@
     --header-bg: linear-gradient(60deg,#2a8f72, #134e5e);
     --header-text: #d9ebe3;
     --accent-color: #ff9800;
+    --loading-bg: linear-gradient(135deg, #134e5e 0%, rgba(113, 178, 128, 0.5) 100%);
 }
 
 /* 紫罗兰 - 柔和紫调 */
@@ -45,6 +48,7 @@
     --header-bg: linear-gradient(120deg,#a288a2, #5B247A);
     --header-text: #ebdcfe;
     --accent-color: #FFC107;
+    --loading-bg: linear-gradient(135deg, #5B247A 0%, rgba(162, 136, 162, 0.5) 100%);
 }
 
 /* 海洋之心 - 清新蓝绿 */
@@ -56,6 +60,7 @@
     --header-bg: linear-gradient(60deg,#006064, #00ACC1);
     --header-text: #85fbff;
     --accent-color: #FF5722;
+    --loading-bg: linear-gradient(135deg, #006064 0%, rgba(0, 172, 193, 0.5) 100%);
 }
 
 /* 晚霞橘暮 - 温暖橙红 */
@@ -67,6 +72,7 @@
     --header-bg: #FFF3E0;
     --header-text: #E65100;
     --accent-color: #607D8B;
+    --loading-bg: linear-gradient(135deg, #b44500 0%, rgba(255, 165, 55, 0.5) 100%);
 }
 
 /* 樱花粉韵 - 柔和粉色 */
@@ -78,6 +84,7 @@
     --header-bg: linear-gradient(to top,#fff,#f6d2d5, #f77983);
     --header-text: #AD1457;
     --accent-color: #4CAF50;
+    --loading-bg: linear-gradient(135deg, #FF5F6D 0%, rgba(255, 195, 113, 0.5) 100%);
 }
 
 /* 薄荷清晨 - 清新薄荷绿 */
@@ -89,6 +96,7 @@
     --header-bg: linear-gradient(to top,#edf8f6, #c8f8f2);
     --header-text: #004D40;
     --accent-color: #FF5722;
+    --loading-bg: linear-gradient(135deg, #11998e 0%, rgba(56, 239, 125, 0.5) 100%);
 }
 
 /* 科技蓝调 - 深邃科技感 */
@@ -100,6 +108,7 @@
     --header-bg:  #fefefe;
     --header-text: #01579B;
     --accent-color: #FF4081;
+    --loading-bg: linear-gradient(135deg, #0B486B 0%, rgba(59, 140, 181, 0.5) 100%);
 }
 
 /* 咖啡时光 - 温暖棕色 */
@@ -111,4 +120,5 @@
     --header-bg: linear-gradient(135deg,#9a6633, #e4cec3);
     --header-text: #3E2723;
     --accent-color: #8BC34A;
+    --loading-bg: linear-gradient(135deg, #603813 0%, rgba(154, 124, 107, 0.5) 100%);
 } 

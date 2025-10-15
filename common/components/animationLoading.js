@@ -1,8 +1,32 @@
 const animationLoading = (function(){
+    // 定义20条恶搞随机加载文本
+    const loadingTexts = [
+        '程序员正在疯狂敲代码，手速快到冒烟了...',
+        '服务器打了个哈欠，说：让我缓缓...',
+        '数据迷路了，正在GPS导航中...',
+        '系统：我太难了，给我点时间装个样子...',
+        '加载中...其实我在摸鱼，别告诉老板',
+        '正在召唤代码之神，需要念三遍咒语...',
+        '网速慢？不存在的，是我故意拖延的',
+        '系统正在思考人生，请勿打扰...',
+        '数据在路上堵车了，前方请绕行...',
+        '程序崩了又修好了，放心，我没告诉任何人',
+        '正在喂养服务器，它说要吃饱才干活...',
+        '加载中...别催，催也是这么慢',
+        'CPU说它需要休息一下，毕竟996太累了',
+        '正在贿赂网络管理员，马上就通了...',
+        '系统正在装模作样地忙碌中...',
+        '数据表示：老子在路上呢，急什么急！',
+        '加载中...您的等待将会获得0.001秒的省时体验',
+        '程序员正在debug，顺便喝了三杯咖啡...',
+        '服务器：能不能让我安静地宕机一会？',
+        '正在用意念传输数据，请保持专注...'
+    ];
+
     function loaddingAnimation() {
         // 创建加载动画容器
         const loadingContainer = document.createElement('div');
-        loadingContainer.className = 'iframe-loading-container';
+        loadingContainer.className = 'modern-loading-container';
         loadingContainer.style.position = 'absolute';
         loadingContainer.style.top = '0';
         loadingContainer.style.left = '0';
@@ -11,391 +35,272 @@ const animationLoading = (function(){
         loadingContainer.style.display = 'flex';
         loadingContainer.style.justifyContent = 'center';
         loadingContainer.style.alignItems = 'center';
-        loadingContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+        // 使用主题变量，实现主题跟随效果
+        loadingContainer.style.background = 'var(--loading-bg)';
         loadingContainer.style.zIndex = '999';
-        loadingContainer.style.backdropFilter = 'blur(5px)';
         loadingContainer.style.transition = 'all 0.5s ease';
+        loadingContainer.style.overflow = 'hidden';
 
-        // 创建卡通风格的加载容器
-        const cartoonContainer = document.createElement('div');
-        cartoonContainer.className = 'cartoon-loading-container';
-        cartoonContainer.style.position = 'relative';
-        cartoonContainer.style.width = '200px';
-        cartoonContainer.style.height = '200px';
-        cartoonContainer.style.display = 'flex';
-        cartoonContainer.style.flexDirection = 'column';
-        cartoonContainer.style.alignItems = 'center';
-        cartoonContainer.style.justifyContent = 'center';
+        // 创建背景粒子效果
+        const particlesContainer = document.createElement('div');
+        particlesContainer.className = 'particles-container';
+        particlesContainer.style.position = 'absolute';
+        particlesContainer.style.width = '100%';
+        particlesContainer.style.height = '100%';
+        particlesContainer.style.overflow = 'hidden';
+        particlesContainer.style.opacity = '0.3';
 
-        // 创建卡通云朵背景
-        const cloudBackground = document.createElement('div');
-        cloudBackground.className = 'cloud-background';
-        cloudBackground.style.position = 'absolute';
-        cloudBackground.style.width = '180px';
-        cloudBackground.style.height = '100px';
-        cloudBackground.style.backgroundColor = 'white';
-        cloudBackground.style.borderRadius = '50px';
-        cloudBackground.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.1)';
-        cloudBackground.style.zIndex = '1';
-        cloudBackground.style.bottom = '40px';
+        // 添加多个粒子
+        for (let i = 0; i < 60; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.position = 'absolute';
+            particle.style.width = `${Math.random() * 4 + 2}px`;
+            particle.style.height = particle.style.width;
+            particle.style.background = 'rgba(255, 255, 255, 0.8)';
+            particle.style.borderRadius = '50%';
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.animation = `float ${Math.random() * 10 + 10}s ease-in-out infinite`;
+            particle.style.animationDelay = `${Math.random() * 5}s`;
+            particle.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
+            particlesContainer.appendChild(particle);
+        }
 
-        // 添加云朵的圆形部分
-        const cloudCircle1 = document.createElement('div');
-        cloudCircle1.style.position = 'absolute';
-        cloudCircle1.style.width = '60px';
-        cloudCircle1.style.height = '60px';
-        cloudCircle1.style.backgroundColor = 'white';
-        cloudCircle1.style.borderRadius = '50%';
-        cloudCircle1.style.top = '-20px';
-        cloudCircle1.style.left = '25px';
+        // 创建玻璃态主容器
+        const glassContainer = document.createElement('div');
+        glassContainer.className = 'glass-container';
+        glassContainer.style.position = 'relative';
+        glassContainer.style.width = '400px';
+        glassContainer.style.padding = '60px 40px';
+        glassContainer.style.background = 'rgba(255, 255, 255, 0.1)';
+        glassContainer.style.backdropFilter = 'blur(20px)';
+        glassContainer.style.borderRadius = '30px';
+        glassContainer.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        glassContainer.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.37)';
+        glassContainer.style.display = 'flex';
+        glassContainer.style.flexDirection = 'column';
+        glassContainer.style.alignItems = 'center';
+        glassContainer.style.zIndex = '2';
+        glassContainer.style.animation = 'float-in 0.8s ease-out';
 
-        const cloudCircle2 = document.createElement('div');
-        cloudCircle2.style.position = 'absolute';
-        cloudCircle2.style.width = '80px';
-        cloudCircle2.style.height = '80px';
-        cloudCircle2.style.backgroundColor = 'white';
-        cloudCircle2.style.borderRadius = '50%';
-        cloudCircle2.style.top = '-30px';
-        cloudCircle2.style.left = '65px';
+        // 创建旋转圆环加载器
+        const spinnerContainer = document.createElement('div');
+        spinnerContainer.className = 'spinner-container';
+        spinnerContainer.style.position = 'relative';
+        spinnerContainer.style.width = '120px';
+        spinnerContainer.style.height = '120px';
+        spinnerContainer.style.marginBottom = '40px';
 
-        const cloudCircle3 = document.createElement('div');
-        cloudCircle3.style.position = 'absolute';
-        cloudCircle3.style.width = '50px';
-        cloudCircle3.style.height = '50px';
-        cloudCircle3.style.backgroundColor = 'white';
-        cloudCircle3.style.borderRadius = '50%';
-        cloudCircle3.style.top = '-10px';
-        cloudCircle3.style.right = '20px';
+        // 外层圆环
+        const outerRing = document.createElement('div');
+        outerRing.className = 'outer-ring';
+        outerRing.style.position = 'absolute';
+        outerRing.style.width = '100%';
+        outerRing.style.height = '100%';
+        outerRing.style.border = '3px solid transparent';
+        outerRing.style.borderTopColor = '#ffffff';
+        outerRing.style.borderRightColor = '#ffffff';
+        outerRing.style.borderRadius = '50%';
+        outerRing.style.animation = 'rotate 1.5s linear infinite';
+        outerRing.style.filter = 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))';
 
-        // 添加云朵阴影效果
-        cloudBackground.style.filter = 'drop-shadow(0px 5px 5px rgba(0, 0, 0, 0.1))';
+        // 中层圆环
+        const middleRing = document.createElement('div');
+        middleRing.className = 'middle-ring';
+        middleRing.style.position = 'absolute';
+        middleRing.style.width = '80px';
+        middleRing.style.height = '80px';
+        middleRing.style.top = '20px';
+        middleRing.style.left = '20px';
+        middleRing.style.border = '3px solid transparent';
+        middleRing.style.borderBottomColor = '#a8edea';
+        middleRing.style.borderLeftColor = '#a8edea';
+        middleRing.style.borderRadius = '50%';
+        middleRing.style.animation = 'rotate-reverse 2s linear infinite';
+        middleRing.style.filter = 'drop-shadow(0 0 8px rgba(168, 237, 234, 0.5))';
 
-        // 组装云朵
-        cloudBackground.appendChild(cloudCircle1);
-        cloudBackground.appendChild(cloudCircle2);
-        cloudBackground.appendChild(cloudCircle3);
+        // 内层发光核心
+        const core = document.createElement('div');
+        core.className = 'core';
+        core.style.position = 'absolute';
+        core.style.width = '40px';
+        core.style.height = '40px';
+        core.style.top = '40px';
+        core.style.left = '40px';
+        core.style.background = 'linear-gradient(135deg, #667eea 0%, #a8edea 100%)';
+        core.style.borderRadius = '50%';
+        core.style.animation = 'pulse 2s ease-in-out infinite';
+        core.style.boxShadow = '0 0 30px rgba(168, 237, 234, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.3)';
 
-        // 创建卡通狗狗（替换原来的太阳）
-        const dogContainer = document.createElement('div');
-        dogContainer.className = 'dog-container';
-        dogContainer.style.position = 'relative';
-        dogContainer.style.zIndex = '2';
+        // 组装旋转器
+        spinnerContainer.appendChild(outerRing);
+        spinnerContainer.appendChild(middleRing);
+        spinnerContainer.appendChild(core);
 
-        const dog = document.createElement('div');
-        dog.className = 'cartoon-dog';
-        dog.style.width = '80px';
-        dog.style.height = '80px';
-        dog.style.position = 'relative';
-        dog.style.animation = 'dog-bounce 2s ease-in-out infinite';
+        // 创建加载文本
+        const loadingText = document.createElement('div');
+        loadingText.className = 'loading-text';
+        loadingText.textContent = 'Loading';
+        loadingText.style.color = '#ffffff';
+        loadingText.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+        loadingText.style.fontSize = '28px';
+        loadingText.style.fontWeight = '600';
+        loadingText.style.marginBottom = '10px';
+        loadingText.style.letterSpacing = '2px';
+        loadingText.style.textShadow = '0 2px 10px rgba(0, 0, 0, 0.3)';
+        loadingText.style.animation = 'text-shimmer 2s ease-in-out infinite';
 
-        // 狗狗头部
-        const dogHead = document.createElement('div');
-        dogHead.className = 'dog-head';
-        dogHead.style.width = '70px';
-        dogHead.style.height = '60px';
-        dogHead.style.backgroundColor = '#F9D59B';
-        dogHead.style.borderRadius = '50% 50% 45% 45%';
-        dogHead.style.position = 'relative';
-        dogHead.style.zIndex = '2';
-        dogHead.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        // 创建副标题
+        const subText = document.createElement('div');
+        subText.className = 'sub-text';
+        // 随机选择一条加载文本
+        const randomText = loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
+        subText.textContent = randomText;
+        subText.style.color = 'rgba(255, 255, 255, 0.8)';
+        subText.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+        subText.style.fontSize = '14px';
+        subText.style.fontWeight = '400';
+        subText.style.marginBottom = '30px';
+        subText.style.opacity = '0.9';
 
-        // 狗狗耳朵
-        const leftEar = document.createElement('div');
-        leftEar.className = 'dog-ear left';
-        leftEar.style.width = '30px';
-        leftEar.style.height = '40px';
-        leftEar.style.backgroundColor = '#E8C285';
-        leftEar.style.borderRadius = '50% 50% 0 50%';
-        leftEar.style.position = 'absolute';
-        leftEar.style.top = '-15px';
-        leftEar.style.left = '-5px';
-        leftEar.style.transform = 'rotate(-30deg)';
-        leftEar.style.zIndex = '1';
-        leftEar.style.transformOrigin = 'bottom right';
-        leftEar.style.animation = 'ear-wiggle 3s ease-in-out infinite alternate';
+        // 创建进度条容器
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-container';
+        progressContainer.style.width = '100%';
+        progressContainer.style.height = '6px';
+        progressContainer.style.background = 'rgba(255, 255, 255, 0.2)';
+        progressContainer.style.borderRadius = '10px';
+        progressContainer.style.overflow = 'hidden';
+        progressContainer.style.position = 'relative';
+        progressContainer.style.boxShadow = 'inset 0 2px 4px rgba(0, 0, 0, 0.1)';
 
-        const rightEar = document.createElement('div');
-        rightEar.className = 'dog-ear right';
-        rightEar.style.width = '30px';
-        rightEar.style.height = '40px';
-        rightEar.style.backgroundColor = '#E8C285';
-        rightEar.style.borderRadius = '50% 50% 50% 0';
-        rightEar.style.position = 'absolute';
-        rightEar.style.top = '-15px';
-        rightEar.style.right = '-5px';
-        rightEar.style.transform = 'rotate(30deg)';
-        rightEar.style.zIndex = '1';
-        rightEar.style.transformOrigin = 'bottom left';
-        rightEar.style.animation = 'ear-wiggle-right 2.5s ease-in-out 0.2s infinite alternate';
+        // 创建进度条
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.style.height = '100%';
+        progressBar.style.width = '0%';
+        progressBar.style.background = 'linear-gradient(90deg, #667eea, #a8edea, #ffffff)';
+        progressBar.style.borderRadius = '10px';
+        progressBar.style.transition = 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+        progressBar.style.boxShadow = '0 0 15px rgba(168, 237, 234, 0.8)';
+        progressBar.style.position = 'relative';
+        progressBar.style.overflow = 'hidden';
 
-        // 狗狗眼睛
-        const leftEye = document.createElement('div');
-        leftEye.className = 'dog-eye left';
-        leftEye.style.width = '12px';
-        leftEye.style.height = '12px';
-        leftEye.style.backgroundColor = '#333';
-        leftEye.style.borderRadius = '50%';
-        leftEye.style.position = 'absolute';
-        leftEye.style.top = '25px';
-        leftEye.style.left = '15px';
-        leftEye.style.animation = 'blink 3s ease-in-out infinite';
+        // 添加进度条光效
+        const progressGlow = document.createElement('div');
+        progressGlow.style.position = 'absolute';
+        progressGlow.style.top = '0';
+        progressGlow.style.left = '0';
+        progressGlow.style.width = '100%';
+        progressGlow.style.height = '100%';
+        progressGlow.style.background = 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent)';
+        progressGlow.style.animation = 'shimmer 1.5s ease-in-out infinite';
+        progressBar.appendChild(progressGlow);
 
-        // 添加眼睛高光
-        const leftEyeHighlight = document.createElement('div');
-        leftEyeHighlight.className = 'eye-highlight';
-        leftEyeHighlight.style.width = '4px';
-        leftEyeHighlight.style.height = '4px';
-        leftEyeHighlight.style.backgroundColor = 'white';
-        leftEyeHighlight.style.borderRadius = '50%';
-        leftEyeHighlight.style.position = 'absolute';
-        leftEyeHighlight.style.top = '2px';
-        leftEyeHighlight.style.left = '2px';
-        leftEye.appendChild(leftEyeHighlight);
+        progressContainer.appendChild(progressBar);
 
-        const rightEye = document.createElement('div');
-        rightEye.className = 'dog-eye right';
-        rightEye.style.width = '12px';
-        rightEye.style.height = '12px';
-        rightEye.style.backgroundColor = '#333';
-        rightEye.style.borderRadius = '50%';
-        rightEye.style.position = 'absolute';
-        rightEye.style.top = '25px';
-        rightEye.style.right = '15px';
-        rightEye.style.animation = 'blink 3s ease-in-out infinite';
+        // 创建百分比显示
+        const percentText = document.createElement('div');
+        percentText.className = 'percent-text';
+        percentText.textContent = '0%';
+        percentText.style.color = 'rgba(255, 255, 255, 0.9)';
+        percentText.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+        percentText.style.fontSize = '18px';
+        percentText.style.fontWeight = '500';
+        percentText.style.marginTop = '20px';
+        percentText.style.letterSpacing = '1px';
 
-        // 添加眼睛高光
-        const rightEyeHighlight = document.createElement('div');
-        rightEyeHighlight.className = 'eye-highlight';
-        rightEyeHighlight.style.width = '4px';
-        rightEyeHighlight.style.height = '4px';
-        rightEyeHighlight.style.backgroundColor = 'white';
-        rightEyeHighlight.style.borderRadius = '50%';
-        rightEyeHighlight.style.position = 'absolute';
-        rightEyeHighlight.style.top = '2px';
-        rightEyeHighlight.style.left = '2px';
-        rightEye.appendChild(rightEyeHighlight);
-
-        // 狗狗鼻子
-        const nose = document.createElement('div');
-        nose.className = 'dog-nose';
-        nose.style.width = '16px';
-        nose.style.height = '12px';
-        nose.style.backgroundColor = '#333';
-        nose.style.borderRadius = '50%';
-        nose.style.position = 'absolute';
-        nose.style.top = '35px';
-        nose.style.left = '50%';
-        nose.style.transform = 'translateX(-50%)';
-
-        // 狗狗嘴巴
-        const mouth = document.createElement('div');
-        mouth.className = 'dog-mouth';
-        mouth.style.width = '20px';
-        mouth.style.height = '10px';
-        mouth.style.borderBottom = '3px solid #333';
-        mouth.style.borderRadius = '0 0 10px 10px';
-        mouth.style.position = 'absolute';
-        mouth.style.bottom = '12px';
-        mouth.style.left = '50%';
-        mouth.style.transform = 'translateX(-50%)';
-
-        // 舌头
-        const tongue = document.createElement('div');
-        tongue.className = 'dog-tongue';
-        tongue.style.width = '14px';
-        tongue.style.height = '8px';
-        tongue.style.backgroundColor = '#FF9999';
-        tongue.style.borderRadius = '0 0 7px 7px';
-        tongue.style.position = 'absolute';
-        tongue.style.bottom = '-3px';
-        tongue.style.left = '50%';
-        tongue.style.transform = 'translateX(-50%)';
-        tongue.style.animation = 'tongue-wag 0.8s ease-in-out infinite alternate';
-        mouth.appendChild(tongue);
-
-        // 狗狗腮红
-        const leftBlush = document.createElement('div');
-        leftBlush.className = 'dog-blush left';
-        leftBlush.style.width = '12px';
-        leftBlush.style.height = '8px';
-        leftBlush.style.backgroundColor = 'rgba(255,105,97,0.4)';
-        leftBlush.style.borderRadius = '50%';
-        leftBlush.style.position = 'absolute';
-        leftBlush.style.top = '35px';
-        leftBlush.style.left = '6px';
-
-        const rightBlush = document.createElement('div');
-        rightBlush.className = 'dog-blush right';
-        rightBlush.style.width = '12px';
-        rightBlush.style.height = '8px';
-        rightBlush.style.backgroundColor = 'rgba(255,105,97,0.4)';
-        rightBlush.style.borderRadius = '50%';
-        rightBlush.style.position = 'absolute';
-        rightBlush.style.top = '35px';
-        rightBlush.style.right = '6px';
-
-        // 组装狗狗头部
-        dogHead.appendChild(leftEar);
-        dogHead.appendChild(rightEar);
-        dogHead.appendChild(leftEye);
-        dogHead.appendChild(rightEye);
-        dogHead.appendChild(nose);
-        dogHead.appendChild(mouth);
-        dogHead.appendChild(leftBlush);
-        dogHead.appendChild(rightBlush);
-        dog.appendChild(dogHead);
-        dogContainer.appendChild(dog);
+        // 组装玻璃态容器
+        glassContainer.appendChild(spinnerContainer);
+        glassContainer.appendChild(loadingText);
+        glassContainer.appendChild(subText);
+        glassContainer.appendChild(progressContainer);
+        glassContainer.appendChild(percentText);
 
         // 添加动画样式
-        if (!document.getElementById('cartoon-loading-styles')) {
+        if (!document.getElementById('modern-loading-styles')) {
             const style = document.createElement('style');
-            style.id = 'cartoon-loading-styles';
+            style.id = 'modern-loading-styles';
             style.textContent = `
-                @keyframes dog-bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-5px); }
-                }
-                
-                @keyframes ear-wiggle {
-                    0% { transform: rotate(-30deg); }
-                    100% { transform: rotate(-20deg); }
-                }
-                
-                @keyframes ear-wiggle-right {
-                    0% { transform: rotate(30deg); }
-                    100% { transform: rotate(20deg); }
-                }
-                
-                @keyframes blink {
-                    0%, 48%, 52%, 100% { transform: scaleY(1); }
-                    50% { transform: scaleY(0.1); }
-                }
-                
-                @keyframes tongue-wag {
-                    0% { height: 8px; }
-                    100% { height: 12px; }
-                }
-                
-                @keyframes fly-bird {
-                    0% { transform: translateX(-50px) translateY(0); }
-                    25% { transform: translateX(100px) translateY(-20px); }
-                    50% { transform: translateX(250px) translateY(0); }
-                    75% { transform: translateX(100px) translateY(20px); }
-                    100% { transform: translateX(-50px) translateY(0); }
-                }
-                
-                @keyframes flap-wing {
+                @keyframes rotate {
                     0% { transform: rotate(0deg); }
-                    100% { transform: rotate(30deg); }
+                    100% { transform: rotate(360deg); }
                 }
                 
-                .iframe-loading-container.fade-out {
+                @keyframes rotate-reverse {
+                    0% { transform: rotate(360deg); }
+                    100% { transform: rotate(0deg); }
+                }
+                
+                @keyframes pulse {
+                    0%, 100% {
+                        transform: scale(1);
+                        box-shadow: 0 0 30px rgba(168, 237, 234, 0.8), inset 0 0 20px rgba(255, 255, 255, 0.3);
+                    }
+                    50% {
+                        transform: scale(1.1);
+                        box-shadow: 0 0 50px rgba(168, 237, 234, 1), inset 0 0 30px rgba(255, 255, 255, 0.5);
+                    }
+                }
+                
+                @keyframes float {
+                    0%, 100% {
+                        transform: translateY(0) translateX(0);
+                    }
+                    25% {
+                        transform: translateY(-20px) translateX(10px);
+                    }
+                    50% {
+                        transform: translateY(-40px) translateX(-10px);
+                    }
+                    75% {
+                        transform: translateY(-20px) translateX(5px);
+                    }
+                }
+                
+                @keyframes float-in {
+                    0% {
+                        opacity: 0;
+                        transform: translateY(30px) scale(0.9);
+                    }
+                    100% {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+                
+                @keyframes text-shimmer {
+                    0%, 100% {
+                        opacity: 1;
+                        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                    }
+                    50% {
+                        opacity: 0.8;
+                        text-shadow: 0 2px 20px rgba(255, 255, 255, 0.5);
+                    }
+                }
+                
+                @keyframes shimmer {
+                    0% {
+                        transform: translateX(-100%);
+                    }
+                    100% {
+                        transform: translateX(200%);
+                    }
+                }
+                
+                .modern-loading-container.fade-out {
                     opacity: 0;
+                    transform: scale(0.95);
                 }
             `;
             document.head.appendChild(style);
         }
 
-        // 创建加载文本
-        const loadingText = document.createElement('div');
-        loadingText.className = 'loading-text';
-        loadingText.textContent = '正在加载...';
-        loadingText.style.marginTop = '20px';
-        loadingText.style.color = '#333';
-        loadingText.style.fontFamily = 'Arial, sans-serif';
-        loadingText.style.fontSize = '16px';
-        loadingText.style.fontWeight = 'bold';
-        loadingText.style.position = 'relative';
-        loadingText.style.zIndex = '3';
-
-        // 创建进度条
-        const progressContainer = document.createElement('div');
-        progressContainer.className = 'progress-container';
-        progressContainer.style.width = '150px';
-        progressContainer.style.height = '8px';
-        progressContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
-        progressContainer.style.borderRadius = '4px';
-        progressContainer.style.marginTop = '15px';
-        progressContainer.style.overflow = 'hidden';
-        progressContainer.style.position = 'relative';
-        progressContainer.style.zIndex = '3';
-        progressContainer.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
-
-        const progressBar = document.createElement('div');
-        progressBar.className = 'progress-bar';
-        progressBar.style.height = '100%';
-        progressBar.style.width = '0%';
-        progressBar.style.backgroundColor = '#E8C285';
-        progressBar.style.borderRadius = '4px';
-        progressBar.style.transition = 'width 0.3s ease';
-
-        progressContainer.appendChild(progressBar);
-
-        // 创建小鸟动画
-        const bird = document.createElement('div');
-        bird.className = 'cartoon-bird';
-        bird.style.position = 'absolute';
-        bird.style.zIndex = '4';
-        bird.style.width = '30px';
-        bird.style.height = '20px';
-        bird.style.top = '30px';
-        bird.style.left = '-50px';
-        bird.style.animation = 'fly-bird 15s linear infinite';
-
-        // 鸟身体
-        const birdBody = document.createElement('div');
-        birdBody.style.position = 'absolute';
-        birdBody.style.width = '20px';
-        birdBody.style.height = '15px';
-        birdBody.style.backgroundColor = '#4FC3F7';
-        birdBody.style.borderRadius = '50% 50% 50% 50%';
-
-        // 鸟翅膀
-        const birdWing = document.createElement('div');
-        birdWing.style.position = 'absolute';
-        birdWing.style.width = '15px';
-        birdWing.style.height = '10px';
-        birdWing.style.backgroundColor = '#29B6F6';
-        birdWing.style.borderRadius = '50% 50% 0 50%';
-        birdWing.style.top = '-5px';
-        birdWing.style.left = '5px';
-        birdWing.style.transformOrigin = 'bottom left';
-        birdWing.style.animation = 'flap-wing 0.5s ease-in-out infinite alternate';
-
-        // 鸟头
-        const birdHead = document.createElement('div');
-        birdHead.style.position = 'absolute';
-        birdHead.style.width = '12px';
-        birdHead.style.height = '12px';
-        birdHead.style.backgroundColor = '#4FC3F7';
-        birdHead.style.borderRadius = '50%';
-        birdHead.style.left = '18px';
-        birdHead.style.top = '-2px';
-
-        // 鸟嘴
-        const birdBeak = document.createElement('div');
-        birdBeak.style.position = 'absolute';
-        birdBeak.style.width = '8px';
-        birdBeak.style.height = '5px';
-        birdBeak.style.backgroundColor = '#FF9800';
-        birdBeak.style.borderRadius = '50% 50% 50% 50%';
-        birdBeak.style.left = '28px';
-        birdBeak.style.top = '2px';
-
-        // 组装小鸟
-        bird.appendChild(birdBody);
-        bird.appendChild(birdWing);
-        bird.appendChild(birdHead);
-        bird.appendChild(birdBeak);
-
         // 组装所有元素
-        cartoonContainer.appendChild(cloudBackground);
-        cartoonContainer.appendChild(dogContainer);
-        cartoonContainer.appendChild(loadingText);
-        cartoonContainer.appendChild(progressContainer);
-        cartoonContainer.appendChild(bird);
-
-        loadingContainer.appendChild(cartoonContainer);
+        loadingContainer.appendChild(particlesContainer);
+        loadingContainer.appendChild(glassContainer);
         document.getElementById('content').appendChild(loadingContainer);
 
         // 模拟进度更新
@@ -404,17 +309,19 @@ const animationLoading = (function(){
             progress += Math.random() * 10;
             if (progress > 100) progress = 100;
             progressBar.style.width = `${progress}%`;
+            percentText.textContent = `${Math.floor(progress)}%`;
 
             if (progress === 100) {
                 clearInterval(progressInterval);
             }
-        }, 300);
+        }, 0);
 
         // 确保在加载完成时进度条达到100%
         loadingContainer.setProgress = (value) => {
             if (value === 100) {
                 clearInterval(progressInterval);
                 progressBar.style.width = '100%';
+                percentText.textContent = '100%';
             }
         };
 
@@ -422,6 +329,7 @@ const animationLoading = (function(){
         loadingContainer.cleanup = () => {
             clearInterval(progressInterval);
             progressBar.style.width = '100%';
+            percentText.textContent = '100%';
         };
 
         return loadingContainer;
