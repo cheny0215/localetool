@@ -693,11 +693,12 @@
         .version-toggle-btn {
             display: ${showTopButton ? 'block' : 'none'};
             margin: 1rem auto;
-            width: 6rem;
+            width: 8rem;
             border-radius: 6rem;
             text-align: center;
             padding: 12px 24px;
-            color: #0071e3;
+            color: #fff;
+            background-color: #0071e3;
             cursor: pointer;
             font-weight: bold;
             font-size: 0.9em;
@@ -713,11 +714,11 @@
         
         /* 按钮文字切换 */
         .version-toggle-btn::before {
-            content: "显示版本信息";
+            content: "Show DM versions";
         }
         
         #toggleVersionInfo:checked ~ .version-toggle-btn::before {
-            content: "隐藏版本信息";
+            content: "Hide DM versions";
         }
         
         /* 默认隐藏版本信息样式 */
@@ -734,8 +735,6 @@
             position: relative;
             border: 2px dashed red !important;
             box-sizing: border-box;
-            margin-left: -2px;
-            margin-right: -2px;
         }
         
         #toggleVersionInfo:checked ~ * .isv::after {
@@ -795,11 +794,12 @@
         .alt-toggle-btn {
             display: ${showTopButton ? 'block' : 'none'};
             margin: 1rem auto;
-            width: 6rem;
+            width: 8rem;
             border-radius: 6rem;
             text-align: center;
             padding: 12px 24px;
-            color: #0071e3;
+            color: #fff;
+            background-color: #0071e3;
             cursor: pointer;
             font-weight: bold;
             font-size: 0.9em;
@@ -815,11 +815,11 @@
         
         /* 按钮文字切换 */
         .alt-toggle-btn::before {
-            content: "显示图片Alt";
+            content: "Show image ALTs";
         }
         
         #toggleAltText:checked ~ .alt-toggle-btn::before {
-            content: "隐藏图片Alt";
+            content: "Hide image ALTs";
         }
         
         /* Alt文本显示元素样式 - 默认隐藏 */
