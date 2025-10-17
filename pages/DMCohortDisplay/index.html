@@ -78,6 +78,10 @@
         #cohortVarInput {
         color:cornflowerblue;
         }
+        input[type="checkbox"]:checked {
+            accent-color: #16baaa;
+            color:azure;
+        }
     </style>
 </head>
 
@@ -107,6 +111,19 @@
             <div style="margin-top: 12px;">
                 <label for="cohortVarInput" style="color: #16baaa;">版本变量名(默认：$cohort)：</label>
                 <input id="cohortVarInput" type="text" value="$cohort" style="width: 120px; border: 1px solid #ccc; border-radius: 4px; padding: 2px 6px;">
+            </div>
+
+            <div style="margin-top: 12px;">
+                <label style="color: #16baaa; cursor: pointer;">
+                    <input type="checkbox" id="showVersionInfoCheckbox" style="cursor: pointer;vertical-align: text-top;" checked>
+                    显示版本信息样式
+                </label>
+            </div>
+            <div style="margin-top: 12px;">
+                <label style="color: #16baaa; cursor: pointer;">
+                    <input type="checkbox" id="showAltCheckbox" style="cursor: pointer;vertical-align: text-top;" checked>
+                    显示图片Alt文本
+                </label>
             </div>
             <hr>
             <div class="layui-btn-container">
@@ -141,6 +158,8 @@
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
             // Checkbox element
+            const showAltCheckbox = document.getElementById('showAltCheckbox');
+            const showVersionInfoCheckbox = document.getElementById('showVersionInfoCheckbox');
 
             const submitButton = document.getElementById('submitButton');
             const outputButton = document.getElementById('outputButton');
@@ -211,43 +230,10 @@
 
                 // 判断是否已存在 style 标签
                 if (!iframehtml.includes('<style name="dmc-cohort-display">')) {
-                    // 在<!--[if gte mso 9]>前面添加style样式
+                    // 在<!--[if gte mso 9]>前面添加style样式（基础样式，具体显示由toggle控制）
                     const styleToAdd = `<style name="dmc-cohort-display">
         table {
                 border-collapse: collapse !important;
-            }
-
-      .isv {
-				position: relative;
-				border: 2px dashed red;
-				box-sizing: border-box;
-				margin-left: -2px;
-				margin-right: -2px;
-			}
-			
-			.isv::after {
-				content: attr(version-label);
-				position: absolute;
-				bottom: 0px;
-				right: 0px;
-				transform: translate(0, 0);
-				height: 16px;
-                padding:0 16px;
-				background: #ff6b6b;
-				color: white;
-				font-size: 12px;
-				font-weight: bold;
-                border-radius: 18px;
-				
-				display: flex;
-				align-items: center;
-				justify-content: center;
-                z-index: 9999;
-				transition: opacity 0.3s ease 0.3s;
-                cursor: pointer;
-			}
-                .isv:hover::after{
-                opacity:0;
             }
     </style>\n`
                     ;
@@ -294,10 +280,33 @@
                 const html_doc_promise = await new Promise((resolve) => {
                     setTimeout(() => {
                         console.log('iframe加载完成');
-                    //    执行代码>>>>>>>>>>>>>>>>>
-                        addVersionInfo()
-                        addVersionInfo_sosumi()
-                        addVersionInfo_custom()
+                        // 执行代码>>>>>>>>>>>>>>>>>
+                        // 是否添加版本信息样式代码
+                        if (showVersionInfoCheckbox.checked) {
+                            addVersionInfo()
+                            addVersionInfo_sosumi()
+                            addVersionInfo_custom()
+                        }
+                        
+                        let iframeHtml = iframeDoc.documentElement.outerHTML;
+
+                        if (showVersionInfoCheckbox.checked) {
+                            iframeHtml = addVersionInfoToggle(iframeHtml);
+                            // 重新写入iframe
+                            iframeDoc.open();
+                            iframeDoc.write(iframeHtml);
+                            iframeDoc.close();
+                        }
+
+                        if (showAltCheckbox.checked) {
+                            iframeHtml = iframeDoc.documentElement.outerHTML; // 重新获取
+                            iframeHtml = addAltTextDisplay(iframeHtml);
+                            // 重新写入iframe
+                            iframeDoc.open();
+                            iframeDoc.write(iframeHtml);
+                            iframeDoc.close();
+                        }
+                        
                         // showMessage({ msg: '版本信息添加完成！', type: 'success' })
                         LoadingModule.hide()
                         resolve(html_doc)
@@ -322,6 +331,7 @@
                 // 去除占位符
                 let iframeOutHtml = iframeDoc.documentElement.outerHTML
                 iframeOutHtml = delPlaceholder(iframeOutHtml)
+                
                 // 恢复<!DOCTYPE前面的内容
                 dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
@@ -630,6 +640,212 @@
                 handleOutput();
                 
                 console.log("标题和段落中的所有动态代码处理完成");
+            }
+
+            // 添加版本信息显示/隐藏按钮功能
+            function addVersionInfoToggle(htmlContent) {
+                // 1. 添加CSS样式和checkbox hack控制器
+                const versionToggleStyles = `
+    <style name="dmc-version-toggle">
+        /* 隐藏checkbox */
+        #toggleVersionInfo {
+            display: none;
+        }
+        
+        /* 切换按钮样式 */
+        .version-toggle-btn {
+            display: block;
+            margin: 1rem auto;
+            width: 6rem;
+            border-radius: 6rem;
+            text-align: center;
+            padding: 12px 24px;
+            color: #0071e3;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .version-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* 按钮文字切换 */
+        .version-toggle-btn::before {
+            content: "显示版本信息";
+        }
+        
+        #toggleVersionInfo:checked ~ .version-toggle-btn::before {
+            content: "隐藏版本信息";
+        }
+        
+        /* 默认隐藏版本信息样式 */
+        .isv {
+            border: none !important;
+        }
+        
+        .isv::after {
+            display: none !important;
+        }
+        
+        /* 当checkbox被选中时显示版本信息样式 */
+        #toggleVersionInfo:checked ~ * .isv {
+            position: relative;
+            border: 2px dashed red !important;
+            box-sizing: border-box;
+            margin-left: -2px;
+            margin-right: -2px;
+        }
+        
+        #toggleVersionInfo:checked ~ * .isv::after {
+            content: attr(version-label);
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            transform: translate(0, 0);
+            height: 16px;
+            padding: 0 16px;
+            background: #ff6b6b;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 18px;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease 0.3s;
+            cursor: pointer;
+        }
+        
+        #toggleVersionInfo:checked ~ * .isv:hover::after {
+            opacity: 0;
+        }
+    </style>`;
+                
+                // 2. 在<head>标签中插入样式
+                htmlContent = htmlContent.replace('</head>', versionToggleStyles + '\n</head>');
+                
+                // 3. 在<body>标签后立即添加checkbox和切换按钮
+                const toggleControl = `
+    <input type="checkbox" id="toggleVersionInfo" checked>
+    <label for="toggleVersionInfo" class="version-toggle-btn"></label>
+`;
+                htmlContent = htmlContent.replace(/<body([^>]*)>/, `<body$1>\n${toggleControl}`);
+                
+                console.log("版本信息显示/隐藏按钮已添加");
+                return htmlContent;
+            }
+
+            // 添加Alt文本显示功能
+            function addAltTextDisplay(htmlContent) {
+                // 1. 添加CSS样式和checkbox hack控制器
+                const altDisplayStyles = `
+    <style name="dmc-alt-display">
+        /* 隐藏checkbox */
+        #toggleAltText {
+            display: none;
+        }
+        
+        /* 切换按钮样式 */
+        .alt-toggle-btn {
+            display: block;
+            margin: 1rem auto;
+            width: 6rem;
+            border-radius: 6rem;
+            text-align: center;
+            padding: 12px 24px;
+            color: #0071e3;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        
+        .alt-toggle-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        /* 按钮文字切换 */
+        .alt-toggle-btn::before {
+            content: "显示图片Alt";
+        }
+        
+        #toggleAltText:checked ~ .alt-toggle-btn::before {
+            content: "隐藏图片Alt";
+        }
+        
+        /* Alt文本显示元素样式 - 默认隐藏 */
+        .img-alt-text {
+            display: none;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background-color: #ffdddd;
+           /* border-left: 4px solid #667eea; */
+            border-radius: 4px;
+            color: red !important;
+            font-size: 13px;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        /* 当checkbox被选中时显示alt文本 */
+        #toggleAltText:checked ~ * .img-alt-text {
+            display: block !important;
+        }
+        
+        /* 图片容器样式 */
+        .img-with-alt {
+            display: block;
+            margin-bottom: 4px;
+        }
+    </style>`;
+                
+                // 2. 在<head>标签中插入样式
+                htmlContent = htmlContent.replace('</head>', altDisplayStyles + '\n</head>');
+                
+                // 3. 给所有有alt属性的img标签添加class并在后面插入alt文本显示元素
+                htmlContent = htmlContent.replace(/<img([^>]*?)alt="([^"]*)"([^>]*?)>/gi, (match, before, altText, after) => {
+                    // 检查是否已经处理过（避免重复处理）
+                    if (match.includes('img-with-alt')) {
+                        return match;
+                    }
+                    
+                    // 处理img标签，添加class
+                    let imgTag = match;
+                    if (before.includes('class="') || after.includes('class="')) {
+                        // 在现有class中添加img-with-alt
+                        imgTag = match.replace(/class="([^"]*)"/i, 'class="$1 img-with-alt"');
+                    } else {
+                        // 添加新的class属性
+                        imgTag = `<img${before}alt="${altText}"${after} class="img-with-alt">`;
+                    }
+                    
+                    // 在img标签后面添加显示alt文本的div
+                    const altTextDiv = `<div class="img-alt-text">${altText}</div>`;
+                    
+                    return imgTag + altTextDiv;
+                });
+                
+                // 4. 在<body>标签后立即添加checkbox和切换按钮
+                const toggleControl = `
+    <input type="checkbox" id="toggleAltText" checked>
+    <label for="toggleAltText" class="alt-toggle-btn"></label>
+`;
+                htmlContent = htmlContent.replace(/<body([^>]*)>/, `<body$1>\n${toggleControl}`);
+                
+                console.log("Alt文本显示功能已添加");
+                return htmlContent;
             }
         });
     </script>

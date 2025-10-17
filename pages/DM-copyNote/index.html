@@ -295,7 +295,7 @@
             formPanel.style.visibility = 'visible';
         }
         // 创建新项目
-        function createNewProject() {
+        function createNewProject() {            
             formPanel.style.visibility = 'visible';
             const projectId = 'project_' + Date.now();
             projects[projectId] = {
@@ -333,7 +333,7 @@
             <button class="delete-project" data-id="${id}">×</button>
         `;
                 // 分别添加点击事件
-                div.querySelector('span').onclick = () => loadProject(id);
+                div.onclick = () => loadProject(id);
                 div.querySelector('.delete-project').onclick = (e) => {
                     e.stopPropagation();
                     deleteProject(id);
