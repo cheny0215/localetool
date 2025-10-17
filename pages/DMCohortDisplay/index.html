@@ -125,6 +125,12 @@
                     显示图片Alt文本
                 </label>
             </div>
+            <div style="margin-top: 12px;">
+                <label style="color: #16baaa; cursor: pointer;">
+                    <input type="checkbox" id="showTopToggleButtonCheckbox" style="cursor: pointer;vertical-align: text-top;" checked>
+                    显示邮件顶部切换按钮
+                </label>
+            </div>
             <hr>
             <div class="layui-btn-container">
                 <button id="submitButton"
@@ -160,7 +166,7 @@
             // Checkbox element
             const showAltCheckbox = document.getElementById('showAltCheckbox');
             const showVersionInfoCheckbox = document.getElementById('showVersionInfoCheckbox');
-
+            const showTopToggleButtonCheckbox = document.getElementById('showTopToggleButtonCheckbox');
             const submitButton = document.getElementById('submitButton');
             const outputButton = document.getElementById('outputButton');
             const copyButton = document.getElementById('copyButton');
@@ -189,6 +195,34 @@
             cohortVarInput.addEventListener('input', function () {
                 cohortVarName = cohortVarInput.value.trim() || '$cohort';
             });
+
+            // 联动逻辑：当显示版本信息样式和显示图片Alt文本都不勾选时，禁用并取消勾选显示邮件顶部切换按钮
+            function updateTopToggleButtonState() {
+                const versionInfoChecked = showVersionInfoCheckbox.checked;
+                const altTextChecked = showAltCheckbox.checked;
+                
+                if (!versionInfoChecked && !altTextChecked) {
+                    // 两个都不勾选时，禁用并取消勾选顶部切换按钮
+                    showTopToggleButtonCheckbox.checked = false;
+                    showTopToggleButtonCheckbox.disabled = true;
+                    showTopToggleButtonCheckbox.style.cursor = 'not-allowed';
+                    showTopToggleButtonCheckbox.style.opacity = '0.5';
+                    showTopToggleButtonCheckbox.parentElement.style.color = '#ccc';
+                } else {
+                    // 至少有一个勾选时，启用顶部切换按钮
+                    showTopToggleButtonCheckbox.disabled = false;
+                    showTopToggleButtonCheckbox.style.cursor = 'pointer';
+                    showTopToggleButtonCheckbox.style.opacity = '1';
+                    showTopToggleButtonCheckbox.parentElement.style.color = '#16baaa';
+                }
+            }
+            
+            // 监听两个复选框的变化
+            showVersionInfoCheckbox.addEventListener('change', updateTopToggleButtonState);
+            showAltCheckbox.addEventListener('change', updateTopToggleButtonState);
+            
+            // 页面加载时执行一次检查
+            updateTopToggleButtonState();
 
             // 工具函数：生成变量名相关的正则
             function getCohortValueRegex() {
@@ -644,6 +678,9 @@
 
             // 添加版本信息显示/隐藏按钮功能
             function addVersionInfoToggle(htmlContent) {
+                // 检查是否显示顶部切换按钮
+                const showTopButton = showTopToggleButtonCheckbox.checked;
+                
                 // 1. 添加CSS样式和checkbox hack控制器
                 const versionToggleStyles = `
     <style name="dmc-version-toggle">
@@ -654,7 +691,7 @@
         
         /* 切换按钮样式 */
         .version-toggle-btn {
-            display: block;
+            display: ${showTopButton ? 'block' : 'none'};
             margin: 1rem auto;
             width: 6rem;
             border-radius: 6rem;
@@ -663,7 +700,7 @@
             color: #0071e3;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 0.9em;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
             user-select: none;
@@ -743,6 +780,9 @@
 
             // 添加Alt文本显示功能
             function addAltTextDisplay(htmlContent) {
+                // 检查是否显示顶部切换按钮
+                const showTopButton = showTopToggleButtonCheckbox.checked;
+                
                 // 1. 添加CSS样式和checkbox hack控制器
                 const altDisplayStyles = `
     <style name="dmc-alt-display">
@@ -753,7 +793,7 @@
         
         /* 切换按钮样式 */
         .alt-toggle-btn {
-            display: block;
+            display: ${showTopButton ? 'block' : 'none'};
             margin: 1rem auto;
             width: 6rem;
             border-radius: 6rem;
@@ -762,7 +802,7 @@
             color: #0071e3;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 0.9em;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
             transition: all 0.3s ease;
             user-select: none;
