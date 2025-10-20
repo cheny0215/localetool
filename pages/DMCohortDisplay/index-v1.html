@@ -496,8 +496,8 @@
                             const modifiedTrContent = trContent.replace(firstTdRegex, `<td ${tdAttrs}>`);
                             const modifiedElementContent = elementContent.replace(trRegex, `<tr ${trMatch[1]}>${modifiedTrContent}</tr>`);
                             
-                            // 返回修改后的内容，删除动态代码注释
-                            return modifiedElementContent;
+                            // 返回修改后的内容，保留动态代码注释
+                            return `<!-- <dmc-dynamic>#if ( ${cohortCondition} ) </dmc-dynamic> -->${modifiedElementContent}<!-- <dmc-dynamic>#end</dmc-dynamic> -->`;
                         }
                     }
                     
@@ -529,19 +529,19 @@
                         // 替换开始标签，保留其余部分
                         const modifiedElementContent = elementContent.replace(elementRegex, `<${tagName} ${attributes}>`);
                         
-                        // 返回修改后的内容，删除动态代码注释
-                        return modifiedElementContent;
+                        // 返回修改后的内容，保留动态代码注释
+                        return `<!-- <dmc-dynamic>#if ( ${cohortCondition} ) </dmc-dynamic> -->${modifiedElementContent}<!-- <dmc-dynamic>#end</dmc-dynamic> -->`;
                     }
                     
-                    // 如果没有找到匹配的元素标签，直接返回元素内容
-                    return elementContent;
+                    // 如果没有找到匹配的元素标签，直接返回原内容
+                    return match;
                 });
                 
                 // 更新html_doc并重新渲染
                 html_doc = htmlContent;
                 handleOutput();
                 
-                console.log("版本信息添加完成，动态代码已删除");
+                console.log("版本信息添加完成，动态代码注释已保留");
             }
 
             function addVersionInfo_sosumi() {
@@ -595,17 +595,15 @@
                     if (!pOpen.includes('version-label="')) {
                         pOpen = pOpen.replace(/<p\s+/, `<p version-label="${versionLabel}" `);
                     }
-                    // 返回修改后的标签
-                    // return pOpen + ifCondition + content + endTag + pClose;
-                    // 返回修改后的标签，删除动态代码（#if到#end），只保留内容部分
-                    return pOpen + content.trim() + pClose;
+                    // 返回修改后的标签，保留动态代码
+                    return pOpen + ifCondition + content + endTag + pClose;
                 });
                 
                 // 更新html_doc并重新渲染
                 html_doc = htmlContent;
                 handleOutput();
                 
-                console.log("sosumi版本信息添加完成，动态代码已删除");
+                console.log("sosumi版本信息添加完成，动态代码已保留");
             }
 
             function addVersionInfo_custom() {
@@ -633,7 +631,7 @@
                     function processContent(text) {
                         // 匹配动态代码的正则表达式 - 修改为处理连续的动态代码块
                         // 格式: #if( $cohort == "x" )内容#end 可能紧跟着 #if( $cohort == "y" )内容#end
-                        const dynamicCodeRegex = /#if\s*\(\s*(\$cohort\s*==\s*"[^"]+")[\s\S]*?\)([\s\S]*?)#end/g;
+                        const dynamicCodeRegex = /#if\s*\([\s\S]*?\)([\s\S]*?)#end/g;
                         
                         let result = text;
                         let matches = [];
@@ -643,8 +641,8 @@
                         while ((match = dynamicCodeRegex.exec(text)) !== null) {
                             matches.push({
                                 fullMatch: match[0],
-                                cohortCondition: match[1],
-                                dynamicContent: match[2],
+                                fullCondition: match[0].match(/#if\s*\(([\s\S]*?)\)/)[1], // 完整的条件表达式
+                                dynamicContent: match[1],
                                 index: match.index,
                                 length: match[0].length
                             });
@@ -654,15 +652,15 @@
                         for (let i = matches.length - 1; i >= 0; i--) {
                             const m = matches[i];
                             
-                            // 提取cohort值
-                            const cohortMatch = m.cohortCondition.match(/\$cohort\s*==\s*"([^"]+)"/);
+                            // 提取cohort值（只取第一个用于version-label）
+                            const cohortMatch = m.fullCondition.match(/\$cohort\s*==\s*"([^"]+)"/);
                             if (!cohortMatch) continue;
                             
                             const cohortValue = cohortMatch[1];
                             if (cohortValue === "all") continue;
                             
-                            // 创建包裹内容的span标签
-                            const wrappedContent = `<span class="isv" style="display: inline-block;" version-label="${cohortValue}">${m.dynamicContent}</span><br>`;
+                            // 创建包裹内容的span标签，保留动态代码
+                            const wrappedContent = `#if( ${m.fullCondition} )<span class="isv" style="display: inline-block;" version-label="${cohortValue}">${m.dynamicContent}</span>#end<br>`;
                             
                             // 替换动态代码
                             result = result.substring(0, m.index) + wrappedContent + result.substring(m.index + m.length);
@@ -682,7 +680,7 @@
                 html_doc = htmlContent;
                 handleOutput();
                 
-                console.log("标题和段落中的所有动态代码处理完成");
+                console.log("标题和段落中的版本信息添加完成，动态代码已保留");
             }
 
             // 添加版本信息显示/隐藏按钮功能
@@ -702,7 +700,7 @@
         .version-toggle-btn {
             display: ${showTopButton ? 'block' : 'none'};
             margin: 1rem auto;
-            width: 10rem;
+            width: 8rem;
             border-radius: 6rem;
             text-align: center;
             padding: 12px 24px;
@@ -803,7 +801,7 @@
         .alt-toggle-btn {
             display: ${showTopButton ? 'block' : 'none'};
             margin: 1rem auto;
-            width: 10rem;
+            width: 8rem;
             border-radius: 6rem;
             text-align: center;
             padding: 12px 24px;
