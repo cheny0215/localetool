@@ -147,19 +147,46 @@
 
         /* 生成结果面板 */
         .result-panel {
-            background: var(--card-background);
+            background: transparent;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
+            padding: 0.5rem;
             overflow-y: auto;
         }
 
+        .result-section {
+            margin-bottom: 1.25rem;
+            background: var(--card-background);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .result-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 0.75rem 1rem;
+            background: linear-gradient(to right, #f0f9ff, #ffffff);
+            border-bottom: 2px solid var(--primary-color);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
         .result-item {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
+            transition: background 0.2s ease;
+        }
+
+        .result-item:hover {
+            background: #fafbfc;
         }
 
         .result-item:last-child {
@@ -168,30 +195,46 @@
 
         .result-content {
             flex: 1;
+            padding-right: 0.75rem;
         }
 
         .result-label {
-            font-size: 0.9rem;
-            color: var(--note-color);
-            margin-bottom: 0.25rem;
-            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
         .result-value {
             font-size: 0.875rem;
             color: var(--text-primary);
             word-break: break-all;
+            line-height: 1.5;
         }
 
         .copy-btn {
-            padding: 0.25rem 0.75rem;
+            padding: 0.4rem 0.875rem;
             background: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 0.75rem;
-            margin-left: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
         }
 
         /* 滚动条样式 */
@@ -434,29 +477,87 @@
 
             // 处理语言显示
             const languages = Array.isArray(project.language) ? project.language.join('&') : project.language;
-
-            const names = {
-                '《SVN提交》svn提交信息': `Update ${project.projectName} code By ${project.developer}`,
-                '《IC平台》项目ic预览平台地址' : `https://${project.icServer}.preview.apple.com/hk/dm/?id=${project.uuid.substring(0, 8)}`,
-                '《IC平台》项目ic预览平台img的src' : `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${project.uuid}/i`,
-                '《ISV》radar回复信息': `Hi XXXX,\n\nUpdated your feedback, please help to review. Thanks.\n\nBest,\n${project.developer}`,
-                '《跑图&SVN提交》图片merge到trunk提交信息': `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}`,
-                '《跑图》radar回复信息': `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}`,
-                '《跑图》Merge List 文件名': `Merge List_${project.projectName}_${languages}_r${project.revision}.txt`,
-                '《跑图》Contact Sheet 文件名': `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html`,
+            
+            // 语言代码映射
+            const languageMap = {
+                'HKEN': '/hk/en',
+                'HKTC': '/hk',
+                'MOTC': '/mo',
+                'TWTC': '/tw',
+                'CNSC': '.cn'
             };
 
-            Object.entries(names).forEach(([label, value]) => {
-                const div = document.createElement('div');
-                div.className = 'result-item';
-                div.innerHTML = `
-                    <div class="result-content">
-                        <div class="result-label">${label}</div>
-                        <div class="result-value">${value.replace(/\n/g, '<br>')}</div>
-                    </div>
-                    <button class="copy-btn" onclick="copyText('${value.replace(/\n/g, '\\n')}', this)">复制</button>
-                `;
-                results.appendChild(div);
+            // 生成浏览器使用的items
+            const browserItems = [];
+            if (Array.isArray(project.language) && project.language.length > 0) {
+                project.language.forEach(lang => {
+                    const langCode = languageMap[lang];
+                    browserItems.push({
+                        label: `${lang} 项目ic预览平台地址`,
+                        value: `https://${project.icServer}.preview.apple.com${langCode}/dm/?id=${project.uuid.substring(0, 8)}`
+                    });
+                });
+            } 
+
+            // 按使用场景分组的数据结构
+            const sections = [
+                {
+                    title: 'SVN 提交使用',
+                    items: [
+                        { label: 'svn提交信息', value: `Update ${project.projectName} code By ${project.developer}` },
+                        { label: '图片merge到trunk提交信息', value: `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}` }
+                    ]
+                },
+                {
+                    title: '浏览器使用',
+                    items: browserItems
+                },
+                {
+                    title: 'mcfly 使用',
+                    items: [
+                        { label: '项目ic预览平台img的src', value: `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${project.uuid}/i` }
+                    ]
+                },
+                {
+                    title: 'radar 使用',
+                    items: [
+                        { label: 'ISV radar回复信息', value: `Hi XXXX,\n\nUpdated your feedback, please help to review. Thanks.\n\nBest,\n${project.developer}` },
+                        { label: '跑图radar回复信息', value: `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}` }
+                    ]
+                },
+                {
+                    title: '跑图文件命名',
+                    items: [
+                        { label: 'Merge List 文件名', value: `Merge List_${project.projectName}_${languages}_r${project.revision}.txt` },
+                        { label: 'Contact Sheet 文件名', value: `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html` }
+                    ]
+                }
+            ];
+
+            // 渲染分组结果
+            sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'result-section';
+                
+                const titleDiv = document.createElement('div');
+                titleDiv.className = 'section-title';
+                titleDiv.textContent = section.title;
+                sectionDiv.appendChild(titleDiv);
+
+                section.items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'result-item';
+                    div.innerHTML = `
+                        <div class="result-content">
+                            <div class="result-label">${item.label}</div>
+                            <div class="result-value">${item.value.replace(/\n/g, '<br>')}</div>
+                        </div>
+                        <button class="copy-btn" onclick="copyText('${item.value.replace(/\n/g, '\\n')}', this)">复制</button>
+                    `;
+                    sectionDiv.appendChild(div);
+                });
+
+                results.appendChild(sectionDiv);
             });
         }
 

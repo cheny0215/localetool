@@ -229,10 +229,6 @@
                 // 匹配 变量名 == "xxx"
                 return new RegExp(cohortVarName.replace(/\$/g, '\\$') + '\\s*==\\s*"([^"]+)"', 'g');
             }
-            function getIfConditionRegex() {
-                // 匹配 #if ( $cohort == "x" || $cohort == "y" ... )
-                return new RegExp('#if\\s*\\(\\s*((?:' + cohortVarName.replace(/\$/g, '\\$') + '\\s*==\\s*"[^"]+"\\s*(?:\\|\\|\\s*)?)+).*?\\)', 'g');
-            }
 
             // input事件
             dataInput.addEventListener('input', function () {
