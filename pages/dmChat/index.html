@@ -743,7 +743,7 @@
             await loadMessages();
             subscribeToMessages();
             setupPresence();
-            await sendSystemMessage(`${currentUser.username} 加入了聊天室`);
+            // await sendSystemMessage(`${currentUser.username} 加入了聊天室`);
         }
 
         // ========== 加载历史消息 ==========
@@ -842,7 +842,7 @@
                 });
         }
 
-        // ========== 发送消息（带超时控制）==========
+        // ========== 发送消息 ==========
         async function sendMessage() {
             // 防止重复发送
             if (isSending) {
@@ -868,54 +868,30 @@
             isSending = true;
             sendBtn.disabled = true;
             sendBtn.textContent = '发送中...';
-            
-            console.log('开始发送消息:', content);
 
             try {
-                // 使用 Promise.race 实现超时控制
-                const insertPromise = supabase
+                // 直接发送，不等待返回
+                const { error } = await supabase
                     .from('messages')
                     .insert({
                         user_id: currentUser.id,
                         username: currentUser.username,
                         content: content,
                         type: 'chat'
-                    })
-                    .select();
-
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('TIMEOUT')), 5000); // 5秒超时
-                });
-
-                const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
+                    });
 
                 if (error) {
-                    console.error('Supabase 返回错误:', error);
                     throw error;
                 }
 
-                console.log('消息发送成功:', data);
                 // 发送成功，清空输入框
                 input.value = '';
                 
             } catch (error) {
-                console.error('发送消息失败:', error);
-                
-                // 显示具体错误信息
-                if (error.message === 'TIMEOUT') {
-                    showError('发送超时，请检查网络连接');
-                } else if (error.message && error.message.includes('JWT')) {
-                    showError('登录已过期，请重新登录');
-                    setTimeout(() => handleLogout(), 2000);
-                } else if (error.message && error.message.includes('network')) {
-                    showError('网络连接失败，请检查网络');
-                } else {
-                    showError('发送失败: ' + (error.message || '未知错误'));
-                }
-                
+                console.error('发送失败:', error);
+                showError('发送失败，请重试');
             } finally {
-                // 恢复发送状态
-                console.log('重置发送状态');
+                // 立即恢复发送状态
                 isSending = false;
                 sendBtn.disabled = false;
                 sendBtn.textContent = '发送';
