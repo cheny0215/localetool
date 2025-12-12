@@ -444,20 +444,44 @@
     <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- 配置文件 -->
-    <script src="config.js"></script>
+    <!-- 配置文件（可选） -->
+    <script src="config.js" onerror="console.log('config.js not found, will try other methods')"></script>
     
     <script>
         // ========== Supabase 配置 ==========
-        if (!window.SUPABASE_CONFIG) {
-            alert('配置文件未找到！请确保 config.js 文件存在并正确配置。');
+        // 优先使用环境变量，其次使用 config.js 文件
+        function getSupabaseConfig() {
+            // 1. 尝试从环境变量获取（通过 meta 标签注入）
+            const urlMeta = document.querySelector('meta[name="supabase-url"]');
+            const keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
+            
+            if (urlMeta && keyMeta) {
+                return {
+                    url: urlMeta.content,
+                    anonKey: keyMeta.content
+                };
+            }
+            
+            // 2. 尝试从全局变量获取（环境变量方式）
+            if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
+                return {
+                    url: window.SUPABASE_URL,
+                    anonKey: window.SUPABASE_ANON_KEY
+                };
+            }
+            
+            // 3. 使用 config.js 文件
+            if (window.SUPABASE_CONFIG) {
+                return window.SUPABASE_CONFIG;
+            }
+            
+            // 4. 都没有则报错
+            alert('配置未找到！请设置环境变量或配置 config.js 文件。');
             throw new Error('Supabase configuration not found');
         }
         
-        const supabase = window.supabase.createClient(
-            window.SUPABASE_CONFIG.url,
-            window.SUPABASE_CONFIG.anonKey
-        );
+        const config = getSupabaseConfig();
+        const supabase = window.supabase.createClient(config.url, config.anonKey);
         
         // ========== 全局变量 ==========
         let currentUser = null;
