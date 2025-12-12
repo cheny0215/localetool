@@ -4,8 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="supabase-url" content="%SUPABASE_URL%">
-    <meta name="supabase-anon-key" content="%SUPABASE_ANON_KEY%">
     <title>聊天室 - Supabase Auth版</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
@@ -506,32 +504,13 @@
     <script>
         // ========== Supabase 配置 ==========
         function getSupabaseConfig() {
-            // 1. 使用 config.js 文件
+            // 只保留 config.js 方式
             if (window.SUPABASE_CONFIG) {
                 return window.SUPABASE_CONFIG;
             }
 
-            // 2. 尝试从全局变量获取（环境变量方式）
-            if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
-                return {
-                    url: window.SUPABASE_URL,
-                    anonKey: window.SUPABASE_ANON_KEY
-                };
-            }
-            // 3. 尝试从环境变量获取（通过 meta 标签注入）
-            const urlMeta = document.querySelector('meta[name="supabase-url"]');
-            const keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
-
-            if (urlMeta && keyMeta) {
-                return {
-                    url: urlMeta.content,
-                    anonKey: keyMeta.content
-                };
-            }
-
-
-            // 4. 都没有则报错
-            alert('配置未找到！请设置环境变量或配置 config.js 文件。');
+            // 没有配置就报错
+            alert('配置未找到！请配置 config.js 文件。');
             throw new Error('Supabase configuration not found');
         }
 
