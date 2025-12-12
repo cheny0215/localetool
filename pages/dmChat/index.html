@@ -855,9 +855,22 @@
             isSending = true;
             sendBtn.disabled = true;
             sendBtn.textContent = '发送中...';
+            
+            console.log('开始发送消息:', content);
+
+            // 添加超时保护
+            const timeoutId = setTimeout(() => {
+                if (isSending) {
+                    console.error('发送超时，强制重置状态');
+                    isSending = false;
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = '发送';
+                    showError('发送超时，请重试');
+                }
+            }, 10000); // 10秒超时
 
             try {
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('messages')
                     .insert({
                         user_id: currentUser.id,
@@ -866,14 +879,19 @@
                         type: 'chat'
                     });
 
+                clearTimeout(timeoutId);
+
                 if (error) {
+                    console.error('Supabase 返回错误:', error);
                     throw error;
                 }
 
+                console.log('消息发送成功:', data);
                 // 发送成功，清空输入框
                 input.value = '';
                 
             } catch (error) {
+                clearTimeout(timeoutId);
                 console.error('发送消息失败:', error);
                 
                 // 显示具体错误信息
@@ -888,6 +906,7 @@
                 
             } finally {
                 // 恢复发送状态
+                console.log('重置发送状态');
                 isSending = false;
                 sendBtn.disabled = false;
                 sendBtn.textContent = '发送';
