@@ -522,6 +522,7 @@
         let messageSubscription = null;
         let presenceChannel = null;
         let isLoginMode = true;
+        let isSending = false; // 防止重复发送
 
         // ========== 初始化 ==========
         async function init() {
@@ -750,7 +751,7 @@
             const { data, error } = await supabase
                 .from('messages')
                 .select('*')
-                .order('created_at', { ascending: true })
+                .order('created_at', { ascending: false })  // 降序：从新到旧
                 .limit(50);
 
             if (error) {
@@ -758,7 +759,8 @@
                 return;
             }
 
-            data.forEach(msg => displayMessage(msg));
+            // 反转数组，让最旧的消息在前面显示
+            data.reverse().forEach(msg => displayMessage(msg));
         }
 
         // ========== 订阅新消息 ==========
@@ -776,7 +778,28 @@
                         displayMessage(payload.new);
                     }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        console.log('消息订阅成功');
+                    } else if (status === 'CHANNEL_ERROR') {
+                        console.error('消息订阅失败');
+                        showError('连接失败，正在重试...');
+                        // 3秒后重试
+                        setTimeout(() => {
+                            if (currentUser) {
+                                subscribeToMessages();
+                            }
+                        }, 3000);
+                    } else if (status === 'TIMED_OUT') {
+                        console.error('消息订阅超时');
+                        showError('连接超时，正在重试...');
+                        setTimeout(() => {
+                            if (currentUser) {
+                                subscribeToMessages();
+                            }
+                        }, 3000);
+                    }
+                });
         }
 
         // ========== 设置在线状态 ==========
@@ -808,29 +831,67 @@
 
         // ========== 发送消息 ==========
         async function sendMessage() {
+            // 防止重复发送
+            if (isSending) {
+                console.log('消息正在发送中，请稍候...');
+                return;
+            }
+
             const input = document.getElementById('messageInput');
+            const sendBtn = document.querySelector('.input-area button');
             const content = input.value.trim();
 
             if (!content) {
                 return;
             }
 
-            const { error } = await supabase
-                .from('messages')
-                .insert({
-                    user_id: currentUser.id,
-                    username: currentUser.username,
-                    content: content,
-                    type: 'chat'
-                });
-
-            if (error) {
-                console.error('Failed to send message:', error);
-                showError('Failed to send message');
+            // 检查用户是否还在线
+            if (!currentUser) {
+                showError('用户未登录，请重新登录');
                 return;
             }
 
-            input.value = '';
+            // 设置发送状态
+            isSending = true;
+            sendBtn.disabled = true;
+            sendBtn.textContent = '发送中...';
+
+            try {
+                const { error } = await supabase
+                    .from('messages')
+                    .insert({
+                        user_id: currentUser.id,
+                        username: currentUser.username,
+                        content: content,
+                        type: 'chat'
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                // 发送成功，清空输入框
+                input.value = '';
+                
+            } catch (error) {
+                console.error('发送消息失败:', error);
+                
+                // 显示具体错误信息
+                if (error.message.includes('JWT')) {
+                    showError('登录已过期，请重新登录');
+                    setTimeout(() => handleLogout(), 2000);
+                } else if (error.message.includes('network')) {
+                    showError('网络连接失败，请检查网络');
+                } else {
+                    showError('发送失败: ' + (error.message || '未知错误'));
+                }
+                
+            } finally {
+                // 恢复发送状态
+                isSending = false;
+                sendBtn.disabled = false;
+                sendBtn.textContent = '发送';
+            }
         }
 
         // ========== 发送系统消息 ==========
