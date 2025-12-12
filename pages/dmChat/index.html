@@ -765,8 +765,18 @@
 
         // ========== 订阅新消息 ==========
         function subscribeToMessages() {
+            // 如果已有订阅，先清理
+            if (messageSubscription) {
+                supabase.removeChannel(messageSubscription);
+            }
+
             messageSubscription = supabase
-                .channel('messages')
+                .channel('messages', {
+                    config: {
+                        broadcast: { self: false },
+                        presence: { key: '' }
+                    }
+                })
                 .on(
                     'postgres_changes',
                     {
@@ -779,6 +789,7 @@
                     }
                 )
                 .subscribe((status) => {
+                    console.log('订阅状态:', status);
                     if (status === 'SUBSCRIBED') {
                         console.log('消息订阅成功');
                     } else if (status === 'CHANNEL_ERROR') {
@@ -798,6 +809,8 @@
                                 subscribeToMessages();
                             }
                         }, 3000);
+                    } else if (status === 'CLOSED') {
+                        console.warn('订阅已关闭');
                     }
                 });
         }
@@ -829,7 +842,7 @@
                 });
         }
 
-        // ========== 发送消息 ==========
+        // ========== 发送消息（带超时控制）==========
         async function sendMessage() {
             // 防止重复发送
             if (isSending) {
@@ -858,28 +871,23 @@
             
             console.log('开始发送消息:', content);
 
-            // 添加超时保护
-            const timeoutId = setTimeout(() => {
-                if (isSending) {
-                    console.error('发送超时，强制重置状态');
-                    isSending = false;
-                    sendBtn.disabled = false;
-                    sendBtn.textContent = '发送';
-                    showError('发送超时，请重试');
-                }
-            }, 10000); // 10秒超时
-
             try {
-                const { data, error } = await supabase
+                // 使用 Promise.race 实现超时控制
+                const insertPromise = supabase
                     .from('messages')
                     .insert({
                         user_id: currentUser.id,
                         username: currentUser.username,
                         content: content,
                         type: 'chat'
-                    });
+                    })
+                    .select();
 
-                clearTimeout(timeoutId);
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('TIMEOUT')), 5000); // 5秒超时
+                });
+
+                const { data, error } = await Promise.race([insertPromise, timeoutPromise]);
 
                 if (error) {
                     console.error('Supabase 返回错误:', error);
@@ -891,14 +899,15 @@
                 input.value = '';
                 
             } catch (error) {
-                clearTimeout(timeoutId);
                 console.error('发送消息失败:', error);
                 
                 // 显示具体错误信息
-                if (error.message.includes('JWT')) {
+                if (error.message === 'TIMEOUT') {
+                    showError('发送超时，请检查网络连接');
+                } else if (error.message && error.message.includes('JWT')) {
                     showError('登录已过期，请重新登录');
                     setTimeout(() => handleLogout(), 2000);
-                } else if (error.message.includes('network')) {
+                } else if (error.message && error.message.includes('network')) {
                     showError('网络连接失败，请检查网络');
                 } else {
                     showError('发送失败: ' + (error.message || '未知错误'));
