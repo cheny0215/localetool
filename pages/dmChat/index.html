@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="supabase-url" content="%SUPABASE_URL%">
-<meta name="supabase-anon-key" content="%SUPABASE_ANON_KEY%">
-    <title>Nexus 聊天室</title>
+    <meta name="supabase-anon-key" content="%SUPABASE_ANON_KEY%">
+    <title>聊天室 - Supabase Auth版</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
 
         * {
             margin: 0;
@@ -16,14 +17,13 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Nunito', sans-serif;
             background: linear-gradient(135deg, #e3f2fd 0%, #f0f4f8 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            color: #2c3e50;
         }
 
         .container {
@@ -33,7 +33,7 @@
             box-shadow: 0 8px 32px rgba(66, 153, 225, 0.15);
             max-width: 900px;
             width: 100%;
-            height: 600px;
+            height: 700px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -70,17 +70,6 @@
             box-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
         }
 
-        @keyframes pulse {
-            0%, 100% { 
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 0.7;
-                transform: scale(1.15);
-            }
-        }
-
         .user-info {
             display: flex;
             align-items: center;
@@ -92,47 +81,6 @@
         .user-name {
             font-weight: 500;
             color: #ffffff;
-        }
-
-        .logout-btn {
-            padding: 8px 16px;
-            font-size: 12px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            backdrop-filter: blur(10px);
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: none;
-        }
-
-        .online-users {
-            background: #e3f2fd;
-            padding: 12px 32px;
-            border-bottom: 1px solid rgba(100, 181, 246, 0.2);
-            font-size: 12px;
-            color: #1976d2;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .online-dot {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: #4caf50;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-            box-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
         }
 
         .messages {
@@ -152,6 +100,7 @@
                 opacity: 0;
                 transform: translateY(8px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -166,7 +115,7 @@
             display: inline-block;
             max-width: 65%;
             padding: 12px 16px;
-            border-radius: 16px;
+            border-radius: 12px;
             word-wrap: break-word;
             font-size: 14px;
             line-height: 1.5;
@@ -195,7 +144,7 @@
 
         .message-time {
             font-size: 10px;
-            opacity: 0.7;
+            opacity: 0.5;
             margin-top: 6px;
             font-weight: 400;
         }
@@ -272,12 +221,12 @@
 
         .auth-container {
             background: #ffffff;
-            border: 1px solid rgba(100, 181, 246, 0.3);
             padding: 48px;
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(66, 153, 225, 0.15);
             max-width: 420px;
             width: 100%;
+            border: 1px solid rgba(100, 181, 246, 0.3);
         }
 
         .auth-container h2 {
@@ -305,13 +254,13 @@
         .form-group input {
             width: 100%;
             padding: 14px 16px;
-            background: #f8fbff;
             border: 2px solid #e3f2fd;
             border-radius: 12px;
             font-size: 14px;
-            color: #2c3e50;
             outline: none;
             transition: all 0.2s ease;
+            background: #f8fbff;
+            color: #2c3e50;
             font-family: 'Inter', sans-serif;
         }
 
@@ -327,8 +276,8 @@
 
         .auth-buttons {
             display: flex;
-            gap: 12px;
-            margin-top: 28px;
+            gap: 10px;
+            margin-top: 25px;
         }
 
         .auth-buttons button {
@@ -344,6 +293,76 @@
             margin-bottom: 20px;
             font-size: 13px;
             text-align: center;
+        }
+
+        .success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .online-users {
+            background: #e3f2fd;
+            padding: 12px 32px;
+            border-bottom: 1px solid rgba(100, 181, 246, 0.2);
+            font-size: 12px;
+            color: #1976d2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .online-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.7;
+                transform: scale(1.15);
+            }
+        }
+
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #64b5f6;
+            font-size: 14px;
+        }
+
+        .auth-toggle a {
+            color: #1976d2;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-toggle a:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #64b5f6;
         }
 
         ::-webkit-scrollbar {
@@ -374,10 +393,6 @@
                 padding: 20px 24px;
             }
 
-            .header h1 {
-                font-size: 18px;
-            }
-
             .messages {
                 padding: 20px 24px;
             }
@@ -389,81 +404,113 @@
             .auth-container {
                 padding: 32px 24px;
             }
-
-            .message-bubble {
-                max-width: 80%;
-            }
         }
     </style>
 </head>
+
 <body>
-    <!-- 登录界面 -->
-    <div id="authContainer" class="auth-container">
-        <h2>Nexus 聊天室</h2>
+    <!-- 加载中 -->
+    <div id="loadingContainer" class="auth-container">
+        <div class="loading">正在加载...</div>
+    </div>
+
+    <!-- 登录/注册界面 -->
+    <div id="authContainer" class="auth-container" style="display: none;">
+        <h2>☁️ DM Nexus 聊天室</h2>
         <div id="errorMessage" class="error" style="display: none;"></div>
-        
-        <div class="form-group">
-            <label>用户名</label>
-            <input type="text" id="usernameInput" placeholder="输入你的用户名">
+        <div id="successMessage" class="success" style="display: none;"></div>
+
+        <!-- 登录表单 -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label>邮箱</label>
+                <input type="email" id="loginEmail" placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="loginPassword" placeholder="输入密码">
+            </div>
+
+            <div class="auth-buttons">
+                <button onclick="handleLogin()" id="loginBtn">登录</button>
+            </div>
+
+            <div class="auth-toggle">
+                还没有账号？<a onclick="toggleAuthMode()">立即注册</a>
+            </div>
         </div>
-        
-        <div class="auth-buttons">
-            <button onclick="login()">进入聊天室</button>
+
+        <!-- 注册表单 -->
+        <div id="registerForm" style="display: none;">
+            <div class="form-group">
+                <label>昵称</label>
+                <input type="text" id="registerUsername" placeholder="输入你的昵称">
+            </div>
+
+            <div class="form-group">
+                <label>邮箱</label>
+                <input type="email" id="registerEmail" placeholder="your@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>密码</label>
+                <input type="password" id="registerPassword" placeholder="至少6位密码">
+            </div>
+
+            <div class="form-group">
+                <label>确认密码</label>
+                <input type="password" id="registerPasswordConfirm" placeholder="再次输入密码">
+            </div>
+
+            <div class="auth-buttons">
+                <button onclick="handleRegister()" id="registerBtn">注册</button>
+            </div>
+
+            <div class="auth-toggle">
+                已有账号？<a onclick="toggleAuthMode()">立即登录</a>
+            </div>
         </div>
     </div>
 
     <!-- 聊天界面 -->
     <div id="chatContainer" class="container" style="display: none;">
         <div class="header">
-            <div class="header-left">
-                <div class="status-indicator"></div>
-                <h1>Nexus 聊天室</h1>
-            </div>
+            <h1>☁️ DM Nexus 聊天室</h1>
             <div class="user-info">
-                <span class="user-name" id="currentUser"></span>
-                <button onclick="logout()" class="logout-btn">退出</button>
+                <span id="currentUser"></span>
+                <button onclick="handleLogout()"
+                    style="margin-left: 15px; padding: 5px 15px; font-size: 12px;">退出</button>
             </div>
         </div>
-        
+
         <div class="online-users">
             <span class="online-dot"></span>
             <span id="onlineCount">0</span> 人在线
         </div>
-        
+
         <div id="messages" class="messages"></div>
-        
+
         <div class="input-area">
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="输入消息..." 
-                onkeypress="handleKeyPress(event)"
-            >
+            <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">发送</button>
         </div>
     </div>
 
     <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
+
     <!-- 配置文件（可选） -->
     <script src="config.js" onerror="console.log('config.js not found, will try other methods')"></script>
-    
+
     <script>
         // ========== Supabase 配置 ==========
-        // 优先使用环境变量，其次使用 config.js 文件
         function getSupabaseConfig() {
-            // 1. 尝试从环境变量获取（通过 meta 标签注入）
-            const urlMeta = document.querySelector('meta[name="supabase-url"]');
-            const keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
-            
-            if (urlMeta && keyMeta) {
-                return {
-                    url: urlMeta.content,
-                    anonKey: keyMeta.content
-                };
+            // 1. 使用 config.js 文件
+            if (window.SUPABASE_CONFIG) {
+                return window.SUPABASE_CONFIG;
             }
-            
+
             // 2. 尝试从全局变量获取（环境变量方式）
             if (window.SUPABASE_URL && window.SUPABASE_ANON_KEY) {
                 return {
@@ -471,108 +518,267 @@
                     anonKey: window.SUPABASE_ANON_KEY
                 };
             }
-            
-            // 3. 使用 config.js 文件
-            if (window.SUPABASE_CONFIG) {
-                return window.SUPABASE_CONFIG;
+            // 3. 尝试从环境变量获取（通过 meta 标签注入）
+            const urlMeta = document.querySelector('meta[name="supabase-url"]');
+            const keyMeta = document.querySelector('meta[name="supabase-anon-key"]');
+
+            if (urlMeta && keyMeta) {
+                return {
+                    url: urlMeta.content,
+                    anonKey: keyMeta.content
+                };
             }
-            
+
+
             // 4. 都没有则报错
             alert('配置未找到！请设置环境变量或配置 config.js 文件。');
             throw new Error('Supabase configuration not found');
         }
-        
+
         const config = getSupabaseConfig();
         const supabase = window.supabase.createClient(config.url, config.anonKey);
-        
+
         // ========== 全局变量 ==========
         let currentUser = null;
         let messageSubscription = null;
         let presenceChannel = null;
+        let isLoginMode = true;
 
-        // ========== 登录功能 ==========
-        async function login() {
-            const username = document.getElementById('usernameInput').value.trim();
-            
-            if (!username) {
-                showError('请输入用户名');
+        // ========== 初始化 ==========
+        async function init() {
+            // 检查是否已登录
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session) {
+                // 已登录，获取用户信息
+                await loadUserProfile(session.user);
+                showChatInterface();
+            } else {
+                // 未登录，显示登录界面
+                document.getElementById('loadingContainer').style.display = 'none';
+                document.getElementById('authContainer').style.display = 'block';
+            }
+
+            // 监听认证状态变化
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    await loadUserProfile(session.user);
+                    showChatInterface();
+                } else if (event === 'SIGNED_OUT') {
+                    showAuthInterface();
+                }
+            });
+        }
+
+        // ========== 用户注册 ==========
+        async function handleRegister() {
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            // 验证
+            if (!username || !email || !password) {
+                showError('请填写所有字段');
                 return;
             }
-            
+
             if (username.length < 2 || username.length > 20) {
-                showError('用户名长度应在 2-20 个字符之间');
+                showError('昵称长度应在2-20个字符之间');
                 return;
             }
-            
-            currentUser = {
-                id: generateUserId(),
-                username: username,
-                joinedAt: new Date().toISOString()
-            };
-            
-            // 保存到本地存储
-            localStorage.setItem('chatUser', JSON.stringify(currentUser));
-            
-            // 切换到聊天界面
+
+            if (password.length < 6) {
+                showError('密码至少需要6位');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showError('两次密码输入不一致');
+                return;
+            }
+
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.textContent = '注册中...';
+
+            try {
+                // 注册用户
+                const { data, error } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            username: username
+                        }
+                    }
+                });
+
+                if (error) throw error;
+
+                // 创建用户资料
+                if (data.user) {
+                    const { error: profileError } = await supabase
+                        .from('user_profiles')
+                        .insert({
+                            user_id: data.user.id,
+                            username: username,
+                            email: email
+                        });
+
+                    if (profileError) {
+                        console.error('创建用户资料失败:', profileError);
+                    }
+                }
+
+                showSuccess('注册成功！请检查邮箱验证链接（如果需要）');
+
+                // 如果不需要邮箱验证，直接登录
+                if (data.session) {
+                    setTimeout(() => {
+                        showChatInterface();
+                    }, 1500);
+                } else {
+                    setTimeout(() => {
+                        toggleAuthMode();
+                    }, 2000);
+                }
+
+            } catch (error) {
+                showError(error.message || '注册失败，请重试');
+            } finally {
+                registerBtn.disabled = false;
+                registerBtn.textContent = '注册';
+            }
+        }
+
+        // ========== 用户登录 ==========
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError('请输入邮箱和密码');
+                return;
+            }
+
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                // 登录成功会触发 onAuthStateChange
+
+            } catch (error) {
+                showError(error.message || '登录失败，请检查邮箱和密码');
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录';
+            }
+        }
+
+        // ========== 用户登出 ==========
+        async function handleLogout() {
+            if (!confirm('确定要退出聊天室吗？')) {
+                return;
+            }
+
+            // 发送离开消息
+            if (currentUser) {
+                await sendSystemMessage(`${currentUser.username} 离开了聊天室`);
+            }
+
+            // 清理订阅
+            if (messageSubscription) {
+                supabase.removeChannel(messageSubscription);
+            }
+            if (presenceChannel) {
+                supabase.removeChannel(presenceChannel);
+            }
+
+            // 登出
+            await supabase.auth.signOut();
+        }
+
+        // ========== 加载用户资料 ==========
+        async function loadUserProfile(user) {
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+            if (error) {
+                console.error('加载用户资料失败:', error);
+                // 使用基本信息
+                currentUser = {
+                    id: user.id,
+                    username: user.user_metadata?.username || user.email.split('@')[0],
+                    email: user.email
+                };
+            } else {
+                currentUser = {
+                    id: data.user_id,
+                    username: data.username,
+                    email: data.email,
+                    avatar_url: data.avatar_url
+                };
+            }
+        }
+
+        // ========== 切换登录/注册模式 ==========
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('loginForm').style.display = isLoginMode ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = isLoginMode ? 'none' : 'block';
+            hideError();
+            hideSuccess();
+        }
+
+        // ========== 显示聊天界面 ==========
+        function showChatInterface() {
+            document.getElementById('loadingContainer').style.display = 'none';
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('chatContainer').style.display = 'flex';
-            document.getElementById('currentUser').textContent = username;
-            
-            // 初始化聊天
-            await initChat();
+            document.getElementById('currentUser').textContent = currentUser.username;
+            initChat();
         }
 
-        // ========== 退出登录 ==========
-        function logout() {
-            if (confirm('确定要退出聊天室吗？')) {
-                // 清理订阅
-                if (messageSubscription) {
-                    supabase.removeChannel(messageSubscription);
-                }
-                if (presenceChannel) {
-                    supabase.removeChannel(presenceChannel);
-                }
-                
-                // Clear local storage
-                localStorage.removeItem('chatUser');
-                currentUser = null;
-                
-                // Switch back to login interface
-                document.getElementById('chatContainer').style.display = 'none';
-                document.getElementById('authContainer').style.display = 'block';
-                document.getElementById('usernameInput').value = '';
-                document.getElementById('messages').innerHTML = '';
-            }
+        // ========== 显示登录界面 ==========
+        function showAuthInterface() {
+            document.getElementById('chatContainer').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('messages').innerHTML = '';
+            currentUser = null;
         }
 
-        // ========== Initialize Chat ==========
+        // ========== 初始化聊天 ==========
         async function initChat() {
-            // Load message history
             await loadMessages();
-            
-            // Subscribe to new messages
             subscribeToMessages();
-            
-            // Setup online presence
             setupPresence();
-            
-            // Send system message
-            await sendSystemMessage(`${currentUser.username} 加入了聊天`);
+            await sendSystemMessage(`${currentUser.username} 加入了聊天室`);
         }
 
-        // ========== Load Message History ==========
+        // ========== 加载历史消息 ==========
         async function loadMessages() {
             const { data, error } = await supabase
                 .from('messages')
                 .select('*')
                 .order('created_at', { ascending: true })
                 .limit(50);
-            
+
             if (error) {
                 console.error('加载消息失败:', error);
                 return;
             }
-            
+
             data.forEach(msg => displayMessage(msg));
         }
 
@@ -625,11 +831,11 @@
         async function sendMessage() {
             const input = document.getElementById('messageInput');
             const content = input.value.trim();
-            
+
             if (!content) {
                 return;
             }
-            
+
             const { error } = await supabase
                 .from('messages')
                 .insert({
@@ -638,13 +844,13 @@
                     content: content,
                     type: 'chat'
                 });
-            
+
             if (error) {
-                console.error('发送消息失败:', error);
-                showError('发送失败，请重试');
+                console.error('Failed to send message:', error);
+                showError('Failed to send message');
                 return;
             }
-            
+
             input.value = '';
         }
 
@@ -664,19 +870,19 @@
         function displayMessage(message) {
             const messagesDiv = document.getElementById('messages');
             const messageEl = document.createElement('div');
-            
+
             if (message.type === 'system') {
                 messageEl.className = 'system-message';
                 messageEl.textContent = message.content;
             } else {
                 const isOwn = message.user_id === currentUser.id;
                 messageEl.className = `message ${isOwn ? 'own' : 'other'}`;
-                
-                const time = new Date(message.created_at).toLocaleTimeString('en-US', {
+
+                const time = new Date(message.created_at).toLocaleTimeString('zh-CN', {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
-                
+
                 messageEl.innerHTML = `
                     ${!isOwn ? `<div class="message-sender">${message.username}</div>` : ''}
                     <div class="message-bubble">
@@ -685,7 +891,7 @@
                     </div>
                 `;
             }
-            
+
             messagesDiv.appendChild(messageEl);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
@@ -698,16 +904,31 @@
         }
 
         function showError(message) {
+            hideSuccess();
             const errorEl = document.getElementById('errorMessage');
             errorEl.textContent = message;
             errorEl.style.display = 'block';
             setTimeout(() => {
                 errorEl.style.display = 'none';
-            }, 3000);
+            }, 5000);
         }
 
-        function generateUserId() {
-            return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            hideError();
+            const successEl = document.getElementById('successMessage');
+            successEl.textContent = message;
+            successEl.style.display = 'block';
+            setTimeout(() => {
+                successEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function hideSuccess() {
+            document.getElementById('successMessage').style.display = 'none';
         }
 
         function escapeHtml(text) {
@@ -716,17 +937,9 @@
             return div.innerHTML;
         }
 
-        // ========== 页面加载时检查登录状态 ==========
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedUser = localStorage.getItem('chatUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                document.getElementById('authContainer').style.display = 'none';
-                document.getElementById('chatContainer').style.display = 'flex';
-                document.getElementById('currentUser').textContent = currentUser.username;
-                initChat();
-            }
-        });
+        // ========== 页面加载时初始化 ==========
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
+
 </html>
