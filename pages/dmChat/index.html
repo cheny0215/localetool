@@ -763,6 +763,22 @@
             data.reverse().forEach(msg => displayMessage(msg));
         }
 
+        //#region ========== 页面可见性变化监听 ==========
+        // document.addEventListener('visibilitychange', function () {
+        //     if (document.visibilityState === 'visible') {
+        //         // 页面重新可见
+        //         if (currentUser) {
+        //             console.log('页面重新激活，重新初始化聊天');
+        //             window.location.reload();
+        //         }
+        //     } else {
+        //         // 页面隐藏
+        //         console.log('页面隐藏');
+        //     }
+        // });
+        //#endregion ========== 页面可见性变化监听END ==========
+
+
         // ========== 订阅新消息 ==========
         function subscribeToMessages() {
             // 如果已有订阅，先清理
@@ -843,13 +859,52 @@
         }
 
         // ========== 发送消息 ==========
-        async function sendMessage() {
-            // 防止重复发送
-            if (isSending) {
-                console.log('消息正在发送中，请稍候...');
-                return;
-            }
+        // async function sendMessage() {
 
+        //     const input = document.getElementById('messageInput');
+        //     const sendBtn = document.querySelector('.input-area button');
+        //     const content = input.value.trim();
+
+        //     if (!content) {
+        //         return;
+        //     }
+
+        //     // 检查用户是否还在线
+        //     if (!currentUser) {
+        //         showError('用户未登录，请重新登录');
+        //         return;
+        //     }
+        //     console.log('发送消息' + content, supabase);
+
+
+        //     try {
+        //         // 直接发送，不等待返回
+        //         const { error } = await supabase
+        //             .from('messages')
+        //             .insert({
+        //                 user_id: currentUser.id,
+        //                 username: currentUser.username,
+        //                 content: content,
+        //                 type: 'chat'
+        //             });
+        //         console.log('已发出');
+        //         if (error) {
+        //             throw error;
+        //         }
+
+        //         // 发送成功，清空输入框
+        //         input.value = '';
+
+        //     } catch (error) {
+        //         console.error('发送失败:', error);
+        //         showError('发送失败，请重试');
+        //     } finally {
+        //         // 立即恢复发送状态
+        //     }
+        // }
+        // ========== 发送消息END ==========
+
+        async function sendMessage() {
             const input = document.getElementById('messageInput');
             const sendBtn = document.querySelector('.input-area button');
             const content = input.value.trim();
@@ -864,37 +919,45 @@
                 return;
             }
 
-            // 设置发送状态
-            isSending = true;
-            sendBtn.disabled = true;
-            sendBtn.textContent = '发送中...';
-
             try {
-                // 直接发送，不等待返回
-                const { error } = await supabase
-                    .from('messages')
-                    .insert({
-                        user_id: currentUser.id,
-                        username: currentUser.username,
-                        content: content,
-                        type: 'chat'
-                    });
+                // 使用原生 fetch 直接调用 Supabase REST API
+                const messageData = {
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    content: content,
+                    type: 'chat'
+                };
 
-                if (error) {
-                    throw error;
+                console.log('准备发送数据:', messageData);
+
+                const response = await fetch(`${config.url}/rest/v1/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': config.anonKey,
+                        'Authorization': `Bearer ${config.anonKey}`,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(messageData)
+                });
+
+                // console.log('响应状态:', response.status);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
                 }
 
-                // 发送成功，清空输入框
+                const data = await response.json();
+                console.log('✅ 发送成功！', data);
+
                 input.value = '';
-                
+
+
             } catch (error) {
-                console.error('发送失败:', error);
-                showError('发送失败，请重试');
+                console.error('❌ 发送失败:', error);
+                showError('发送失败：' + (error.message || '未知错误'));
             } finally {
-                // 立即恢复发送状态
-                isSending = false;
-                sendBtn.disabled = false;
-                sendBtn.textContent = '发送';
             }
         }
 
