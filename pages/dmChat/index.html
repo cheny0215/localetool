@@ -496,7 +496,8 @@
     </div>
 
     <!-- Supabase JS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../common/supabase.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
 
     <!-- 配置文件（可选） -->
     <script src="config.js" onerror="console.log('config.js not found, will try other methods')"></script>
@@ -515,7 +516,7 @@
         }
 
         const config = getSupabaseConfig();
-        const supabase = window.supabase.createClient(config.url, config.anonKey);
+        const supabase1 = window.supabase.createClient(config.url, config.anonKey);
 
         // ========== 全局变量 ==========
         let currentUser = null;
@@ -527,20 +528,22 @@
         // ========== 初始化 ==========
         async function init() {
             // 检查是否已登录
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await supabase1.auth.getSession();
 
             if (session) {
+                // document.write('已登录，获取用户信息')
                 // 已登录，获取用户信息
                 await loadUserProfile(session.user);
                 showChatInterface();
             } else {
+                // document.write('未登录，显示登录界面')
                 // 未登录，显示登录界面
                 document.getElementById('loadingContainer').style.display = 'none';
                 document.getElementById('authContainer').style.display = 'block';
             }
 
             // 监听认证状态变化
-            supabase.auth.onAuthStateChange(async (event, session) => {
+            supabase1.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session) {
                     await loadUserProfile(session.user);
                     showChatInterface();
@@ -584,7 +587,7 @@
 
             try {
                 // 注册用户
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await supabase1.auth.signUp({
                     email: email,
                     password: password,
                     options: {
@@ -598,7 +601,7 @@
 
                 // 创建用户资料
                 if (data.user) {
-                    const { error: profileError } = await supabase
+                    const { error: profileError } = await supabase1
                         .from('user_profiles')
                         .insert({
                             user_id: data.user.id,
@@ -647,7 +650,7 @@
             loginBtn.textContent = '登录中...';
 
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await supabase1.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
@@ -676,19 +679,19 @@
 
             // 清理订阅
             if (messageSubscription) {
-                supabase.removeChannel(messageSubscription);
+                supabase1.removeChannel(messageSubscription);
             }
             if (presenceChannel) {
-                supabase.removeChannel(presenceChannel);
+                supabase1.removeChannel(presenceChannel);
             }
 
             // 登出
-            await supabase.auth.signOut();
+            await supabase1.auth.signOut();
         }
 
         // ========== 加载用户资料 ==========
         async function loadUserProfile(user) {
-            const { data, error } = await supabase
+            const { data, error } = await supabase1
                 .from('user_profiles')
                 .select('*')
                 .eq('user_id', user.id)
@@ -748,7 +751,7 @@
 
         // ========== 加载历史消息 ==========
         async function loadMessages() {
-            const { data, error } = await supabase
+            const { data, error } = await supabase1
                 .from('messages')
                 .select('*')
                 .order('created_at', { ascending: false })  // 降序：从新到旧
@@ -783,10 +786,10 @@
         function subscribeToMessages() {
             // 如果已有订阅，先清理
             if (messageSubscription) {
-                supabase.removeChannel(messageSubscription);
+                supabase1.removeChannel(messageSubscription);
             }
 
-            messageSubscription = supabase
+            messageSubscription = supabase1
                 .channel('messages', {
                     config: {
                         broadcast: { self: false },
@@ -833,7 +836,7 @@
 
         // ========== 设置在线状态 ==========
         function setupPresence() {
-            presenceChannel = supabase.channel('online-users', {
+            presenceChannel = supabase1.channel('online-users', {
                 config: {
                     presence: {
                         key: currentUser.id
@@ -874,12 +877,12 @@
         //         showError('用户未登录，请重新登录');
         //         return;
         //     }
-        //     console.log('发送消息' + content, supabase);
+        //     console.log('发送消息' + content, supabase1);
 
 
         //     try {
         //         // 直接发送，不等待返回
-        //         const { error } = await supabase
+        //         const { error } = await supabase1
         //             .from('messages')
         //             .insert({
         //                 user_id: currentUser.id,
@@ -963,7 +966,7 @@
 
         // ========== 发送系统消息 ==========
         async function sendSystemMessage(content) {
-            await supabase
+            await supabase1
                 .from('messages')
                 .insert({
                     user_id: 'system',

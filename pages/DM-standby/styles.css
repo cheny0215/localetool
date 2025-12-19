@@ -284,6 +284,15 @@ body {
   margin: 0;
 }
 
+.screenshot-img-input{
+    margin-left: 8px;
+    border: 1px solid rgb(100, 172, 236);
+    border-radius: 4px;
+    color: #666;
+    padding: 2px 8px;
+    width: 40px;
+}
+
 /* 可复制元素样式 */
 .copyable, .screenshot-name {
   cursor: pointer;

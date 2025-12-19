@@ -258,6 +258,45 @@
         #language-checkboxes{
             display: flex;
         }
+
+        .uuid-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.2rem;
+            background: var(--background-color);
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .uuid-item .uuid-text {
+            font-size: 12px;
+            flex: 1;
+            word-break: break-all;
+            color: var(--text-primary);
+        }
+
+        .uuid-item .uuid-version {
+            font-size:0.8rem;
+            margin-right: 0.5rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .uuid-item button {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .uuid-item button:hover {
+            background: #dc2626;
+        }
     </style>
 </head>
 
@@ -299,8 +338,14 @@
                 <input type="text" id="icServer" placeholder="输入服务器地址">
             </div>
             <div class="form-group">
-                <label>uuid</label>
-                <input type="text" id="uuid" placeholder="输入项目的uuid">
+                <label>uuid <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: normal;">(每个uuid代表一个版本)</span></label>
+                <div id="uuid-list" style="margin-bottom: 0.5rem;">
+                    <!-- UUID列表将在这里动态生成 -->
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="uuid-input" placeholder="输入新的uuid" style="flex: 1;">
+                    <button onclick="addUuid()" style="padding: 0.5rem 1rem; background: var(--text-secondary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">添加</button>
+                </div>
             </div>
             <div class="form-group">
                 <label>项目语言</label>
@@ -348,7 +393,7 @@
                     developer: '',
                     pm: '',
                     icServer: '',
-                    uuid: '',
+                    uuid: [],
                     language: '',
                     radar: '',
                     revision: '',
@@ -412,8 +457,8 @@
             document.getElementById('developer').value = '';
             document.getElementById('pm').value = '';
             document.getElementById('icServer').value = '';
-            document.getElementById('uuid').value = '';
-            document.getElementById('language').value = '';
+            document.getElementById('uuid-input').value = '';
+            document.getElementById('uuid-list').innerHTML = '';
             document.getElementById('radar').value = '';
             document.getElementById('revision').value = '';
             document.getElementById('generatedResults').innerHTML = '';
@@ -429,9 +474,11 @@
             document.getElementById('developer').value = project.developer;
             document.getElementById('pm').value = project.pm;
             document.getElementById('icServer').value = project.icServer;
-            document.getElementById('uuid').value = project.uuid;
             document.getElementById('radar').value = project.radar;
             document.getElementById('revision').value = project.revision;
+            
+            // 渲染UUID列表
+            renderUuidList();
 
             // 处理语言多选
             // 清除所有复选框的选中状态
@@ -489,12 +536,17 @@
 
             // 生成浏览器使用的items
             const browserItems = [];
-            if (Array.isArray(project.language) && project.language.length > 0) {
-                project.language.forEach(lang => {
-                    const langCode = languageMap[lang];
-                    browserItems.push({
-                        label: `${lang} 项目ic预览平台地址`,
-                        value: `https://${project.icServer}.preview.apple.com${langCode}/dm/?id=${project.uuid.substring(0, 8)}`
+            const uuids = Array.isArray(project.uuid) ? project.uuid : (project.uuid ? [project.uuid] : []);
+            
+            if (Array.isArray(project.language) && project.language.length > 0 && uuids.length > 0) {
+                uuids.forEach((uuid, uuidIndex) => {
+                    project.language.forEach(lang => {
+                        const langCode = languageMap[lang];
+                        const versionLabel = uuids.length > 1 ? ` (版本${uuidIndex + 1})` : '';
+                        browserItems.push({
+                            label: `${lang}${versionLabel} 项目ic预览平台地址`,
+                            value: `https://${project.icServer}.preview.apple.com${langCode}/dm/?id=${uuid.substring(0, 8)}`
+                        });
                     });
                 });
             } 
@@ -514,9 +566,13 @@
                 },
                 {
                     title: 'mcfly 使用',
-                    items: [
-                        { label: '项目ic预览平台img的src', value: `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${project.uuid}/i` }
-                    ]
+                    items: uuids.map((uuid, index) => {
+                        const versionLabel = uuids.length > 1 ? ` (版本${index + 1})` : '';
+                        return {
+                            label: `项目ic预览平台img的src${versionLabel}`,
+                            value: `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${uuid}/i`
+                        };
+                    })
                 },
                 {
                     title: 'radar 使用',
@@ -574,11 +630,90 @@
             });
         }
 
+        // 添加UUID相关函数
+        function addUuid() {
+            if (!currentProjectId) return;
+            
+            const input = document.getElementById('uuid-input');
+            const uuid = input.value.trim();
+            
+            if (!uuid) {
+                alert('请输入UUID');
+                return;
+            }
+            
+            // 确保uuid是数组
+            if (!Array.isArray(projects[currentProjectId].data.uuid)) {
+                projects[currentProjectId].data.uuid = [];
+            }
+            
+            // 检查是否已存在
+            if (projects[currentProjectId].data.uuid.includes(uuid)) {
+                alert('该UUID已存在');
+                return;
+            }
+            
+            projects[currentProjectId].data.uuid.push(uuid);
+            input.value = '';
+            
+            saveData();
+            renderUuidList();
+            generateResults();
+        }
+
+        function removeUuid(index) {
+            if (!currentProjectId) return;
+            
+            if (confirm('确定要删除这个UUID吗？')) {
+                projects[currentProjectId].data.uuid.splice(index, 1);
+                saveData();
+                renderUuidList();
+                generateResults();
+            }
+        }
+
+        function renderUuidList() {
+            if (!currentProjectId) return;
+            
+            const uuidList = document.getElementById('uuid-list');
+            const uuids = projects[currentProjectId].data.uuid || [];
+            
+            // 兼容旧数据：如果uuid是字符串，转换为数组
+            if (typeof uuids === 'string' && uuids) {
+                projects[currentProjectId].data.uuid = [uuids];
+                saveData();
+            }
+            
+            const uuidArray = Array.isArray(projects[currentProjectId].data.uuid) 
+                ? projects[currentProjectId].data.uuid 
+                : [];
+            
+            if (uuidArray.length === 0) {
+                uuidList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-secondary); padding: 0.5rem;">暂无UUID</div>';
+                return;
+            }
+            
+            uuidList.innerHTML = uuidArray.map((uuid, index) => `
+                <div class="uuid-item">
+                    <span class="uuid-version">版本${index + 1}</span>
+                    <span class="uuid-text">${uuid}</span>
+                    <button onclick="removeUuid(${index})">删除</button>
+                </div>
+            `).join('');
+        }
+
         // 监听表单变化
-        ['projectName', 'developer', 'pm', 'icServer', 'radar','uuid','revision'].forEach(id => {
+        ['projectName', 'developer', 'pm', 'icServer', 'radar','revision'].forEach(id => {
             document.getElementById(id).addEventListener('input', () => {
                 updateProjectData();
             });
+        });
+        
+        // UUID输入框支持回车添加
+        document.getElementById('uuid-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addUuid();
+            }
         });
 
         // 为语言复选框添加事件监听
@@ -603,7 +738,7 @@
                 icServer: document.getElementById('icServer').value,
                 language: selectedLanguages, // 保存为数组
                 radar: document.getElementById('radar').value,
-                uuid: document.getElementById('uuid').value,
+                uuid: projects[currentProjectId].data.uuid || [], // 保持UUID数组不变
                 revision: document.getElementById('revision').value,
             };
 

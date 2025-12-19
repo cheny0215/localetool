@@ -45,14 +45,14 @@
                         <label>请填写DM项目名称：</label>
                         <div class="input-container">
                             <input type="text" id="projectName" value="项目名字">
-                            <span class="text-tip">例如: Holiday 2025 Still Time</span>
+                            <span class="text-tip">例如: Holiday 2026 Still Time</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>请填写DM项目年份编号：</label>
                         <div class="input-container">
                             <input type="text" id="projectYear" value="FY25 Q1">
-                            <span class="text-tip">格式参考: FY25 Q1</span>
+                            <span class="text-tip">格式参考: FY26 Q1</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -105,6 +105,8 @@
                         <div class="name-label">
                             <i class="ri-screenshot-line"></i>
                             <h3>五个语言截图命名</h3>
+                            <span style="color:rgb(100, 172, 236);font-size: 12px;margin-left: 14px;">图片后缀名:</span>
+                            <input class="screenshot-img-input" id="screenshotImgInput" type="text" value=".png">
                         </div>
                         <div id="screenshotNames"></div>
                     </div>
@@ -128,7 +130,8 @@
             backupFileName: document.getElementById('backupFileName'),
             backupScreenshotName: document.getElementById('backupScreenshotName'),
             screenshotNames: document.getElementById('screenshotNames'),
-            copyTip: document.getElementById('copyTip')
+            copyTip: document.getElementById('copyTip'),
+            screenshotImgInput: document.getElementById('screenshotImgInput')
         };
 
         // 打开截图工具
@@ -161,8 +164,8 @@
             elements.screenshotNames.innerHTML = '';
 
             selectedLanguages.forEach(lang => {
-                const desktopName = `${projectYear} ${projectName}_Desktop_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}.png`;
-                const mobileName = `${projectYear} ${projectName}_Mobile_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}.png`;
+                const desktopName = `${projectYear} ${projectName}_Desktop_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}${elements.screenshotImgInput.value}`;
+                const mobileName = `${projectYear} ${projectName}_Mobile_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}${elements.screenshotImgInput.value}`;
 
                 const langGroup = document.createElement('div');
                 langGroup.className = 'language-group';
@@ -195,7 +198,7 @@
         }
 
         // 添加事件监听器
-        document.querySelectorAll('.project-form input').forEach(input => {
+        document.querySelectorAll('.project-form input,#screenshotImgInput').forEach(input => {
             input.addEventListener('input', updateNames);
         });
 
