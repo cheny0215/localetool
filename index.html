@@ -525,15 +525,11 @@
                             loadingContainer.cleanup();
                         }
 
-                        // 添加淡出效果
-                        loadingContainer.classList.add('fade-out');
                         loadingContainer.style.display = 'none';
                     }, 300);
                 };
             } catch (error) {
                 console.log('iframe加载失败', error);
-                // 添加淡出效果
-                loadingContainer.classList.add('fade-out');
                 loadingContainer.style.display = 'none';
             }
 

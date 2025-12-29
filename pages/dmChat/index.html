@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聊天室 - Supabase Auth版</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
 
         * {
             margin: 0;
@@ -16,56 +16,122 @@
 
         body {
             font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #e3f2fd 0%, #f0f4f8 100%);
+            background: #ffffff;
+            background-size: 400% 400%;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            position: relative;
+            animation: gradientShift 5s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
         }
 
         .container {
             background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid rgba(100, 181, 246, 0.2);
-            box-shadow: 0 8px 32px rgba(66, 153, 225, 0.15);
+            border-radius: 24px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 900px;
             width: 100%;
-            height: 700px;
+            max-height: 600px;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #6db1e8 0%, #2e74ac 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-bottom: none;
             color: #ffffff;
-            padding: 24px 32px;
+            padding: 20px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 24px 24px 0 0;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+            position: relative;
+        }
+
+        /* 头部光效 */
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.08) 50%, transparent 70%);
+            animation: shine 4s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 16px;
+        }
+
+        /* 聊天室图标 */
+        .chat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes iconPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3);
+            }
         }
 
         .header h1 {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 22px;
+            font-weight: 700;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .status-indicator {
-            width: 8px;
-            height: 8px;
-            background: #81d4fa;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 50%;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
         }
 
         .user-info {
@@ -77,20 +143,58 @@
         }
 
         .user-name {
-            font-weight: 500;
+            font-weight: 600;
             color: #ffffff;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* 用户头像 */
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #667eea;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .messages {
             flex: 1;
             overflow-y: auto;
             padding: 24px 32px;
-            background: linear-gradient(to bottom, #fcfdff 0%, #ffffff 100%);
+            background: #ffffff;
+            position: relative;
+        }
+
+        /* 消息区域装饰图案 */
+        .messages::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(118, 75, 162, 0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         .message {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
             animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
         }
 
         @keyframes slideIn {
@@ -112,32 +216,67 @@
         .message-bubble {
             display: inline-block;
             max-width: 65%;
-            padding: 12px 16px;
-            border-radius: 12px;
+            padding: 14px 18px;
+            border-radius: 18px;
             word-wrap: break-word;
             font-size: 14px;
-            line-height: 1.5;
+            line-height: 1.6;
+            position: relative;
         }
 
+        /* 消息气泡尾巴 */
+        .message.own .message-bubble::after {
+            content: '';
+            position: absolute;
+            right: -7px;
+            bottom: 8px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid #764ba2;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+        }
+
+
         .message.own .message-bubble {
-            background: linear-gradient(135deg, #64b5f6 0%, #1e92f2 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #ffffff;
-            box-shadow: 0 2px 8px rgba(66, 165, 245, 0.3);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+            border: none;
         }
 
         .message.other .message-bubble {
-            background: #ffffff;
-            color: #2c3e50;
-            border: 1px solid #e3f2fd;
+            background: #f8f9fa;
+            color: #2d3748;
+            border: 1px solid #babec2;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .message-sender {
             font-size: 11px;
-            color: #64b5f6;
-            margin-bottom: 6px;
+            color: #667eea;
+            margin-bottom: 8px;
             font-weight: 600;
             letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 发送者头像小图标 */
+        .sender-avatar {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid white;
+            box-shadow: 0 1px 4px rgba(102, 126, 234, 0.3);
         }
 
         .message-time {
@@ -149,62 +288,104 @@
 
         .system-message {
             text-align: center;
-            color: #a3a5a8;
+            color: #6c757d;
             font-size: 11px;
             margin: 16px 0;
             letter-spacing: 0.3px;
             font-weight: 500;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            width: auto;
+            border: 1px solid #babec2;
         }
 
         .input-area {
             padding: 20px 32px 24px;
             background: #ffffff;
-            border-top: 1px solid rgba(100, 181, 246, 0.2);
+            border-top: 1px solid #e9ecef;
             display: flex;
             gap: 12px;
+            align-items: center;
         }
 
         #messageInput {
             flex: 1;
             padding: 14px 20px;
-            background: #f8fbff;
-            border: 2px solid #e3f2fd;
-            border-radius: 12px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 24px;
             font-size: 14px;
-            color: #2c3e50;
+            color: #2d3748;
             outline: none;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
         }
 
         #messageInput:focus {
-            border-color: #90caf9;
+            border-color: #667eea;
             background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(144, 202, 249, 0.1);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         #messageInput::placeholder {
-            color: #90caf9;
+            color: #a0aec0;
         }
 
         button {
             padding: 14px 28px;
-            background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #ffffff;
             border: none;
-            border-radius: 12px;
+            border-radius: 24px;
             cursor: pointer;
             font-weight: 600;
             font-size: 14px;
-            transition: all 0.2s ease;
-            font-family: 'Inter', sans-serif;
-            box-shadow: 0 2px 8px rgba(66, 165, 245, 0.3);
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(66, 165, 245, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        /* 发送按钮特殊样式 */
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .send-btn::after {
+            content: '✈️';
         }
 
         button:active {
@@ -218,22 +399,27 @@
         }
 
         .auth-container {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
             padding: 48px;
-            border-radius: 20px;
-            box-shadow: 0 8px 32px rgba(66, 153, 225, 0.15);
+            border-radius: 32px;
+            box-shadow: 0 20px 60px rgba(229, 115, 115, 0.2),
+                        0 8px 16px rgba(0, 0, 0, 0.05);
             max-width: 420px;
             width: 100%;
-            border: 1px solid rgba(100, 181, 246, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            position: relative;
+            z-index: 1;
         }
 
         .auth-container h2 {
-            color: #1976d2;
+            color: #e57373;
             margin-bottom: 32px;
             text-align: center;
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(229, 115, 115, 0.1);
         }
 
         .form-group {
@@ -243,33 +429,35 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            color: #64b5f6;
-            font-weight: 500;
+            color: #e57373;
+            font-weight: 600;
             font-size: 13px;
             letter-spacing: 0.3px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e3f2fd;
-            border-radius: 12px;
+            padding: 16px 20px;
+            border: 2px solid rgba(229, 115, 115, 0.2);
+            border-radius: 20px;
             font-size: 14px;
             outline: none;
-            transition: all 0.2s ease;
-            background: #f8fbff;
-            color: #2c3e50;
-            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            color: #5d4e4e;
+            font-family: 'Nunito', sans-serif;
+            box-shadow: 0 2px 8px rgba(229, 115, 115, 0.1);
         }
 
         .form-group input:focus {
-            border-color: #90caf9;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(144, 202, 249, 0.1);
+            border-color: #e57373;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 16px rgba(229, 115, 115, 0.2);
         }
 
         .form-group input::placeholder {
-            color: #90caf9;
+            color: #d4a5a5;
         }
 
         .auth-buttons {
@@ -305,24 +493,60 @@
         }
 
         .online-users {
-            background: #e3f2fd;
-            padding: 12px 32px;
-            border-bottom: 1px solid rgba(100, 181, 246, 0.2);
-            font-size: 12px;
-            color: #1976d2;
+            background: #f8f9fa;
+            padding: 16px 32px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+            color: #6c757d;
             display: flex;
             align-items: center;
-            gap: 8px;
+            font-weight: 600;
+        }
+
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-right: 12px;
+
         }
 
         .online-dot {
             display: inline-block;
-            width: 6px;
-            height: 6px;
-            background: #4caf50;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
             border-radius: 50%;
             animation: pulse 2s infinite;
-            box-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        }
+
+        /* 在线用户列表 */
+        .online-users-list {
+            display: flex;
+            align-items: center;
+        }
+
+        .online-user-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .online-user-badge:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
         }
 
         @keyframes pulse {
@@ -346,8 +570,15 @@
             font-size: 14px;
         }
 
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+            color: #c49393;
+            font-size: 14px;
+        }
+
         .auth-toggle a {
-            color: #1976d2;
+            color: #e57373;
             cursor: pointer;
             text-decoration: none;
             font-weight: 600;
@@ -360,7 +591,8 @@
         .loading {
             text-align: center;
             padding: 20px;
-            color: #64b5f6;
+            color: #e57373;
+            font-weight: 600;
         }
 
         ::-webkit-scrollbar {
@@ -372,12 +604,12 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #bbdefb;
+            background: rgba(229, 115, 115, 0.3);
             border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #90caf9;
+            background: rgba(229, 115, 115, 0.5);
         }
 
         @media (max-width: 768px) {
@@ -474,30 +706,41 @@
     <!-- 聊天界面 -->
     <div id="chatContainer" class="container" style="display: none;">
         <div class="header">
-            <h1>☁️ DM Nexus 聊天室</h1>
+            <div class="header-left">
+                <div class="chat-icon">💬</div>
+                <div>
+                    <h1>DM Nexus 聊天室</h1>
+                    <div class="status-indicator"></div>
+                </div>
+            </div>
             <div class="user-info">
-                <span id="currentUser"></span>
+                <div class="user-avatar" id="userAvatar"></div>
+                <span class="user-name" id="currentUser"></span>
                 <button onclick="handleLogout()"
-                    style="margin-left: 15px; padding: 5px 15px; font-size: 12px;">退出</button>
+                    style="padding: 8px 20px; font-size: 12px; border-radius: 20px;">退出</button>
             </div>
         </div>
 
         <div class="online-users">
-            <span class="online-dot"></span>
-            <span id="onlineCount">0</span> 人在线
+            <div class="online-status">
+                <span class="online-dot"></span>
+                <span><span id="onlineCount">0</span> 人在线</span>
+            </div>
+            <div class="online-users-list" id="onlineUsersList">
+                <!-- 在线用户头像将动态添加到这里 -->
+            </div>
         </div>
 
         <div id="messages" class="messages"></div>
 
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="输入消息..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">发送</button>
+            <button onclick="sendMessage()" class="send-btn" title="发送"></button>
         </div>
     </div>
 
     <!-- Supabase JS SDK -->
     <script src="../../common/supabase.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> -->
 
     <!-- 配置文件（可选） -->
     <script src="config.js" onerror="console.log('config.js not found, will try other methods')"></script>
@@ -531,12 +774,10 @@
             const { data: { session } } = await supabase1.auth.getSession();
 
             if (session) {
-                // document.write('已登录，获取用户信息')
                 // 已登录，获取用户信息
                 await loadUserProfile(session.user);
                 showChatInterface();
             } else {
-                // document.write('未登录，显示登录界面')
                 // 未登录，显示登录界面
                 document.getElementById('loadingContainer').style.display = 'none';
                 document.getElementById('authContainer').style.display = 'block';
@@ -730,6 +971,11 @@
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('chatContainer').style.display = 'flex';
             document.getElementById('currentUser').textContent = currentUser.username;
+            
+            // 设置用户头像（显示用户名首字母）
+            const userAvatar = document.getElementById('userAvatar');
+            userAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+            
             initChat();
         }
 
@@ -849,6 +1095,9 @@
                     const state = presenceChannel.presenceState();
                     const onlineCount = Object.keys(state).length;
                     document.getElementById('onlineCount').textContent = onlineCount;
+                    
+                    // 更新在线用户列表
+                    updateOnlineUsersList(state);
                 })
                 .subscribe(async (status) => {
                     if (status === 'SUBSCRIBED') {
@@ -859,6 +1108,36 @@
                         });
                     }
                 });
+        }
+
+        // ========== 更新在线用户列表 ==========
+        function updateOnlineUsersList(state) {
+            const listContainer = document.getElementById('onlineUsersList');
+            listContainer.innerHTML = '';
+            
+            // 最多显示5个在线用户
+            const users = Object.values(state).slice(0, 5);
+            
+            users.forEach(userArray => {
+                const user = userArray[0]; // presence state 返回的是数组
+                if (user && user.username) {
+                    const badge = document.createElement('div');
+                    badge.className = 'online-user-badge';
+                    badge.textContent = user.username.charAt(0).toUpperCase();
+                    badge.title = user.username;
+                    listContainer.appendChild(badge);
+                }
+            });
+            
+            // 如果超过5个用户，显示 +N
+            const totalUsers = Object.keys(state).length;
+            if (totalUsers > 5) {
+                const moreBadge = document.createElement('div');
+                moreBadge.className = 'online-user-badge';
+                moreBadge.textContent = `+${totalUsers - 5}`;
+                moreBadge.title = `还有 ${totalUsers - 5} 人在线`;
+                listContainer.appendChild(moreBadge);
+            }
         }
 
         // ========== 发送消息 ==========
@@ -993,8 +1272,16 @@
                     minute: '2-digit'
                 });
 
+                // 获取用户名首字母
+                const initial = message.username.charAt(0).toUpperCase();
+
                 messageEl.innerHTML = `
-                    ${!isOwn ? `<div class="message-sender">${message.username}</div>` : ''}
+                    ${!isOwn ? `
+                        <div class="message-sender">
+                            <span class="sender-avatar">${initial}</span>
+                            ${message.username}
+                        </div>
+                    ` : ''}
                     <div class="message-bubble">
                         ${escapeHtml(message.content)}
                         <div class="message-time">${time}</div>

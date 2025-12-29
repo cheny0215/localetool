@@ -115,9 +115,7 @@
                 <hr>
                 <input type="checkbox" id="addMarginCheckbox" name="addMargin" title="h标签p标签加margin" checked>
                 <input type="checkbox" id="delUnderlineCheckbox" name="delUnderline" title="a标签去掉下划线" checked>
-                <input type="checkbox" id="replaceFontFamilyCheckbox" name="replaceFontFamily" title="替换所有font-family"
-                    checked>
-                <input type="checkbox" id="tableFontFamilyCheckbox" name="tableFontFamily" title="第一个table添加font-family"
+                <input type="checkbox" id="replaceFontFamilyCheckbox" name="replaceFontFamily" title="替换所有font-family/首个table添加font-family"
                     checked>
                 <input type="checkbox" id="replacePreNbspCheckbox" name="replacePreNbsp" title="替换preview-copy中的nbsp"
                     checked>
@@ -129,6 +127,8 @@
                     <input type="checkbox" id="addDateZwnjCheckbox" name="addDateZwnj" title="日期间添加zwnj" checked>
                     <input type="checkbox" id="appStoreNowrapCheckbox" name="addDateZwnj" title="footer下载appStore不换行"
                     checked>
+                    <input type="checkbox" id="removeAddressUnderlineCheckbox" name="removeAddressUnderline"
+                        title="移除办公地址下划线(自动识别hk添加)" checked>
                     <hr>
                     <div>
                         <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
@@ -194,7 +194,6 @@
             const addMarginCheckbox = document.getElementById('addMarginCheckbox');
             const delUnderlineCheckbox = document.getElementById('delUnderlineCheckbox');
             const replaceFontFamilyCheckbox = document.getElementById('replaceFontFamilyCheckbox');
-            const tableFontFamilyCheckbox = document.getElementById('tableFontFamilyCheckbox');
             const replacePreNbspCheckbox = document.getElementById('replacePreNbspCheckbox');
             const del414MediaCheckbox = document.getElementById('del414MediaCheckbox');
             const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
@@ -202,6 +201,8 @@
             const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
             const addDateZwnjCheckbox = document.getElementById('addDateZwnjCheckbox');
             const appStoreNowrapCheckbox = document.getElementById('appStoreNowrapCheckbox');
+
+            const removeAddressUnderlineCheckbox = document.getElementById('removeAddressUnderlineCheckbox');
 
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
             const layoutNotCenterCheckbox = document.getElementById('layoutNotCenterCheckbox');
@@ -237,7 +238,6 @@
                     addMarginCheckbox.checked = elem.checked
                     delUnderlineCheckbox.checked = elem.checked
                     replaceFontFamilyCheckbox.checked = elem.checked
-                    tableFontFamilyCheckbox.checked = elem.checked
                     replacePreNbspCheckbox.checked = elem.checked
                     del414MediaCheckbox.checked = elem.checked
                     replacepSelectorCheckbox.checked = elem.checked
@@ -245,6 +245,7 @@
                     imgToCenterCheckbox.checked = elem.checked
                     addDateZwnjCheckbox.checked = elem.checked
                     appStoreNowrapCheckbox.checked = elem.checked
+                    removeAddressUnderlineCheckbox.checked = elem.checked
                 });
             })
 
@@ -327,7 +328,7 @@
                         addMarginCheckbox.checked && addMargin();
                         delUnderlineCheckbox.checked && delUnderline();
                         replaceFontFamilyCheckbox.checked && replaceFontFamily();
-                        tableFontFamilyCheckbox.checked && tableFontFamily();
+                        replaceFontFamilyCheckbox.checked && tableFontFamily();
                         replacePreNbspCheckbox.checked && replacePreNbsp();
                         del414MediaCheckbox.checked && del414Media();
                         legalPackageCheckbox.checked && legalPackage();
@@ -335,6 +336,7 @@
                         imgToCenterCheckbox.checked && imgToCenter();
                         addDateZwnjCheckbox.checked && addDateZwnj();
                         appStoreNowrapCheckbox.checked && appStoreNowrap();
+                        removeAddressUnderlineCheckbox.checked && removeAddressUnderline();
                         supNormalSizeCheckbox.checked && supNormalSize();
                         layoutNotCenterCheckbox.checked && layoutNotCenter();
                         setNowrapSpanCheckbox.checked && setNowrapSpan();
@@ -365,6 +367,8 @@
                 let iframeOutHtml = iframeDoc.documentElement.outerHTML
                 iframeOutHtml = delPlaceholder(iframeOutHtml)
                 iframeOutHtml = replaceAllColorToHex(iframeOutHtml)
+                // 将零宽连字符转换回 &zwj; 实体
+                iframeOutHtml = iframeOutHtml.replace(/\u200D/g, '&zwj;')
                 dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
 
@@ -604,6 +608,22 @@
                         o.style.setProperty('white-space', 'nowrap');
                     }
                 })
+            }
+
+            // HK
+            function removeAddressUnderline() {
+                const curlang = iframeDoc.documentElement.lang;
+                if( !(curlang === 'zh-HK' || curlang === 'en-HK')){
+                    return
+                }                
+                let htmlContent = iframeDoc.documentElement.outerHTML
+                console.log("🚀 ~ removeAddressUnderline ~ htmlContent:", htmlContent)
+                const preciseHKTCReg = /香港銅鑼灣時代廣場第一座 2401/g;
+                const preciseHKENReg = /Room 2401, Tower One, Times Square, Causeway Bay/g;
+                htmlContent = htmlContent.replace(preciseHKTCReg, '香&zwj;港&zwj;銅&zwj;鑼灣&zwj;時代&zwj;廣&zwj;場第&zwj;一座 24&zwj;01')
+                htmlContent = htmlContent.replace(preciseHKENReg, 'Ro&zwj;om 24&zwj;01, To&zwj;wer O&zwj;ne, Ti&zwj;mes Squ&zwj;are, Ca&zwj;use&zwj;way B&zwj;ay')
+                html_doc = htmlContent
+                handleOutput()
             }
 
             // mobile的sup标签设置行内样式（sina邮箱）

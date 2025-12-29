@@ -48,7 +48,6 @@ const animationLoading = (function(){
         particlesContainer.style.width = '100%';
         particlesContainer.style.height = '100%';
         particlesContainer.style.overflow = 'hidden';
-        particlesContainer.style.opacity = '0.3';
 
         // 添加多个粒子
         for (let i = 0; i < 60; i++) {
@@ -73,11 +72,6 @@ const animationLoading = (function(){
         glassContainer.style.position = 'relative';
         glassContainer.style.width = '400px';
         glassContainer.style.padding = '60px 40px';
-        glassContainer.style.background = 'rgba(255, 255, 255, 0.1)';
-        glassContainer.style.backdropFilter = 'blur(20px)';
-        glassContainer.style.borderRadius = '30px';
-        glassContainer.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-        glassContainer.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.37)';
         glassContainer.style.display = 'flex';
         glassContainer.style.flexDirection = 'column';
         glassContainer.style.alignItems = 'center';

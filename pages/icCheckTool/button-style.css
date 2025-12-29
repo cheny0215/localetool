@@ -1,0 +1,211 @@
+/* From Uiverse.io by PriyanshuGupta28 */ 
+.pushable {
+  position: relative;
+  background: transparent;
+  padding: 0px;
+  border: none;
+  cursor: pointer;
+  outline-offset: 4px;
+  outline-color: deeppink;
+  transition: filter 250ms;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* 默认紫色主题 */
+.shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+  filter: blur(2px);
+  will-change: transform;
+  transform: translateY(2px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+.edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.front {
+  display: block;
+  position: relative;
+  border-radius: 8px;
+  padding: 12px 20px;
+  color: white;
+  font-weight: 600;
+  /* text-transform: uppercase; */
+  letter-spacing: 1.5px;
+  font-size: 0.8rem;
+  transform: translateY(-4px);
+  transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
+}
+
+/* 紫色主题 */
+.pushable.theme-purple .shadow {
+  background: hsl(226, 25%, 69%);
+}
+
+.pushable.theme-purple .edge {
+  background: linear-gradient(
+    to right,
+    hsl(248, 39%, 39%) 0%,
+    hsl(248, 39%, 49%) 8%,
+    hsl(248, 39%, 39%) 92%,
+    hsl(248, 39%, 29%) 100%
+  );
+}
+
+.pushable.theme-purple .front {
+    background: hsl(248, 53%, 58%);
+
+}
+
+/* 蓝色主题 - 第一行 */
+.pushable.theme-blue .shadow {
+  background: hsl(210, 50%, 70%);
+}
+
+.pushable.theme-blue .edge {
+  background: linear-gradient(
+    to right,
+    hsl(210, 60%, 40%) 0%,
+    hsl(210, 60%, 50%) 8%,
+    hsl(210, 60%, 40%) 92%,
+    hsl(210, 60%, 30%) 100%
+  );
+}
+
+.pushable.theme-blue .front {
+  background: hsl(210, 70%, 55%);
+}
+
+/* 绿色主题 - 第二行 */
+.pushable.theme-green .shadow {
+  background: hsl(150, 45%, 65%);
+}
+
+.pushable.theme-green .edge {
+  background: linear-gradient(
+    to right,
+    hsl(150, 55%, 35%) 0%,
+    hsl(150, 55%, 45%) 8%,
+    hsl(150, 55%, 35%) 92%,
+    hsl(150, 55%, 25%) 100%
+  );
+}
+
+.pushable.theme-green .front {
+  background: hsl(150, 60%, 45%);
+}
+
+/* 橙色主题 - 第三行 */
+.pushable.theme-orange .shadow {
+  background: hsl(25, 70%, 70%);
+}
+
+.pushable.theme-orange .edge {
+  background: linear-gradient(
+    to right,
+    hsl(25, 80%, 45%) 0%,
+    hsl(25, 80%, 55%) 8%,
+    hsl(25, 80%, 45%) 92%,
+    hsl(25, 80%, 35%) 100%
+  );
+}
+
+.pushable.theme-orange .front {
+  background: hsl(25, 85%, 55%);
+}
+
+/* 红色主题 - 第四行 */
+.pushable.theme-red .shadow {
+  background: hsl(0, 60%, 70%);
+}
+
+.pushable.theme-red .edge {
+  background: linear-gradient(
+    to right,
+    hsl(0, 70%, 45%) 0%,
+    hsl(0, 70%, 55%) 8%,
+    hsl(0, 70%, 45%) 92%,
+    hsl(0, 70%, 35%) 100%
+  );
+}
+
+.pushable.theme-red .front {
+  background: hsl(0, 75%, 55%);
+}
+
+/* 青色主题 - 第五行 */
+.pushable.theme-cyan .shadow {
+  background: hsl(180, 50%, 70%);
+}
+
+.pushable.theme-cyan .edge {
+  background: linear-gradient(
+    to right,
+    hsl(180, 60%, 40%) 0%,
+    hsl(180, 60%, 50%) 8%,
+    hsl(180, 60%, 40%) 92%,
+    hsl(180, 60%, 30%) 100%
+  );
+}
+
+.pushable.theme-cyan .front {
+  background: hsl(180, 65%, 50%);
+}
+
+/* 粉色主题 - 第六行 */
+.pushable.theme-pink .shadow {
+  background: hsl(330, 60%, 75%);
+}
+
+.pushable.theme-pink .edge {
+  background: linear-gradient(
+    to right,
+    hsl(330, 70%, 50%) 0%,
+    hsl(330, 70%, 60%) 8%,
+    hsl(330, 70%, 50%) 92%,
+    hsl(330, 70%, 40%) 100%
+  );
+}
+
+.pushable.theme-pink .front {
+  background: hsl(330, 75%, 60%);
+}
+
+.pushable:hover {
+  filter: brightness(110%);
+}
+
+.pushable:hover .front {
+  transform: translateY(-6px);
+  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+
+.pushable:active .front {
+  transform: translateY(-2px);
+  transition: transform 34ms;
+}
+
+.pushable:hover .shadow {
+  transform: translateY(4px);
+  transition: transform 250ms cubic-bezier(0.3, 0.7, 0.4, 1.5);
+}
+
+.pushable:active .shadow {
+  transform: translateY(1px);
+  transition: transform 34ms;
+}
+
+.pushable:focus:not(:focus-visible) {
+  outline: none;
+}
