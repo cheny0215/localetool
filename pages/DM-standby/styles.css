@@ -145,9 +145,10 @@ body {
 }
 
 .section-description {
-  color: #0071e3;
+  color: #8383df;
   /* color: #6e6e73; */
   font-size: 14px;
+  font-weight: 700;
   margin: 0 0 20px 0;
 }
 
@@ -286,11 +287,22 @@ body {
 
 .screenshot-img-input{
     margin-left: 8px;
-    border: 1px solid rgb(100, 172, 236);
+    border: 1px solid #8383df;
     border-radius: 4px;
-    color: #666;
+    color: #8383df;
     padding: 2px 8px;
     width: 40px;
+}
+.screenshot-version-input{
+    margin-left: 8px;
+    border: 1px solid #8383df;
+    border-radius: 4px;
+    color: #8383df;
+    padding: 2px 8px;
+    width: 60px;
+}
+.screenshot-version-input::placeholder{
+  color: #ccc;
 }
 
 /* 可复制元素样式 */

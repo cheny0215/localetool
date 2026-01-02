@@ -72,8 +72,8 @@
                         <label>请选择DM项目语言（默认全选）：</label>
                         <div class="checkbox-container">
                             <div class="checkbox-group">
-                                <label class="checkbox-label"><input type="checkbox" value="HKEN" checked><span>HKEN</span></label>
                                 <label class="checkbox-label"><input type="checkbox" value="HKTC" checked><span>HKTC</span></label>
+                                <label class="checkbox-label"><input type="checkbox" value="HKEN" checked><span>HKEN</span></label>
                                 <label class="checkbox-label"><input type="checkbox" value="MOTC" checked><span>MOTC</span></label>
                                 <label class="checkbox-label"><input type="checkbox" value="CNSC" checked><span>CNSC</span></label>
                                 <label class="checkbox-label"><input type="checkbox" value="TWTC" checked><span>TWTC</span></label>
@@ -84,8 +84,8 @@
             </div>
 
             <div class="results-section">
-                <h2 class="section-title"><i class="ri-file-list-3-line"></i> 生成的命名</h2>
-                <p class="section-description"><i class="ri-alert-line" style="vertical-align: bottom;padding-right: 4px;"></i>左侧填好后这里同步生成标准命名，点击即可复制使用</p>
+                <h2 class="section-title"><i class="ri-file-list-3-line"></i> 自动生成的命名</h2>
+                <p class="section-description"><i class="ri-alert-line" style="vertical-align: bottom;padding-right: 4px;"></i>这边自动生成文件夹命名和截图的命名，点击即可复制到剪贴板</p>
                 <div class="generated-names">
                     <div class="name-group">
                         <div class="name-label">
@@ -102,11 +102,13 @@
                         <div class="copyable" id="backupScreenshotName"></div>
                     </div>
                     <div class="name-group screenshot-names">
-                        <div class="name-label">
+                        <div class="name-label screen">
                             <i class="ri-screenshot-line"></i>
                             <h3>五个语言截图命名</h3>
-                            <span style="color:rgb(100, 172, 236);font-size: 12px;margin-left: 14px;">图片后缀名:</span>
+                            <span style="color:#8383df;font-size: 12px;margin-left: 14px;">图片后缀名:</span>
                             <input class="screenshot-img-input" id="screenshotImgInput" type="text" value=".png">
+                            <span style="color:#8383df;font-size: 12px;margin-left: 14px;">若项目有多版本，添加后缀名:</span>
+                            <input class="screenshot-version-input" id="screenshotVersionInput" type="text" value="" placeholder="_版本1">
                         </div>
                         <div id="screenshotNames"></div>
                     </div>
@@ -131,7 +133,8 @@
             backupScreenshotName: document.getElementById('backupScreenshotName'),
             screenshotNames: document.getElementById('screenshotNames'),
             copyTip: document.getElementById('copyTip'),
-            screenshotImgInput: document.getElementById('screenshotImgInput')
+            screenshotImgInput: document.getElementById('screenshotImgInput'),
+            screenshotVersionInput: document.getElementById('screenshotVersionInput'),
         };
 
         // 打开截图工具
@@ -146,6 +149,8 @@
             const projectDate = elements.projectDate.value;
             const projectManager = elements.projectManager.value;
             const selectedLanguages = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
+            const projectSuffix = elements.screenshotImgInput.value;
+            const projectVersion = elements.screenshotVersionInput.value;
 
             // 保存项目负责人到本地存储
             const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : {};
@@ -164,8 +169,8 @@
             elements.screenshotNames.innerHTML = '';
 
             selectedLanguages.forEach(lang => {
-                const desktopName = `${projectYear} ${projectName}_Desktop_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}${elements.screenshotImgInput.value}`;
-                const mobileName = `${projectYear} ${projectName}_Mobile_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}${elements.screenshotImgInput.value}`;
+                const desktopName = `${projectYear} ${projectName}${projectVersion}_Desktop_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}${projectSuffix}`;
+                const mobileName = `${projectYear} ${projectName}${projectVersion}_Mobile_${lang.substring(0,2)}_${lang.substring(2)}_${projectDate}${projectSuffix}`;
 
                 const langGroup = document.createElement('div');
                 langGroup.className = 'language-group';
@@ -198,7 +203,7 @@
         }
 
         // 添加事件监听器
-        document.querySelectorAll('.project-form input,#screenshotImgInput').forEach(input => {
+        document.querySelectorAll('.project-form input,.name-label.screen').forEach(input => {
             input.addEventListener('input', updateNames);
         });
 
