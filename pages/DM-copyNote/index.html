@@ -338,6 +338,10 @@
                 <input type="text" id="icServer" placeholder="输入服务器地址">
             </div>
             <div class="form-group">
+                <label>项目年份</label>
+                <input type="text" id="year" placeholder="输入项目所在服务器年份文件夹">
+            </div>
+            <div class="form-group">
                 <label>uuid <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: normal;">(每个uuid代表一个版本)</span></label>
                 <div id="uuid-list" style="margin-bottom: 0.5rem;">
                     <!-- UUID列表将在这里动态生成 -->
@@ -469,11 +473,13 @@
         function loadProject(id) {
             currentProjectId = id;
             const project = projects[id].data;
+            console.log("🚀 ~ loadProject ~ project:", project)
 
             document.getElementById('projectName').value = project.projectName;
             document.getElementById('developer').value = project.developer;
             document.getElementById('pm').value = project.pm;
             document.getElementById('icServer').value = project.icServer;
+            document.getElementById('year').value = project.year;
             document.getElementById('radar').value = project.radar;
             document.getElementById('revision').value = project.revision;
             
@@ -570,7 +576,7 @@
                         const versionLabel = uuids.length > 1 ? ` (版本${index + 1})` : '';
                         return {
                             label: `项目ic预览平台img的src${versionLabel}`,
-                            value: `https://${project.icServer}.preview.apple.com/hk/en/dm/25/${uuid}/i`
+                            value: `https://${project.icServer}.preview.apple.com/hk/en/dm/${project.year}/${uuid}/i`
                         };
                     })
                 },
@@ -703,7 +709,7 @@
         }
 
         // 监听表单变化
-        ['projectName', 'developer', 'pm', 'icServer', 'radar','revision'].forEach(id => {
+        ['projectName', 'developer', 'pm', 'icServer','year', 'radar','revision'].forEach(id => {
             document.getElementById(id).addEventListener('input', () => {
                 updateProjectData();
             });
@@ -736,6 +742,7 @@
                 developer: document.getElementById('developer').value,
                 pm: document.getElementById('pm').value,
                 icServer: document.getElementById('icServer').value,
+                year: document.getElementById('year').value,
                 language: selectedLanguages, // 保存为数组
                 radar: document.getElementById('radar').value,
                 uuid: projects[currentProjectId].data.uuid || [], // 保持UUID数组不变
