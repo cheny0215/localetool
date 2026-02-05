@@ -141,6 +141,9 @@
                         document.querySelectorAll('.ad-language')[0].textContent = '＜AD＞';
                     }
 
+                    // 替换 ${global.copyrightYear} 为 当前年份
+                    content = content.replace('${global.copyrightYear}', new Date().getFullYear());
+
                     // 获取 iframe 元素
                     const iframe = document.getElementById('previewFrame');
 
