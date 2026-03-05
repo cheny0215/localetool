@@ -41,7 +41,7 @@ body {
 }
 
 .html-preview {
-  overflow: hidden;
+  /* overflow: hidden; */
   background: #fff;
   border: 1px solid #d2d2d7;
   border-top: none;
