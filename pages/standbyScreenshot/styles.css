@@ -75,7 +75,7 @@ body {
 .field-name {
   font-weight: 600;
   color: #181818;
-  font-size: 12px;
+  font-size: 10px;
   margin-right: 10px;
   transition: font-size 0.3s ease;
 }
