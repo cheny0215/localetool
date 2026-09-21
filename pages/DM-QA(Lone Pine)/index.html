@@ -126,37 +126,9 @@
                 <hr>
                 <input type="checkbox" id="addMarginCheckbox" name="addMargin" title="h标签p标签加margin" checked>
                 <input type="checkbox" id="delUnderlineCheckbox" name="delUnderline" title="a标签去掉下划线" checked>
-                <input type="checkbox" id="replaceFontFamilyCheckbox" name="replaceFontFamily" title="替换所有font-family/首个table添加font-family"
-                    checked>
-                <input type="checkbox" id="replacePreNbspCheckbox" name="replacePreNbsp" title="替换preview-copy中的nbsp"
-                    checked>
-                    <!-- <input type="checkbox" id="del414MediaCheckbox" name="del414Media" title="去除414媒体查询" checked> -->
-                    <input type="checkbox" id="legalPackageCheckbox" name="legalPackage" title="包裹legal末尾防止单字" checked>
-                    <!-- <input type="checkbox" id="replacepSelectorCheckbox" name="replacepSelector" title="替换css中>p选择器"
-                    checked> -->
-                    <input type="checkbox" id="imgToCenterCheckbox" name="imgToCenter" title="img图片设置居中" checked>
-                    <input type="checkbox" id="addDateZwnjCheckbox" name="addDateZwnj" title="日期间添加zwnj" checked>
-                    <input type="checkbox" id="appStoreNowrapCheckbox" name="addDateZwnj" title="footer下载appStore不换行"
-                    checked>
-                    <input type="checkbox" id="removeAddressUnderlineCheckbox" name="removeAddressUnderline"
-                        title="移除办公地址下划线(自动识别hk添加)" checked>
-                    <hr>
-                    <div>
-                        <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize"
-                        title="sina邮箱移动端添加sup样式"><span class="layui-badge-rim layui-border-orange">sina邮箱/CN</span>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="layoutNotCenterCheckbox" name="layoutNotCenter"
-                        title="sina邮箱移动端布局不局中"><span class="layui-badge-rim layui-border-orange">sina邮箱/CN</span>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="setNowrapSpanCheckbox" name="setNowrapSpan"
-                        title="mobile网易span设置nowrap属性"><span class="layui-badge-rim layui-border-orange">163邮箱/CN</span>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="delUnderlineImportantCheckbox" name="delUnderlineImportant"
-                        title="desktop去除下划线的!important"><span class="layui-badge-rim layui-border-orange">CN</span>
-                    </div>
+                <input type="checkbox" id="hideSmallImgCheckbox" name="hideSmallImg" title="img最近的hideSmall父元素添加display:none;" checked>
+                <input type="checkbox" id="supNormalSizeCheckbox" name="supNormalSize" title="sup标签设置行内样式（sina/163邮箱）" checked>
+                    
                 <hr>
             </div>
             <div class="layui-btn-container">
@@ -181,18 +153,7 @@
     </div>
     <script>
         
-        // #region
-        // 数据库
-        const langArr = [
-            { lang: 'zh-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang HK', 'STHeiti', 'Helvetica Neue', Helvetica, '微軟正黑體Microsoft JhengHei', '微軟正黑體 Microsoft JhengHei', 'Microsoft JhengHei', '微軟正黑體', 'MingLiU', Arial, sans-serif, 'SF Pro Icons'!important;" },
-            { lang: 'zh-TW', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang TC', 'STHeiti', 'Helvetica Neue', Helvetica, '微軟正黑體Microsoft JhengHei', '微軟正黑體 Microsoft JhengHei', 'Microsoft JhengHei', '微軟正黑體', 'MingLiU', Arial, sans-serif, 'SF Pro Icons'!important;" },
-            { lang: 'zh-CN', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'SFNSText', 'PingFang SC', 'STHeiti', 'Helvetica Neue', Helvetica, 'Microsoft yahei', '微软雅黑', Arial, sans-serif, 'SF Pro Icons'!important;" },
-            { lang: 'en-HK', font: "font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'SF Pro Icons'!important;" },
-        ]
-        const preCopyNbsp = `
-        &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp;‌‌‌&nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp; ⠀ &nbsp;‌‌‌
-        `
-        // #endregion
+    
 
         document.addEventListener('DOMContentLoaded', function () {
             const dataInput = document.getElementById('dataInput');
@@ -204,21 +165,8 @@
             const allSelectCheckbox = document.getElementById('allSelectCheckbox');
             const addMarginCheckbox = document.getElementById('addMarginCheckbox');
             const delUnderlineCheckbox = document.getElementById('delUnderlineCheckbox');
-            const replaceFontFamilyCheckbox = document.getElementById('replaceFontFamilyCheckbox');
-            const replacePreNbspCheckbox = document.getElementById('replacePreNbspCheckbox');
-            const del414MediaCheckbox = document.getElementById('del414MediaCheckbox');
-            const legalPackageCheckbox = document.getElementById('legalPackageCheckbox');
-            const replacepSelectorCheckbox = document.getElementById('replacepSelectorCheckbox');
-            const imgToCenterCheckbox = document.getElementById('imgToCenterCheckbox');
-            const addDateZwnjCheckbox = document.getElementById('addDateZwnjCheckbox');
-            const appStoreNowrapCheckbox = document.getElementById('appStoreNowrapCheckbox');
-
-            const removeAddressUnderlineCheckbox = document.getElementById('removeAddressUnderlineCheckbox');
-
+            const hideSmallImgCheckbox = document.getElementById('hideSmallImgCheckbox');
             const supNormalSizeCheckbox = document.getElementById('supNormalSizeCheckbox');
-            const layoutNotCenterCheckbox = document.getElementById('layoutNotCenterCheckbox');
-            const setNowrapSpanCheckbox = document.getElementById('setNowrapSpanCheckbox');
-            const delUnderlineImportantCheckbox = document.getElementById('delUnderlineImportantCheckbox');
             // Checkbox element
 
             const submitButton = document.getElementById('submitButton');
@@ -227,14 +175,20 @@
             const resetButton = document.getElementById('resetButton');
 
             let html_doc = '';
-            let hiddenPreContent = '';
+            let hiddenPreContent = [];
             let hiddenFontContent = '';
             let dynamicContent = '';
+            function hiddenPreDivRe() {
+                return /<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/g;
+            }
+            const whitespaceEntityTokens = {
+                '&nbsp;': '[[[QA_ENTITY_NBSP]]]',
+                '&ensp;': '[[[QA_ENTITY_ENSP]]]',
+                '&emsp;': '[[[QA_ENTITY_EMSP]]]',
+                '&thinsp;': '[[[QA_ENTITY_THINSP]]]',
+            };
 
-            const pre_placeholder = '<!-- [[PRE_PLACEHOLDER]] -->';        // preview copy部分 预处理
-            const font_placeholder = '<!-- [[FONT_PLACEHOLDER]] -->';      // 暂存注释的那一大段内容
-            const zwnj_placeholder = '<!-- [[ZWNJ_PLACEHOLDER]] -->';        // 零宽空格
-            const dynamic_placeholder = '<!-- [[DYNAMIC_PLACEHOLDER]] -->';     // 动态内容
+
 
             // layui的一些方法
             layui.use(function () {
@@ -248,81 +202,28 @@
                     const value = elem.value; // 获得 checkbox 值
                     addMarginCheckbox.checked = elem.checked
                     delUnderlineCheckbox.checked = elem.checked
-                    replaceFontFamilyCheckbox.checked = elem.checked
-                    replacePreNbspCheckbox.checked = elem.checked
-                    // del414MediaCheckbox.checked = elem.checked
-                    // replacepSelectorCheckbox.checked = elem.checked
-                    legalPackageCheckbox.checked = elem.checked
-                    imgToCenterCheckbox.checked = elem.checked
-                    addDateZwnjCheckbox.checked = elem.checked
-                    appStoreNowrapCheckbox.checked = elem.checked
-                    removeAddressUnderlineCheckbox.checked = elem.checked
+                    hideSmallImgCheckbox.checked = elem.checked
+                    supNormalSizeCheckbox.checked = elem.checked
                 });
             })
 
             // input事件
             dataInput.addEventListener('input', function () {
                 html_doc = dataInput.value;
-                toPlaceholder()
                 handleOutput()
             });
 
-            // 占位符
-            function toPlaceholder() {
-                // html_doc = html_doc.replace(/<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/, (match, content) => {
-                //     console.log("🚀 ~ html_doc=html_doc.replace ~ match:", match)
-                //     hiddenPreContent = match; // 存储内容
-                //     return pre_placeholder; // 替换为占位符
-                // });
-                html_doc = html_doc.replace(/\<!--\[if gte mso 9\]\>([\s\S]*)\<!\[endif\]--\>/, (match, content) => {
-                    hiddenFontContent = match; // 存储内容
-                    return font_placeholder; // 替换为占位符
-                });
-                html_doc = html_doc.replace(/&zwnj;/g, zwnj_placeholder)
-                // 存储<!DOCTYPE前面的所有内容
-                html_doc = html_doc.replace(/^[\s\S]*?(?=<!DOCTYPE)/i, (match) => {
-                    dynamicContent = match; // 存储匹配到的内容
-                    return dynamic_placeholder; // 替换为占位符
-                });
-            }
-            function delPlaceholder(iframehtml) {
-                // iframehtml = iframehtml.replace(pre_placeholder, hiddenPreContent);      // 替换占位符为原内容
-                iframehtml = iframehtml.replace(font_placeholder, hiddenFontContent);
-                iframehtml = iframehtml.replace(new RegExp(escapeRegExp(zwnj_placeholder), 'g'), '&zwnj;')
-                return iframehtml
-            }
-            // 工具函数-转义正则中的特殊字符
-            function escapeRegExp(string) {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // 转义特殊字符
-            }
-            // 工具函数-将RGB转换为十六进制
-            function rgbToHex(rgb) {
-                // 提取 RGB 值
-                const result = rgb.match(/\d+/g);
-                if (!result) return null;
-                // 转换为十六进制
-                return '#' + result.map(x => {
-                    const hex = parseInt(x).toString(16).padStart(2, '0'); // 转换为十六进制并补零
-                    return hex;
-                }).join('');
-            }
-            // 替换rgb颜色为hex颜色
-            function replaceAllColorToHex(iframehtml) {
-                // 正则表达式匹配RGB颜色格式，如rgb(255, 255, 255)或rgba(255, 255, 255, 0.5)
-                const rgbRegex = /rgb\((\d+),\s*(\d+),\s*(\d+)\)|rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/g;
-                
-                return iframehtml.replace(rgbRegex, (match) => {
-                    // 使用已有的rgbToHex函数转换颜色
-                    const hexColor = rgbToHex(match);
-                    return hexColor || match; // 如果转换失败，保留原始值
-                });
-            }
 
             // 一键添加事件
             submitButton.onclick = async () => {
                 // localStorage.setItem('cy_outputButton_current_html', '')
                 LoadingModule.show()
-                html_doc = dataInput.value;
+                hiddenPreContent = [];
+                html_doc = dataInput.value.replace(hiddenPreDivRe(), (match) => {
+                    hiddenPreContent.push(match);
+                    return `<!-- [[PRE_PLACEHOLDER_${hiddenPreContent.length - 1}]] -->`;
+                });
+                html_doc = preserveWhitespaceEntities(html_doc);
                 // 禁用输入框
                 dataInput.disabled = true;
                 dataInput.style.backgroundColor = '#f5f5f5';
@@ -331,27 +232,14 @@
                 submitButton.disabled = true;
                 submitButton.style.setProperty('background', '#ccc', 'important');;
                 submitButton.style.cursor = 'not-allowed';
-                toPlaceholder()
                 handleOutput()
                 const html_doc_promise = await new Promise((resolve) => {
                     setTimeout(() => {
                         //使用三元运算符链式调用
                         addMarginCheckbox.checked && addMargin();
                         delUnderlineCheckbox.checked && delUnderline();
-                        replaceFontFamilyCheckbox.checked && replaceFontFamily();
-                        replaceFontFamilyCheckbox.checked && tableFontFamily();
-                        replacePreNbspCheckbox.checked && replacePreNbsp();
-                        // del414MediaCheckbox.checked && del414Media();
-                        // replacepSelectorCheckbox.checked && replacepSelector();
-                        legalPackageCheckbox.checked && legalPackage();
-                        imgToCenterCheckbox.checked && imgToCenter();
-                        addDateZwnjCheckbox.checked && addDateZwnj();
-                        appStoreNowrapCheckbox.checked && appStoreNowrap();
-                        removeAddressUnderlineCheckbox.checked && removeAddressUnderline();
+                        hideSmallImgCheckbox.checked && hideSmallImg();
                         supNormalSizeCheckbox.checked && supNormalSize();
-                        layoutNotCenterCheckbox.checked && layoutNotCenter();
-                        setNowrapSpanCheckbox.checked && setNowrapSpan();
-                        delUnderlineImportantCheckbox.checked && delUnderlineImportant();
                         showMessage({ msg: 'QA添加完成！', type: 'success' })
                         LoadingModule.hide()
                         resolve(html_doc)
@@ -366,20 +254,17 @@
                 outputButton.style.setProperty('background', '#ccc', 'important');
                 outputButton.style.cursor = 'not-allowed';
                 
-                // 去除tbody
-                const tbodies = iframeDoc.querySelectorAll('tbody');
-                tbodies.forEach(tbody => {
-                    while (tbody.firstChild) {
-                        tbody.parentNode.insertBefore(tbody.firstChild, tbody);
-                    }
-                    tbody.parentNode.removeChild(tbody);
-                });
                 // 去除占位符
                 let iframeOutHtml = iframeDoc.documentElement.outerHTML
-                iframeOutHtml = delPlaceholder(iframeOutHtml)
-                // iframeOutHtml = replaceAllColorToHex(iframeOutHtml)
+                iframeOutHtml = restoreWhitespaceEntities(iframeOutHtml)
                 // 将零宽连字符转换回 &zwj; 实体
                 iframeOutHtml = iframeOutHtml.replace(/\u200D/g, '&zwj;')
+                hiddenPreContent.forEach((block, i) => {
+                    iframeOutHtml = iframeOutHtml.replace(`<!-- [[PRE_PLACEHOLDER_${i}]] -->`, () => block);
+                });
+                const originalPreDivs = dataInput.value.match(hiddenPreDivRe()) || [];
+                let originalPreIdx = 0;
+                iframeOutHtml = iframeOutHtml.replace(hiddenPreDivRe(), () => originalPreDivs[originalPreIdx++] ?? '');
                 dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
 
@@ -403,7 +288,7 @@
 
                 
                 // 清空所有变量
-                hiddenPreContent = '';
+                hiddenPreContent = [];
                 hiddenFontContent = '';
                 html_doc = '';
                 
@@ -436,6 +321,19 @@
                 iframeDoc.write(html_doc);
                 iframeDoc.close();
             }
+            function preserveWhitespaceEntities(html) {
+                return Object.entries(whitespaceEntityTokens).reduce((result, [entity, token]) => {
+                    return result.replace(new RegExp(escapeRegExp(entity), 'g'), token);
+                }, html);
+            }
+            function restoreWhitespaceEntities(html) {
+                return Object.entries(whitespaceEntityTokens).reduce((result, [entity, token]) => {
+                    return result.replace(new RegExp(escapeRegExp(token), 'g'), entity);
+                }, html);
+            }
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
             // 给h1~h6,p标签加上margin：0；
             function addMargin() {
                 const elements = iframeDoc.querySelectorAll('h1, h2, h3, h4, h5, h6, p');
@@ -459,187 +357,21 @@
                     }
                 });
             }
-            // 替换所有font-family
-            function replaceFontFamily() {
-                let newFontFamily
-                const curlang = iframeDoc.documentElement.lang;
-                console.log("🚀 ~ replaceFontFamily ~ curlang:", curlang)
-                langArr.forEach(o => {
-                    if (o.lang == curlang) {
-                        newFontFamily = o.font
-                    }
-                })
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                const regex = /font-family:\s*[^;]+;/g;
-                htmlContent = htmlContent.replace(regex, newFontFamily)
-                html_doc = htmlContent
-                handleOutput()
-            }
-            // 第一个Table添加font-family
-            function tableFontFamily() {
-                let newFontFamily
-                const curlang = iframeDoc.documentElement.lang;
-                langArr.forEach(o => {
-                    if (o.lang == curlang) {
-                        newFontFamily = o.font
-                    }
-                })
-                const elements = iframeDoc.querySelector('table');
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                if (elements && !elements.style.fontFamily) {
-                    console.log('替换第一个fontfamily');
-                    htmlContent = htmlContent.replace(/\<table/, `<table style="${newFontFamily}"`)
-                    html_doc = htmlContent
-                }
-                handleOutput()
-            }
-            // 替换preview-copy中的nbsp
-            function replacePreNbsp() {
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                const preCopyString = htmlContent.replace(/<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/, (match, content) => {
-                    match = match.replace(content, preCopyNbsp)
-                    return match; // 替换为占位符
-                });
-                html_doc = preCopyString
-                handleOutput()
-            }
-            // 删除末尾footer部分nbsp
-            // function delNbsp() {
-            //     let htmlContent = iframeDoc.documentElement.outerHTML
-            //     const pattern = /(&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp;&nbsp;)/g;
-            //     let matches = htmlContent.match(pattern);
-            //     if (matches.length == 4) {
-            //         let count = 0; // 用于计数替换次数
-            //         const modifiedString = htmlContent.replace(pattern, (match) => {
-            //             count++;
-            //             return (count > 2) ? '&nbsp;&nbsp;&nbsp;&nbsp;\|&nbsp;&nbsp;&nbsp; ' : match;
-            //         });
-            //         html_doc = modifiedString
-            //         handleOutput()
-            //     }
-            // }
-            // 删除414媒体查询
-            function del414Media() {
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                let regex = /@media\s*screen\s*and\s*\(\s*max-device-width\s*:\s*414px\s*\)\s*{\s*u\s*~\s*div\s*{\s*min-width:\s*375px\s*;\s*}\s*body\s*,\s*u\s*\+\s*div\s*{\s*min-width\s*:\s*375px\s*;\s*}\s*}/;
-                let replacement = `@media screen and (max-device-width:414px) {
-          u ~ div { min-width: 100%;}
-          body,u+div { min-width: 100%;}
-        }`;
-                html_doc = htmlContent.replace(regex, replacement);
-                console.log("🚀 ~ 替换414")
-                handleOutput()
-            }
-            // legal末尾防止单字
-            function legalPackage() {
-                // 获取所有的 p 标签
-                const paragraphs = iframeDoc.querySelectorAll('p.sosumi');
-                console.log("🚀 ~ legalPackage ~ paragraphs:", paragraphs)
-                paragraphs.forEach(p => {
-                    // 获取 p 标签的内容
-                    const text = p.innerHTML;
-                    // 检查最后三个字符
-                    if (text.length >= 3) {
-                        const lastThreeChars = text.slice(-3);
-                        const regex = /^[\u4e00-\u9fa5]{2}\。$/; // 匹配两个中文字符加一个句号
-                        // 如果匹配，进行替换
-                        if (regex.test(lastThreeChars)) {
-                            // 用 <span> 包裹最后三个字符
-                            const wrappedText = text.slice(0, -3) + '<span class="nowrap" style="white-space: nowrap !important;">' + lastThreeChars + '</span>';
-                            p.innerHTML = wrappedText;
-                        }
+            // img最近的hideSmall父元素添加display:none;
+            function hideSmallImg() {
+                const elements = iframeDoc.querySelectorAll('img');
+                console.log("🚀 ~ hideSmallImg ~ elements:", elements)
+                elements.forEach(img => {
+                    const hideSmallParent = img.parentElement && img.parentElement.closest('.hideSmall');
+                    if (hideSmallParent) {
+                        hideSmallParent.style.display = 'none';
                     }
                 });
             }
-            // 替换css中>p选择器
-            function replacepSelector() {
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                const regex = /\.m-.+?(>)p/g;
-                html_doc = htmlContent.replace(regex, (match, content) => {
-                    return match.replace(content, ' ');
-                });
-                console.log("🚀 ~ 替换>p选择器")
-                handleOutput()
-            }
-            // img图片设置居中
-            function imgToCenter() {
-                const imgElement = iframeDoc.querySelectorAll('img');
-                imgElement.forEach(o => {
-                    const computedImgDisplay = window.getComputedStyle(o).display
-                    const computedImgMarginLeft = window.getComputedStyle(o).marginLeft
-                    const computedImgMarginRight = window.getComputedStyle(o).marginRight
-                    const computedImgTextAlign = window.getComputedStyle(o).textAlign
-                    // console.log("🚀 ~ imgToCenter ~ 图片display:", computedImgDisplay)
-                    if (computedImgDisplay == 'block' && computedImgMarginLeft != '0px' && computedImgMarginLeft != '0' && computedImgMarginRight != '0px' && computedImgMarginRight != '0') {
-                        o.style.display = 'inline-block'
-                        o.style.textAlign = 'center'
-                        // 获取图片的第一个父元素并设置其行高为0
-                        if (o && o.parentElement) {
-                        o.parentElement.style.lineHeight = '0';
-                        }
-                    } else if (computedImgDisplay == 'inline-block' && computedImgTextAlign == 'center') {
-                        o.style.display = 'inline-block'
-                        o.style.textAlign = 'center'
-                    }
-                })
-            }
-            // 日期间添加zwnj
-            function addDateZwnj() {
 
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                // 添加正则匹配和替换逻辑
-                const datePatterns = [
-                    /(\d{4})\s年\s(\d{1,2})\s月\s(\d{1,2})\s日/g,
-                    /(\d{4})\s年\s(\d{1,2})\s月/g,
-                    /(\d{1,2})\s月\s(\d{1,2})\s日/g,
-                    /(\d{4})\s年/g,
-                    /(\d{1,2})\s月/g,
-                ];
-
-                datePatterns.forEach(pattern => {
-                    htmlContent = htmlContent.replace(pattern, (match) => {
-                        // 将日期中的每个字符用 &zwnj; 连接
-                        console.log(match, 'hh');
-
-                        return match.split('').join('&zwnj;');
-                    });
-                });
-                html_doc = htmlContent;
-                handleOutput();
-            }
-            // footer下载appStore不换行
-            function appStoreNowrap() {
-                //查找a标签，如果href="${clicks.get('BNAV_APP')}"，则设置white-space:nowrap
-                const a = iframeDoc.querySelectorAll('a');
-
-                a.forEach(o => {
-
-                    if (o.href.includes("clicks.get('BNAV_APP')")) {
-                        o.style.setProperty('white-space', 'nowrap');
-                    }
-                })
-            }
-
-            // HK
-            function removeAddressUnderline() {
-                const curlang = iframeDoc.documentElement.lang;
-                if( !(curlang === 'zh-HK' || curlang === 'en-HK')){
-                    return
-                }                
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                console.log("🚀 ~ removeAddressUnderline ~ htmlContent:", htmlContent)
-                const preciseHKTCReg = /香港銅鑼灣時代廣場第一座 2401/g;
-                const preciseHKENReg = /Room 2401, Tower One, Times Square, Causeway Bay/g;
-                htmlContent = htmlContent.replace(preciseHKTCReg, '香&zwj;港&zwj;銅&zwj;鑼灣&zwj;時代&zwj;廣&zwj;場第&zwj;一座 24&zwj;01')
-                htmlContent = htmlContent.replace(preciseHKENReg, 'Ro&zwj;om 24&zwj;01, To&zwj;wer O&zwj;ne, Ti&zwj;mes Squ&zwj;are, Ca&zwj;use&zwj;way B&zwj;ay')
-                html_doc = htmlContent
-                handleOutput()
-            }
-
-            // mobile的sup标签设置行内样式（sina邮箱）
+            // mobile的sup标签设置行内样式（sina/163邮箱）
             function supNormalSize() {
-                const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
-                const sups = desktopContainer[0].querySelectorAll('sup');
+                const sups = iframeDoc.querySelectorAll('sup');
                 sups.forEach(o => {
                     o.style.fontSize = '0.65em'
                     o.style.lineHeight = '0'
@@ -647,51 +379,6 @@
                 })
             }
 
-            // mobile的整体布局不居中（sina邮箱）
-            function layoutNotCenter() {
-                const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
-                if (desktopContainer && desktopContainer.length > 0) {
-                    const rowTrs = desktopContainer[0].querySelectorAll('tr.row');
-                    rowTrs.forEach(tr => {
-                        const tables = tr.querySelectorAll('table[width="660"]');
-                        if (tables && tables.length > 0) {
-                            tables[0].style.margin = '0 auto';
-                        }
-                    });
-                }
-            }
-
-            // mobile的span标签如果设置了white-space:nowrap,设置class类名nowrap，并且nowrap加important（163邮箱）
-            function setNowrapSpan() {
-
-                const mobileContainer = iframeDoc.querySelectorAll('.mobile-container');
-                const sfcopy = iframeDoc.querySelectorAll('.sfcopy span');
-                const spans = mobileContainer[0].querySelectorAll('span');
-                [...spans, ...sfcopy].forEach(o => {
-                    if (o.style.whiteSpace == 'nowrap') {
-                        o.style.setProperty('white-space', 'nowrap', 'important')
-                        o.classList.add('nowrap')
-                    }
-                })
-
-                let htmlContent = iframeDoc.documentElement.outerHTML
-                // 添加正则匹配和替换逻辑
-                const regex = /\.eyebrow-text\s*,\s*\.nowrap\s*\{\s*white-space\s*:\s*nowrap\s*;\s*\}/g;
-                html_doc = htmlContent.replace(regex, '.eyebrow-text, .nowrap { white-space: nowrap !important; }');
-                handleOutput();
-            }
-
-            // desktop去除下划线的!important
-            function delUnderlineImportant() {
-
-                const desktopContainer = iframeDoc.querySelectorAll('.desktop-container');
-                const a_href = desktopContainer[0].querySelectorAll('a');
-                a_href.forEach(a => {
-                    if (!a.className.includes('btn')) {
-                        a.style.textDecoration = 'none';
-                    }
-                });
-            }
 
         });
     </script>
