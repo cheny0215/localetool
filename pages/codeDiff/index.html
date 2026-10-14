@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
@@ -8,336 +8,693 @@
     <link rel="stylesheet" href="../../css/index.css">
     <link rel="stylesheet" href="../../common/layui/css/layui.css" />
     <script src="../../common/layui/layui.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/elegant.min.css">
+    <link rel="stylesheet" href="../../common/codemirror/codemirror.min.css">
     <script src="../../common/components/ShowMessage.js" defer></script>
     <script src="../../common/components/Loading.js" defer></script>
 
     <style>
+        :root {
+            --cd-bg: #f5f6f8;
+            --cd-surface: #ffffff;
+            --cd-border: #e5e7eb;
+            --cd-border-strong: #d1d5db;
+            --cd-text: #1f2937;
+            --cd-text-2: #6b7280;
+            --cd-text-3: #9ca3af;
+            --cd-primary: #2563eb;
+            --cd-primary-hover: #1d4ed8;
+            --cd-red: #dc2626;
+            --cd-red-bg: #fee2e2;
+            --cd-red-mark: #fecaca;
+            --cd-green: #16a34a;
+            --cd-green-bg: #dcfce7;
+            --cd-green-mark: #bbf7d0;
+            --cd-radius: 10px;
+            --cd-mono: "SF Mono", Menlo, Monaco, Consolas, "Courier New", monospace;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            background: var(--cd-bg);
+            color: var(--cd-text);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            font-size: 14px;
         }
 
-        .CodeMirror {
-            border: 1px solid #ddd;
-            min-height: 50vh;
+        .page {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 20px 24px 40px;
         }
 
-        .container {
+        /* 顶部工具栏 */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
             display: flex;
+            align-items: center;
             justify-content: space-between;
+            gap: 16px;
+            padding: 12px 0 16px;
+            background: var(--cd-bg);
+        }
+
+        .toolbar-title {
+            display: flex;
+            align-items: baseline;
             gap: 10px;
         }
 
-        .container>div {
-            width: 50%;
+        .toolbar-title h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--cd-text);
         }
 
-        .diffBox {
-            width: 100%;
+        .toolbar-title span {
+            font-size: 12px;
+            color: var(--cd-text-3);
         }
 
-        .diff-output {
-            width: 100%;
-            overflow: auto;
-            margin-top: 20px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            background-color: #f8f8f8;
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .diff-added {
-            background-color: #90fe94;
-        }
-
-        .diff-removed {
-            background-color: #ffa3b2;
-        }
-
-        /* 表格table样式 */
-        table {
-            width: 100%;
-            /* 表格宽度 */
-            border-collapse: collapse;
-            /* 合并边框 */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            /* 阴影效果 */
-            background-color: #ffffff;
-            /* 表格背景色 */
-        }
-
-        th,
-        td {
-            padding: 12px 15px;
-            /* 内边距 */
-            text-align: left;
-            /* 左对齐 */
-            border-bottom: 1px solid #ddd;
-            /* 边框 */
-        }
-
-        th {
-            background-color: #4c90af;
-            /* 表头背景色 */
-            color: white;
-            /* 表头文字颜色 */
-            font-weight: bold;
-            /* 粗体 */
-            text-transform: uppercase;
-            /* 全部大写 */
-        }
-
-        tr:hover {
-            background-color: #f1f1f1 !important;
-            /* 悬停效果 */
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-            /* 偶数行背景色 */
-        }
-
-        tr:nth-child(odd) {
-            background-color: #ffffff;
-            /* 奇数行背景色 */
-        }
-
-        /* 美化标题 */
-        h3 {
-            color: #4c90af;
-            padding: 10px 0;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        h3::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: #4c90af;
-            border-radius: 2px;
-        }
-
-        /* 美化编辑器容器 */
-        .container > div {
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 34px;
+            padding: 0 14px;
+            border: 1px solid var(--cd-border-strong);
             border-radius: 8px;
-            padding: 15px;
-            background: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            background: var(--cd-surface);
+            color: var(--cd-text);
+            font-size: 13px;
+            cursor: pointer;
+            transition: background .15s, border-color .15s, color .15s;
+            white-space: nowrap;
         }
 
-        .container > div:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .btn:hover {
+            border-color: var(--cd-text-3);
+            background: #f9fafb;
         }
 
-        /* 美化按钮 */
-        .layui-btn {
-            transition: all 0.3s ease;
+        .btn .layui-icon {
+            font-size: 14px;
+        }
+
+        .btn.is-active {
+            border-color: var(--cd-primary);
+            color: var(--cd-primary);
+            background: #eff6ff;
+        }
+
+        .btn-primary {
+            border-color: var(--cd-primary);
+            background: var(--cd-primary);
+            color: #fff;
+            font-weight: 500;
+            padding: 0 18px;
+        }
+
+        .btn-primary:hover {
+            border-color: var(--cd-primary-hover);
+            background: var(--cd-primary-hover);
+        }
+
+        .btn-primary kbd {
+            font-family: inherit;
+            font-size: 11px;
+            padding: 1px 5px;
             border-radius: 4px;
+            background: rgba(255, 255, 255, .2);
+        }
+
+        .divider {
+            width: 1px;
+            height: 20px;
+            background: var(--cd-border-strong);
+            margin: 0 4px;
+        }
+
+        /* 编辑区 */
+        .editors {
             position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .pane {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: var(--cd-surface);
+            border: 1px solid var(--cd-border);
+            border-radius: var(--cd-radius);
             overflow: hidden;
+            transition: border-color .15s, box-shadow .15s;
         }
 
-        .layui-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        .pane:focus-within {
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
         }
 
-        .layui-btn:active {
-            transform: translateY(1px);
+        .pane-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 44px;
+            padding: 0 8px 0 14px;
+            border-bottom: 1px solid var(--cd-border);
+            background: #fafafa;
         }
 
-        /* 美化图标按钮 */
-        .layui-icon {
-            transition: all 0.2s ease;
+        .pane-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 13px;
         }
 
-        .layui-icon:hover {
-            opacity: 0.8;
-            transform: scale(1.1);
+        .pane-title .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
         }
 
-        /* 美化badge */
-        .layui-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-weight: normal;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .pane-left .dot { background: var(--cd-red); }
+        .pane-right .dot { background: var(--cd-green); }
+
+        .pane-meta {
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--cd-text-3);
+        }
+
+        .pane-tools {
+            display: flex;
+            gap: 2px;
+        }
+
+        .icon-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 20px;
-            height: 20px;
-            vertical-align: middle;
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--cd-text-2);
+            cursor: pointer;
+            transition: background .15s, color .15s;
         }
 
-        /* 美化对比结果区域 */
+        .icon-btn:hover {
+            background: #eef0f3;
+            color: var(--cd-text);
+        }
+
+        .icon-btn.danger:hover {
+            background: var(--cd-red-bg);
+            color: var(--cd-red);
+        }
+
+        .icon-btn .layui-icon {
+            font-size: 16px;
+        }
+
+        .swap-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 5;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--cd-border-strong);
+            border-radius: 50%;
+            background: var(--cd-surface);
+            color: var(--cd-text-2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+            cursor: pointer;
+            transition: color .15s, border-color .15s;
+        }
+
+        .swap-btn:hover {
+            color: var(--cd-primary);
+            border-color: var(--cd-primary);
+        }
+
+        .CodeMirror {
+            height: 46vh;
+            min-height: 300px;
+            font-family: var(--cd-mono);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .CodeMirror-gutters {
+            border-right: 1px solid #f0f0f0;
+            background: #fcfcfc;
+        }
+
+        .CodeMirror-linenumber {
+            color: #c0c4cc;
+        }
+
+        .CodeMirror-placeholder {
+            color: var(--cd-text-3) !important;
+        }
+
+        /* 结果区 */
+        .result {
+            margin-top: 20px;
+            background: var(--cd-surface);
+            border: 1px solid var(--cd-border);
+            border-radius: var(--cd-radius);
+        }
+
+        .result-header {
+            position: sticky;
+            top: var(--toolbar-h, 62px);
+            z-index: 4;
+            border-radius: var(--cd-radius) var(--cd-radius) 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 48px;
+            padding: 0 14px;
+            border-bottom: 1px solid var(--cd-border);
+            background: #fafafa;
+        }
+
+        .result-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .result-header h2 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .stat {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--cd-mono);
+        }
+
+        .stat-removed {
+            background: var(--cd-red-bg);
+            color: var(--cd-red);
+        }
+
+        .stat-added {
+            background: var(--cd-green-bg);
+            color: var(--cd-green);
+        }
+
+        .result-header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-counter {
+            min-width: 56px;
+            text-align: center;
+            font-size: 12px;
+            font-family: var(--cd-mono);
+            color: var(--cd-text-2);
+        }
+
+        .nav-hint {
+            font-size: 12px;
+            color: var(--cd-text-3);
+            margin-right: 6px;
+        }
+
         .diff-output {
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            padding: 16px 20px;
+            min-height: 160px;
+            font-family: var(--cd-mono);
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--cd-text);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .diff-added,
+        .diff-removed {
+            border-radius: 3px;
+            padding: 1px 0;
+            transition: box-shadow .15s;
         }
 
         .diff-added {
-            border-radius: 3px;
-            padding: 2px 0px;
+            background: var(--cd-green-mark);
+            color: #14532d;
         }
 
         .diff-removed {
-            border-radius: 3px;
-            padding: 2px 0px;
+            background: var(--cd-red-mark);
+            color: #7f1d1d;
+            text-decoration: line-through;
+            text-decoration-color: rgba(127, 29, 29, .45);
         }
 
-        /* 美化返回顶部按钮 */
-        .diffBox a .layui-icon-up {
-            transition: all 0.3s ease;
-            opacity: 0.8;
+        .diff-current {
+            box-shadow: 0 0 0 2px var(--cd-primary);
         }
 
-        .diffBox a .layui-icon-up:hover {
+        .empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 40px 0;
+            font-family: inherit;
+            color: var(--cd-text-3);
+            white-space: normal;
+        }
+
+        .empty .layui-icon {
+            font-size: 36px;
+            color: #d1d5db;
+        }
+
+        .empty.is-same .layui-icon {
+            color: var(--cd-green);
+        }
+
+        .empty.is-same {
+            color: var(--cd-text-2);
+        }
+
+        .back-top {
+            position: fixed;
+            right: 32px;
+            bottom: 32px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: var(--cd-primary);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, .35);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: opacity .2s, transform .2s, visibility .2s, background .15s, box-shadow .15s;
+        }
+
+        .back-top.is-visible {
             opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .back-top .layui-icon {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .back-top:hover {
+            background: var(--cd-primary-hover);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, .45);
             transform: translateY(-2px);
         }
 
-        /* 美化CodeMirror编辑器 */
-        .CodeMirror {
-            border-radius: 4px;
-            transition: all 0.3s ease;
+        /* 差异列表弹窗 */
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
         }
 
-        .CodeMirror:focus-within {
-            box-shadow: 0 0 0 2px rgba(76, 144, 175, 0.1);
+        .diff-table th,
+        .diff-table td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
         }
 
-        /* 按钮容器样式优化 */
-        .layui-btn-container {
-            background: #f8f9fa;
-            border-radius: 6px;
-            padding: 15px !important;
+        .diff-table th {
+            position: sticky;
+            top: 0;
+            background: #fafafa;
+            color: var(--cd-text-2);
+            font-weight: 500;
         }
 
-        /* 添加当前选中差异的样式 */
-        .diff-current {
-            border: 2px solid #ff4444;
-            border-radius: 4px;
-            padding: 2px;
+        .diff-table td:first-child,
+        .diff-table th:first-child {
+            width: 56px;
+            color: var(--cd-text-3);
+            font-family: var(--cd-mono);
         }
 
-        /* 优化差异样式，添加过渡效果 */
-        .diff-added, .diff-removed {
-            transition: all 0.2s ease;
+        .diff-table td:nth-child(2),
+        .diff-table th:nth-child(2) {
+            width: 80px;
+        }
+
+        .diff-table td:last-child {
+            font-family: var(--cd-mono);
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .diff-table tbody tr {
+            cursor: pointer;
+        }
+
+        .diff-table tbody tr:hover {
+            background: #eff6ff;
+        }
+
+        @media (max-width: 860px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+                position: static;
+            }
+
+            .editors {
+                grid-template-columns: 1fr;
+            }
+
+            .swap-btn {
+                transform: translate(-50%, -50%) rotate(90deg);
+            }
+
+            .result-header {
+                position: static;
+                flex-wrap: wrap;
+                padding: 8px 14px;
+            }
         }
     </style>
 </head>
 
 <body>
+    <div class="page">
+        <header class="toolbar" id="compareTool">
+            <div class="toolbar-title">
+                <h1>文本对比</h1>
+                <span>逐词比较两段文本的差异</span>
+            </div>
+            <div class="toolbar-actions">
+                <button class="btn" onclick="readSessionText()" title="读取 session 中保存的新旧 HTML">
+                    <i class="layui-icon layui-icon-download-circle"></i>读取 session
+                </button>
+                <button class="btn is-active" id="wordWrapBtn" onclick="wordWrap()">
+                    <i class="layui-icon layui-icon-align-left"></i>自动换行
+                </button>
+                <button class="btn is-active" id="ignoreSpaceBtn" onclick="toggleIgnoreSpace()" title="不标记仅由空格、缩进、换行造成的差异">
+                    <i class="layui-icon layui-icon-fonts-clear"></i>忽略空白差异
+                </button>
+                <button class="btn" onclick="clearText()">
+                    <i class="layui-icon layui-icon-refresh"></i>清空
+                </button>
+                <span class="divider"></span>
+                <button class="btn btn-primary" onclick="compare()">
+                    开始对比 <kbd id="shortcutKey">Ctrl ↵</kbd>
+                </button>
+            </div>
+        </header>
 
-    <h3 id="compareTool">文本对比工具</h3>
+        <section class="editors">
+            <div class="pane pane-left">
+                <div class="pane-header">
+                    <div class="pane-title">
+                        <span class="dot"></span>原始文本
+                        <span class="pane-meta" id="meta1">0 行 · 0 字符</span>
+                    </div>
+                    <div class="pane-tools">
+                        <button class="icon-btn" title="复制" onclick="copyText(1)"><i class="layui-icon layui-icon-file"></i></button>
+                        <button class="icon-btn danger" title="清空" onclick="delText(1)"><i class="layui-icon layui-icon-delete"></i></button>
+                    </div>
+                </div>
+                <textarea id="code1"></textarea>
+            </div>
 
-    <div class="container">
-        <div style="border-top:1px solid #ffacba;">
-            <span style="color: #fa4f6b;line-height: 40px;">文本1</span>
-            <span class="layui-badge" id="text_icon1">--</span>&nbsp;&nbsp;
-            <i class="layui-icon layui-icon-delete"
-                style="vertical-align: middle;font-size: 26px;cursor: pointer;color: #666;" onclick="delText(1)"></i>
-            <i class="layui-icon layui-icon-file"
-                style="vertical-align: middle;font-size: 20px;cursor: pointer;color: #666;" onclick="copyText(1)"></i>
-            <textarea id="code1" wrap="hard"></textarea>
-        </div>
-        <div style="border-top:1px solid #c9ffa9;">
-            <span style="color: #58c31a;line-height: 40px;">文本2</span>
-            <span class="layui-badge" style="background:#16b777" id="text_icon2">--</span>&nbsp;&nbsp;
-            <i class="layui-icon layui-icon-delete"
-                style="vertical-align: middle;font-size: 26px;cursor: pointer;color: #666;" onclick="delText(2)"></i>
-            <i class="layui-icon layui-icon-file"
-                style="vertical-align: middle;font-size: 20px;cursor: pointer;color: #666;" onclick="copyText(2)"></i>
-            <textarea id="code2" wrap="hard"></textarea>
-        </div>
+            <button class="swap-btn" title="交换左右文本" onclick="swapText()">
+                <i class="layui-icon layui-icon-transfer"></i>
+            </button>
+
+            <div class="pane pane-right">
+                <div class="pane-header">
+                    <div class="pane-title">
+                        <span class="dot"></span>修改后文本
+                        <span class="pane-meta" id="meta2">0 行 · 0 字符</span>
+                    </div>
+                    <div class="pane-tools">
+                        <button class="icon-btn" title="复制" onclick="copyText(2)"><i class="layui-icon layui-icon-file"></i></button>
+                        <button class="icon-btn danger" title="清空" onclick="delText(2)"><i class="layui-icon layui-icon-delete"></i></button>
+                    </div>
+                </div>
+                <textarea id="code2"></textarea>
+            </div>
+        </section>
+
+        <section class="result">
+            <div class="result-header">
+                <div class="result-header-left">
+                    <h2 id="compareResult">对比结果</h2>
+                    <span class="stat stat-removed" title="删除处数">−<span id="text_icon1">0</span></span>
+                    <span class="stat stat-added" title="新增处数">+<span id="text_icon2">0</span></span>
+                </div>
+                <div class="result-header-right">
+                    <span class="nav-hint">↑ ↓ 键切换差异</span>
+                    <button class="icon-btn" title="上一处差异" onclick="navigateDiff('prev')"><i class="layui-icon layui-icon-up"></i></button>
+                    <span class="nav-counter" id="navCounter">– / –</span>
+                    <button class="icon-btn" title="下一处差异" onclick="navigateDiff('next')"><i class="layui-icon layui-icon-down"></i></button>
+                    <span class="divider"></span>
+                    <button class="btn" lay-on="page"><i class="layui-icon layui-icon-list"></i>差异列表</button>
+                </div>
+            </div>
+            <div id="diff-output" class="diff-output"></div>
+        </section>
     </div>
 
-    <div class="layui-btn-container" style="padding: 12px 0;">
-        <button onclick="compare()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">对比</button>
-        <button onclick="wordWrap()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">text是否折行显示</button>
-        <button onclick="clearText()" class="layui-btn layui-btn-sm layui-btn-primary layui-border">Clear</button>
-        <button onclick="readSessionText()"
-            class="layui-btn layui-btn-sm layui-btn-primary layui-border">读取session数据</button>
-        <button type="button" class="layui-btn layui-btn-sm layui-btn-primary layui-border"
-            lay-on="page">查看差异列表</button>
-    </div>
+    <button class="back-top" id="backTop" title="回到顶部" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+        <i class="layui-icon layui-icon-top"></i>
+    </button>
 
-    <h3 id="compareResult">对比结果</h3>
-    <div class="diffBox">
-        <a href="#compareTool" style="display: none;"><span class="layui-icon layui-icon-up"
-                style="color:#fa4f6b;font-size: 40px;padding:1px 6px;background-color: rgba(0, 0, 0, 0.05);font-weight: 700;border-radius: 6px;position: fixed;bottom:20px;right:40px;cursor: pointer;"></span></a>
-        <div id="diff-output" class="diff-output"></div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
+    <script src="../../common/codemirror/codemirror.min.js"></script>
+    <script src="../../common/codemirror/mode/javascript/javascript.min.js"></script>
+    <script src="../../common/codemirror/addon/display/placeholder.min.js"></script>
     <script>
         const diffOutput = document.querySelector('#diff-output')
         const text_icon1 = document.querySelector('#text_icon1')
         const text_icon2 = document.querySelector('#text_icon2')
-        const compareResult = document.querySelector('#compareResult')
+        const navCounter = document.querySelector('#navCounter')
+        const wordWrapBtn = document.querySelector('#wordWrapBtn')
+
+        const isMac = /Mac|iPhone|iPad/.test(navigator.platform)
+        document.querySelector('#shortcutKey').textContent = isMac ? '⌘ ↵' : 'Ctrl ↵'
+
+        const EMPTY_HTML = `<div class="empty"><i class="layui-icon layui-icon-tips"></i>在上方输入两段文本，点击「开始对比」查看差异</div>`
+        const SAME_HTML = `<div class="empty is-same"><i class="layui-icon layui-icon-ok-circle"></i>两段文本完全一致</div>`
 
         let diffArr = []
-        // 初始化CodeMirror编辑器
-        let editor1
-        let editor2
-        editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
+
+        const editorOptions = {
             lineNumbers: true,
             mode: "javascript",
-            theme: "elegant",
             lineWrapping: true,
+        }
+        const editor1 = CodeMirror.fromTextArea(document.getElementById("code1"), {
+            ...editorOptions,
+            placeholder: '粘贴原始文本…',
+        });
+        const editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
+            ...editorOptions,
+            placeholder: '粘贴修改后的文本…',
         });
 
-        editor2 = CodeMirror.fromTextArea(document.getElementById("code2"), {
-            lineNumbers: true,
-            mode: "javascript",
-            theme: "elegant",
-            lineWrapping: true,
-        });
-        function escapeHtml(text) {
-            let element = document.createElement('div');
-            element.innerText = text;
-            return element.innerHTML;
+        function updateMeta(editor, el) {
+            const value = editor.getValue()
+            const lines = value ? editor.lineCount() : 0
+            el.textContent = `${lines} 行 · ${value.length} 字符`
         }
+        editor1.on('change', () => updateMeta(editor1, document.querySelector('#meta1')))
+        editor2.on('change', () => updateMeta(editor2, document.querySelector('#meta2')))
+
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function resetResult() {
+            diffArr = []
+            text_icon1.textContent = '0'
+            text_icon2.textContent = '0'
+            diffOutput.innerHTML = EMPTY_HTML
+            initDiffNavigation()
+        }
+
         function clearText() {
             editor1.setValue('')
             editor2.setValue('')
-            text_icon1.textContent = '--'
-            text_icon2.textContent = '--'
-            diffOutput.innerHTML = '';
+            resetResult()
         }
+
         function delText(num) {
-            if (num == 1) {
-                text_icon1.textContent = '--'
-                editor1.setValue('')
-            }
-            if (num == 2) {
-                text_icon2.textContent = '--'
-                editor2.setValue('')
-            }
-            diffOutput.innerHTML = '';
-            showMessage({ msg: '已删除', type: 'error', delay: 500, isTransition: false })
+            (num == 1 ? editor1 : editor2).setValue('')
+            resetResult()
+            showMessage({ msg: '已清空', type: 'error', delay: 500, isTransition: false })
         }
+
         function copyText(num) {
-            if (num == 1) {
-                navigator.clipboard.writeText(editor1.getValue())
-            }
-            if (num == 2) {
-                navigator.clipboard.writeText(editor2.getValue())
-            }
+            navigator.clipboard.writeText((num == 1 ? editor1 : editor2).getValue())
             showMessage({ msg: '已复制', type: 'info', delay: 500, isTransition: false })
         }
-        function readSessionText(num) {
+
+        function swapText() {
+            const text1 = editor1.getValue()
+            editor1.setValue(editor2.getValue())
+            editor2.setValue(text1)
+            if (diffArr.length || diffOutput.querySelector('.is-same')) compare()
+        }
+
+        function readSessionText() {
             const json_compareObj = localStorage.getItem('cy_outputButton_current_html')
+            if (!json_compareObj) {
+                showMessage({ msg: '没有可读取的 session 数据', type: 'error' })
+                return
+            }
             const compareObj = JSON.parse(json_compareObj)
             editor1.setValue(compareObj.oldHtml)
             editor2.setValue(compareObj.newHtml)
@@ -345,160 +702,221 @@
             showMessage({ msg: '读取session数据成功', type: 'success' })
         }
 
+        let diffWorker = null
+        let diffRequestId = 0
+        const pendingDiffs = new Map()
 
-        // 对比文本的函数
-        async function compare() {
-            LoadingModule.show()
-            console.log('compare');
-            diffArr = []
-            diffOutput.innerHTML = ''
-            let text1 = escapeHtml(editor1.getValue());
-            let text2 = escapeHtml(editor2.getValue());
+        try {
+            diffWorker = new Worker('./diff.worker.js')
+            diffWorker.onmessage = (e) => {
+                const pending = pendingDiffs.get(e.data.id)
+                if (!pending) return
+                pendingDiffs.delete(e.data.id)
+                pending.resolve(e.data.diff)
+            }
+            diffWorker.onerror = (e) => {
+                e.preventDefault()
+                diffWorker.terminate()
+                diffWorker = null
+                pendingDiffs.forEach(({ text1, text2, resolve }) => resolve(diffOnMainThread(text1, text2)))
+                pendingDiffs.clear()
+            }
+        } catch (err) {
+            // file:// 协议下浏览器禁止创建 Worker
+            diffWorker = null
+            console.log('file:// 协议下浏览器禁止创建 Worker');
+            
+        }
 
-            let diff = await new Promise((resolve) => {
-                setTimeout(() => {
-                    // 使用jsdiff库进行文本对比
-                    // let diff = Diff.diffLines(text1, text2);
-                    const diffs = Diff.diffWords(text1, text2);
-                    resolve(diffs)
-                    LoadingModule.hide()
-                }, 0)
+        function loadDiffLib() {
+            if (window.Diff) return Promise.resolve()
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script')
+                script.src = '../../common/jsdiff/diff.min.js'
+                script.onload = resolve
+                script.onerror = reject
+                document.head.appendChild(script)
             })
-            console.log('diff', diff);
+        }
 
+        async function diffOnMainThread(text1, text2) {
+            await loadDiffLib()
+            await new Promise(resolve => setTimeout(resolve, 0))
+            return Diff.diffWords(text1, text2)
+        }
 
-            let diffHtml = diff.map(function (part, index, arr) {
-                let color = part.added ? 'diff-added' : part.removed ? 'diff-removed' : '';
-                let diffElement = `<span class="${color}">${part.value.replace(/\n/g, '<br>')}</span>`
+        function runDiff(id, text1, text2) {
+            if (!diffWorker) return diffOnMainThread(text1, text2)
+            return new Promise((resolve) => {
+                pendingDiffs.set(id, { text1, text2, resolve })
+                diffWorker.postMessage({ id, text1, text2 })
+            })
+        }
+
+        async function compare() {
+            const requestId = ++diffRequestId
+            const text1 = editor1.getValue();
+            const text2 = editor2.getValue();
+
+            LoadingModule.show()
+            let diff
+            try {
+                diff = await runDiff(requestId, text1, text2)
+            } catch (err) {
+                showMessage({ msg: '对比失败：差异库加载失败', type: 'error' })
+                return
+            } finally {
+                if (requestId === diffRequestId) LoadingModule.hide()
+            }
+            if (requestId !== diffRequestId) return
+
+            diffArr = []
+
+            let addedCount = 0
+            let removedCount = 0
+            let diffHtml = diff.map(function (part) {
+                const value = escapeHtml(part.value)
+                if (ignoreSpace && (part.added || part.removed) && !part.value.trim()) {
+                    return part.added ? value : ''
+                }
                 if (part.added) {
-                    diffArr.push({
-                        added: `<span class="diff-added">${part.value.replace(/\n/g, '<br>')}</span>`,
-                    })
+                    addedCount++
+                    diffArr.push({ added: value })
+                    return `<span class="diff-added">${value}</span>`
                 }
                 if (part.removed) {
-                    diffArr.push({
-                        removed: `<span class="diff-removed">${part.value.replace(/\n/g, '<br>')}</span>`,
-                    })
+                    removedCount++
+                    diffArr.push({ removed: value })
+                    return `<span class="diff-removed">${value}</span>`
                 }
-                const { addedCount, removedCount } = diffArr.reduce((acc, item) => {
-                    if (item.added) acc.addedCount++;
-                    if (item.removed) acc.removedCount++;
-                    return acc;
-                }, { addedCount: 0, removedCount: 0 });
-                text_icon1.innerText = removedCount
-                text_icon2.innerText = addedCount
-                return diffElement;
+                return value
             }).join('');
-            if (diff.length === 1 && !diff[0].removed && !diff[0].added) {
-                diffHtml = '<h1>文本无差异</h1>'
+
+            text_icon1.textContent = removedCount
+            text_icon2.textContent = addedCount
+
+            if (!editor1.getValue() && !editor2.getValue()) {
+                diffHtml = EMPTY_HTML
+            } else if (!addedCount && !removedCount) {
+                diffHtml = SAME_HTML
             }
-            console.log('diffArr', diffArr);
             showMessage({ msg: '对比完成！', type: 'success' })
             diffOutput.innerHTML = diffHtml;
-            // 初始化差异导航
             initDiffNavigation();
         }
 
         function wordWrap() {
-            const currentWrap1 = editor1.getOption('lineWrapping');
-            editor1.setOption('lineWrapping', !currentWrap1);
-            const currentWrap2 = editor2.getOption('lineWrapping');
-            editor2.setOption('lineWrapping', !currentWrap2);
+            const wrap = !editor1.getOption('lineWrapping')
+            editor1.setOption('lineWrapping', wrap)
+            editor2.setOption('lineWrapping', wrap)
+            wordWrapBtn.classList.toggle('is-active', wrap)
+        }
+
+        let ignoreSpace = true
+        function toggleIgnoreSpace() {
+            ignoreSpace = !ignoreSpace
+            document.querySelector('#ignoreSpaceBtn').classList.toggle('is-active', ignoreSpace)
+            if (editor1.getValue() || editor2.getValue()) compare()
         }
 
         layui.use(function () {
             var layer = layui.layer;
             var util = layui.util;
-            // 批量事件
             util.on('lay-on', {
                 page: function () {
-                    // 遍历 diffArr 数组并填充表格
-                    const rows = diffArr.map((item) => {
-                        if (item.added) {
-                            return `<tr>
-                                <td><strong>Added</strong></td>
-                                <td>${item.added}</td>
+                    if (!diffArr.length) {
+                        showMessage({ msg: '暂无差异', type: 'info' })
+                        return
+                    }
+                    const rows = diffArr.map((item, index) => {
+                        const isAdded = 'added' in item
+                        return `<tr data-index="${index}" title="点击跳转到该处差异">
+                                <td>${index + 1}</td>
+                                <td><span class="stat ${isAdded ? 'stat-added' : 'stat-removed'}">${isAdded ? '新增' : '删除'}</span></td>
+                                <td><span class="${isAdded ? 'diff-added' : 'diff-removed'}">${isAdded ? item.added : item.removed}</span></td>
                             </tr>`;
-                        }
-                        if (item.removed) {
-                            return `<tr>
-                                <td><strong>Removed</strong></td>
-                                <td>${item.removed}</td>
-                            </tr>`;
-                        }
-                        return ''; // 返回空字符串以防止未定义项的出现
-                    }).join(''); // 将生成的数组连接成一个字符串
-                    const tableHtml = `<table>
+                    }).join('');
+                    const tableHtml = `<table class="diff-table">
                                     <thead>
-                                        <tr>
-                                            <th>type</th>
-                                            <th>content</th>
-                                        </tr>
+                                        <tr><th>#</th><th>类型</th><th>内容</th></tr>
                                     </thead>
-                                    <tbody>
-                                        ${rows}
-                                    </tbody>
+                                    <tbody>${rows}</tbody>
                                 </table>`;
 
-                    let table = layer.open({
+                    const layerIndex = layer.open({
                         type: 1,
-                        area: ['820px', '440px'], // 宽高
-                        content: tableHtml
+                        title: `差异列表（${diffArr.length} 处）· 点击行跳转`,
+                        area: ['820px', '520px'],
+                        shadeClose: true,
+                        content: tableHtml,
+                        success: function (layero) {
+                            layero[0].querySelector('.diff-table tbody').addEventListener('click', (e) => {
+                                const row = e.target.closest('tr[data-index]')
+                                if (!row) return
+                                layer.close(layerIndex)
+                                goToDiff(Number(row.dataset.index))
+                            })
+                        }
                     });
-                    layer.title('<h4>文本差异列表</h4>', table)
                 },
             })
         })
 
+        const toolbar = document.querySelector('.toolbar')
+        new ResizeObserver(() => {
+            document.documentElement.style.setProperty('--toolbar-h', `${toolbar.offsetHeight}px`)
+        }).observe(toolbar)
+
+        const backTop = document.querySelector('#backTop')
         window.addEventListener('scroll', function () {
-            const myDiv = document.querySelector('.diffBox a');
-            if (window.scrollY >= 2000) {
-                myDiv.style.display = 'block'; // 显示div
-            } else {
-                myDiv.style.display = 'none'; // 隐藏div
-            }
+            backTop.classList.toggle('is-visible', window.scrollY >= 400)
         });
 
         let currentDiffIndex = -1;
         let diffElements = [];
 
+        function updateNavCounter() {
+            navCounter.textContent = diffElements.length
+                ? `${currentDiffIndex + 1 || '–'} / ${diffElements.length}`
+                : '– / –'
+        }
+
         function initDiffNavigation() {
-            // 获取所有差异元素
-            diffElements = document.querySelectorAll('.diff-added, .diff-removed');
+            diffElements = diffOutput.querySelectorAll('.diff-added, .diff-removed');
             currentDiffIndex = -1;
-            
-            // 移除所有当前高亮
-            diffElements.forEach(el => el.classList.remove('diff-current'));
+            updateNavCounter()
+        }
+
+        function goToDiff(index) {
+            if (!diffElements[index]) return;
+
+            if (currentDiffIndex >= 0) {
+                diffElements[currentDiffIndex].classList.remove('diff-current');
+            }
+            currentDiffIndex = index;
+
+            const currentElement = diffElements[currentDiffIndex];
+            currentElement.classList.add('diff-current');
+            currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            updateNavCounter()
         }
 
         function navigateDiff(direction) {
             if (diffElements.length === 0) return;
-
-            // 移除当前高亮
-            if (currentDiffIndex >= 0) {
-                diffElements[currentDiffIndex].classList.remove('diff-current');
-            }
-
-            // 计算新的索引
-            if (direction === 'next') {
-                currentDiffIndex = (currentDiffIndex + 1) % diffElements.length;
-            } else {
-                currentDiffIndex = currentDiffIndex <= 0 ? diffElements.length - 1 : currentDiffIndex - 1;
-            }
-
-            // 添加新的高亮
-            const currentElement = diffElements[currentDiffIndex];
-            currentElement.classList.add('diff-current');
-
-            // 滚动到当前元素
-            currentElement.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
+            const total = diffElements.length
+            goToDiff(direction === 'next'
+                ? (currentDiffIndex + 1) % total
+                : (currentDiffIndex <= 0 ? total - 1 : currentDiffIndex - 1))
         }
 
-        // 添加键盘事件监听
         document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                e.preventDefault();
+                compare();
+                return;
+            }
+            // 焦点在编辑器或输入框内时保留方向键的原生行为
+            if (e.target.closest('.CodeMirror, input, textarea')) return;
             if (e.key === 'ArrowDown') {
                 e.preventDefault();
                 navigateDiff('next');
@@ -507,6 +925,8 @@
                 navigateDiff('prev');
             }
         });
+
+        resetResult()
     </script>
 
 </body>

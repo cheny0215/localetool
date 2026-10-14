@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="./assets/css/messageBoard.css">
     <script src="./common/layui/layui.js"></script>
     <script src="./common/components/Loading.js"></script>
-    <script src="./common/components/animationLoading.js"></script>
+    <script src="./common/components/simpleLoading.js"></script>
 
     <style>
         /* 基本样式 */
@@ -21,6 +21,7 @@
             display: flex;
             transition: margin-left 0.3s;
             position: relative;
+            overflow: hidden;
         }
 
         #sidebar {
@@ -291,6 +292,54 @@
             position: relative;
             top: -1px;
         }
+
+        /* 最近常用工具 */
+        .layui-nav .recent-tools {
+            left: auto;
+            right: 0;
+            width: 260px;
+            max-width: calc(100vw - 24px);
+        }
+
+        .recent-tools dd a {
+            display: flex !important;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .recent-tools dd a > span:first-child {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .recent-tools .recent-count {
+            flex-shrink: 0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .recent-tools .recent-empty {
+            padding: 8px 20px;
+            font-size: 12px;
+            color: #999;
+            line-height: 1.6;
+            white-space: normal;
+        }
+
+        .recent-tools .recent-clear {
+            border-top: 1px solid #eee;
+            margin-top: 4px;
+        }
+
+        .recent-tools .recent-clear a {
+            justify-content: center !important;
+            font-size: 12px;
+            color: #999 !important;
+        }
     </style>
 </head>
 
@@ -382,7 +431,8 @@
                     </dl>
                 </li>
                 <li class="layui-nav-item">
-                    <a style="cursor: pointer;" onclick="window.open('./pages/demo/index.html')">最近更新内容</a>
+                    <a href="javascript:;" class="layui-icon-time layui-icon">最近常用</a>
+                    <dl class="layui-nav-child recent-tools" id="recentToolsList"></dl>
                 </li>
             </ul>
             <div id="content">
@@ -508,7 +558,7 @@
             iframe.src = `./pages/${path}/index.html`;
             iframe.setAttribute('data-name', name);
 
-            const loadingContainer = animationLoading.loaddingAnimation()
+            const loadingContainer = simpleLoading.loaddingAnimation()
 
             try {
 
@@ -598,11 +648,77 @@
                 // 阻止事件冒泡
                 e.stopPropagation();
 
-                // 激活当前点击的菜单项
-                activeButton(index);
-                sessionStorage.setItem('cy_activeButton_current_index', index);
+                openTool(index);
             }
         }
+
+        function openTool(index) {
+            activeButton(index);
+            sessionStorage.setItem('cy_activeButton_current_index', index);
+            recordToolUsage(cBTN[index].getAttribute('path'));
+        }
+
+        // 最近常用工具
+        const RECENT_TOOLS_KEY = 'cy_recent_tools_usage'
+        const RECENT_TOOLS_LIMIT = 8
+        const recentToolsList = document.getElementById('recentToolsList')
+
+        function getToolUsage() {
+            try {
+                return JSON.parse(localStorage.getItem(RECENT_TOOLS_KEY)) || {}
+            } catch (e) {
+                return {}
+            }
+        }
+
+        function recordToolUsage(path) {
+            const usage = getToolUsage()
+            const item = usage[path] || { count: 0, lastUsed: 0 }
+            item.count++
+            item.lastUsed = Date.now()
+            usage[path] = item
+            localStorage.setItem(RECENT_TOOLS_KEY, JSON.stringify(usage))
+            renderRecentTools()
+        }
+
+        // 次数越多、越近使用排得越前：每隔 7 天未使用，权重衰减一半
+        function usageScore({ count, lastUsed }) {
+            const days = (Date.now() - lastUsed) / 86400000
+            return count / (1 + days / 7)
+        }
+
+        function renderRecentTools() {
+            const usage = getToolUsage()
+            const tools = [...cBTN]
+                .map((btn, index) => ({ index, name: btn.getAttribute('name'), usage: usage[btn.getAttribute('path')] }))
+                .filter(tool => tool.usage)
+                .sort((a, b) => usageScore(b.usage) - usageScore(a.usage))
+                .slice(0, RECENT_TOOLS_LIMIT)
+
+            if (!tools.length) {
+                recentToolsList.innerHTML = '<div class="recent-empty">暂无记录，从左侧打开过的工具会显示在这里</div>'
+                return
+            }
+
+            recentToolsList.innerHTML = tools.map(tool => `
+                <dd><a href="javascript:;" data-index="${tool.index}" title="${tool.name}">
+                    <span>${tool.name}</span><span class="recent-count">${tool.usage.count} 次</span>
+                </a></dd>`).join('') +
+                '<dd class="recent-clear"><a href="javascript:;" data-action="clear">清空记录</a></dd>'
+        }
+
+        recentToolsList.addEventListener('click', function (e) {
+            const link = e.target.closest('a')
+            if (!link) return
+            if (link.dataset.action === 'clear') {
+                localStorage.removeItem(RECENT_TOOLS_KEY)
+                renderRecentTools()
+                return
+            }
+            openTool(Number(link.dataset.index))
+        })
+
+        renderRecentTools()
 
 
         // 加载动画
@@ -617,6 +733,8 @@
 
     <!-- 添加每日一言内容 -->
     <script src="./assets/js/daily-sentence.js"></script>
+
+    
 
 
 </body>

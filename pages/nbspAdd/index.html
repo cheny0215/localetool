@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="../../css/index.css">
     <link rel="stylesheet" href="../../common/layui/css/layui.css"/>
     <script src="../../common/layui/layui.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/5.0.0/diff.min.js"></script>
+    <script src="../../common/jsdiff/diff.min.js"></script>
     <script src="../../common/components/ShowMessage.js" defer></script>
     <script src="../../common/components/Loading.js" defer></script>
     <style>
@@ -87,7 +87,7 @@
         }
 
         .layui-btn:hover {
-            transform: perspective(800px) translateY(-4px) rotateX(5deg);
+            transform: perspective(800px) translateY(-2px) rotateX(5deg);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15), 
                        0 12px 28px rgba(0,0,0,0.12);
         }
@@ -270,7 +270,7 @@
         
         <div class="button-group">
             <button id="btnToNbsp" class="layui-btn layui-btn-normal">转换&amp;nbsp;并复制</button>
-            <button id="btnToNbspMcfly" class="layui-btn layui-btn-warm">转换:nbsp:并复制</button>
+            <button id="btnToNbspMcfly" class="layui-btn layui-btn-warm">转换{%nbsp%}并复制</button>
             <button id="btnToClear" class="layui-btn layui-btn-danger">清除内容</button>
         </div>
 
@@ -285,7 +285,7 @@
     </div>
     
     <div class="footer">
-        文本空格转换工具 © 2024
+        文本空格转换工具 © <script>document.write(new Date().getFullYear())</script>
     </div>
 </body>
 <script>
@@ -369,7 +369,7 @@
     });
 
     btnToNbspMcfly.addEventListener('click', function () {
-        replaceSpacesWithNbsp(':nbsp:')
+        replaceSpacesWithNbsp('{%nbsp%}')
     });
 
     btnToClear.addEventListener('click', function () {
