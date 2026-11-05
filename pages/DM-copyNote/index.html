@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>项目信息生成器</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
             --success-color: #059669;
-            --note-color: #0892a7;
-            --background-color: #f8fafc;
+            --background-color: #f1f5f9;
             --card-background: #ffffff;
             --border-color: #e2e8f0;
-            --text-primary: #1e293b;
+            --text-primary: #0f172a;
             --text-secondary: #64748b;
-            --selected-background: #eff6ff;
+            --svn: #2563eb;
+            --browser: #0891b2;
+            --mcfly: #d97706;
+            --radar: #7c3aed;
+            --file: #059669;
         }
 
         * {
@@ -27,368 +29,692 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: var(--background-color);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background-color);
+            color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
         }
 
-        .app-container {
-            display: grid;
-            grid-template-columns: 250px 0.8fr 1fr;
-            gap: 1rem;
-            height: 100vh;
-            padding: 1rem;
+        button,
+        input,
+        select {
+            font-family: inherit;
         }
 
-        /* 项目列表面板 */
-        .projects-panel {
-            background: var(--card-background);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        .app {
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        .projects-header {
-            padding: 1rem;
+        .topbar {
+            flex: none;
+            background: #fff;
             border-bottom: 1px solid var(--border-color);
+            padding: 14px 20px 0;
         }
 
-        .projects-header h2 {
-            font-size: 1rem;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .new-project-btn {
-            width: 100%;
-            padding: 0.5rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.875rem;
-        }
-
-        .projects-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0.5rem;
-        }
-
-        .project-item {
-            font-size: 0.875rem;
-            padding: 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
+        .top-row {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.5rem;
+            gap: 10px;
         }
 
-        .project-item:hover {
-            background: var(--background-color);
+        .brand {
+            flex: none;
+            margin-right: 8px;
         }
 
-        .project-item.active {
-            background: var(--selected-background);
-            border-left: 3px solid var(--primary-color);
+        .brand h1 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
-        .delete-project {
-            opacity: 0;
-            color: #ef4444;
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            padding: 0.25rem;
-        }
-
-        .project-item:hover .delete-project {
-            opacity: 1;
-        }
-
-        /* 表单面板 */
-        .form-panel {
-            background: var(--card-background);
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 1.5rem;
-            overflow-y: auto;
-            visibility: hidden;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: flex;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            gap: 2px;
-            margin-right: 10px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 0.875rem;
-        }
-
-        /* 生成结果面板 */
-        .result-panel {
-            background: transparent;
-            border-radius: 8px;
-            padding: 0.5rem;
-            overflow-y: auto;
-        }
-
-        .result-section {
-            margin-bottom: 1.25rem;
-            background: var(--card-background);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-
-        .result-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .section-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            padding: 0.75rem 1rem;
-            background: linear-gradient(to right, #f0f9ff, #ffffff);
-            border-bottom: 2px solid var(--primary-color);
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .result-item {
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            transition: background 0.2s ease;
-        }
-
-        .result-item:hover {
-            background: #fafbfc;
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-        }
-
-        .result-content {
-            flex: 1;
-            padding-right: 0.75rem;
-        }
-
-        .result-label {
-            font-size: 0.75rem;
+        .brand p {
+            font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 0.35rem;
-            font-weight: 500;
-            letter-spacing: 0.3px;
+            margin-top: 2px;
         }
 
-        .result-value {
-            font-size: 0.875rem;
+        .project-select {
+            flex: 1;
+            min-width: 0;
+            max-width: 360px;
+            height: 36px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0 10px;
+            background: #fff;
             color: var(--text-primary);
-            word-break: break-all;
-            line-height: 1.5;
+            font-size: 14px;
         }
 
-        .copy-btn {
-            padding: 0.4rem 0.875rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.75rem;
+        .btn {
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+            color: var(--text-primary);
+            font-size: 13px;
             font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+            cursor: pointer;
             white-space: nowrap;
         }
 
-        .copy-btn:hover {
+        .btn:hover {
+            background: #f8fafc;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
             background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
         }
 
-        .copy-btn:active {
-            transform: translateY(0);
+        .btn-active {
+            border-color: #93c5fd;
+            background: #eff6ff;
+            color: var(--primary-color);
         }
 
-        /* 滚动条样式 */
-        ::-webkit-scrollbar {
-            width: 6px;
+        .search-row {
+            margin-top: 12px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        .search {
+            width: 100%;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0 14px;
+            font-size: 14px;
+            background: #f8fafc;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 3px;
+        .search:focus {
+            outline: none;
+            border-color: #93c5fd;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        #language-checkboxes{
+        .tabs {
             display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 2px 10px;
+            margin-right: 12px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab .count {
+            font-weight: 500;
+            margin-left: 4px;
+            color: #94a3b8;
+        }
+
+        .tab.active {
+            color: var(--text-primary);
+            border-bottom-color: currentColor;
+        }
+
+        .tab.active[data-cat="svn"] { color: var(--svn); }
+        .tab.active[data-cat="browser"] { color: var(--browser); }
+        .tab.active[data-cat="mcfly"] { color: var(--mcfly); }
+        .tab.active[data-cat="radar"] { color: var(--radar); }
+        .tab.active[data-cat="file"] { color: var(--file); }
+
+        .workspace {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            position: relative;
+        }
+
+        .drawer {
+            width: 0;
+            flex: none;
+            overflow: hidden;
+            background: #fff;
+            border-right: 1px solid transparent;
+            transition: width 0.18s ease;
+        }
+
+        .app.editing .drawer {
+            width: 320px;
+            border-right-color: var(--border-color);
+            overflow-y: auto;
+        }
+
+        .drawer-inner {
+            width: 320px;
+            padding: 16px 16px 28px;
+        }
+
+        .drawer-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .drawer-head h2 {
+            font-size: 15px;
+        }
+
+        .icon-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 18px;
+        }
+
+        .icon-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .field-block {
+            margin-bottom: 16px;
+        }
+
+        .field-block h3 {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 8px;
+        }
+
+        .form-group.span-2 {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #334155;
+        }
+
+        .form-group input {
+            width: 100%;
+            height: 34px;
+            padding: 0 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            font-size: 13px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+
+        .hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .lang-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .lang-chip {
+            position: relative;
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .lang-chip input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .lang-chip:has(input:checked) {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: #fff;
+        }
+
+        .uuid-add {
+            display: flex;
+            gap: 6px;
+        }
+
+        .uuid-add input {
+            flex: 1;
+            height: 34px;
+            padding: 0 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            font-size: 13px;
         }
 
         .uuid-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0.2rem;
-            background: var(--background-color);
-            border-radius: 4px;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+            gap: 8px;
+            padding: 6px 8px;
+            background: #f8fafc;
+            border-radius: 7px;
+            margin-bottom: 6px;
         }
 
-        .uuid-item .uuid-text {
-            font-size: 12px;
+        .uuid-version {
+            flex: none;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--mcfly);
+            background: #f5f3ff;
+            border-radius: 999px;
+            padding: 2px 6px;
+        }
+
+        .uuid-text {
             flex: 1;
+            min-width: 0;
+            font-size: 12px;
             word-break: break-all;
-            color: var(--text-primary);
-        }
-
-        .uuid-item .uuid-version {
-            font-size:0.8rem;
-            margin-right: 0.5rem;
-            color: var(--text-secondary);
-            font-weight: 500;
         }
 
         .uuid-item button {
-            background: #ef4444;
-            color: white;
+            flex: none;
             border: none;
-            border-radius: 4px;
-            padding: 0.25rem 0.5rem;
+            background: transparent;
+            color: #ef4444;
             cursor: pointer;
-            font-size: 0.75rem;
+            font-size: 12px;
         }
 
-        .uuid-item button:hover {
-            background: #dc2626;
+        .danger-link {
+            margin-top: 8px;
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 0;
+        }
+
+        .board {
+            flex: 1;
+            min-width: 0;
+            overflow-y: auto;
+            padding: 16px 20px 32px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+            align-content: start;
+        }
+
+        .card {
+            text-align: left;
+            background: var(--tint, #fff);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--cat, var(--primary-color));
+            border-radius: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+        }
+
+        .card.svn { --cat: var(--svn); --tint: #f5f9ff; }
+        .card.browser { --cat: var(--browser); --tint: #f3fbfc; }
+        .card.mcfly { --cat: var(--mcfly); --tint: #fffaf3; }
+        .card.radar { --cat: var(--radar); --tint: #f7f5ff; }
+        .card.file { --cat: var(--file); --tint: #f3fbf6; }
+
+        .card:hover {
+            border-color: #cbd5e1;
+            border-left-color: var(--cat);
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        }
+
+        .card:focus-visible {
+            outline: 2px solid var(--cat);
+            outline-offset: 2px;
+        }
+
+        .card.copied {
+            background: #f0fdf4;
+            border-color: #86efac;
+            border-left-color: var(--success-color);
+        }
+
+        .card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--cat);
+        }
+
+        .copy-state {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        .card:hover .copy-state,
+        .card:focus-visible .copy-state {
+            color: var(--cat);
+        }
+
+        .card.copied .copy-state {
+            color: var(--success-color);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.3;
+        }
+
+        .card-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .card-value {
+            margin-top: 6px;
+            background: #f8fafc;
+            border-radius: 6px;
+            border:1px solid #999;
+            padding: 6px 8px;
+            font-size: 12px;
+            line-height: 1.45;
+            color: #334155;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            word-break: break-all;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+
+        .empty {
+            height: 100%;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-secondary);
+            gap: 8px;
+        }
+
+        .empty strong {
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        .empty p {
+            font-size: 13px;
+            max-width: 360px;
+            line-height: 1.5;
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: 24px;
+            transform: translateX(-50%) translateY(12px);
+            background: #0f172a;
+            color: #fff;
+            font-size: 13px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.18s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 99px;
+        }
+
+        @media (max-width: 760px) {
+            .brand p {
+                display: none;
+            }
+
+            .workspace {
+                flex-direction: column;
+            }
+
+            .app.editing .drawer,
+            .drawer-inner {
+                width: 100%;
+            }
+
+            .app.editing .drawer {
+                max-height: 42vh;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="app-container">
-        <!-- 项目列表 -->
-        <div class="projects-panel">
-            <div class="projects-header">
-                <h2>项目列表</h2>
-                <div style="padding-bottom:0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
-                    项目中经常使用到的文本或者提交信息，都可以根据已有信息自动拼好，直接点击复制
+    <div class="app" id="app">
+        <header class="topbar">
+            <div class="top-row">
+                <div class="brand">
+                    <h1>复制便签</h1>
+                    <p>点卡片即可复制</p>
                 </div>
-                <button class="new-project-btn" onclick="createNewProject()">新建项目</button>
+                <select class="project-select" id="projectSelect" aria-label="当前项目"></select>
+                <button class="btn btn-primary" id="newProjectBtn" type="button">新建项目</button>
+                <button class="btn" id="editToggle" type="button">编辑项目</button>
             </div>
-            <div class="projects-list" id="projectsList">
-                <!-- 项目列表将在这里动态生成 -->
+            <div class="search-row">
+                <input class="search" id="searchInput" type="search" placeholder="搜索要复制的内容，例如 SVN、HKEN、radar、文件名" autocomplete="off">
             </div>
-        </div>
+            <div class="tabs" id="tabs" role="tablist"></div>
+        </header>
 
-        <!-- 表单 -->
-        <div class="form-panel">
-            <div style="padding-bottom:0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
-                在下方一次性设置好你的项目的相关信息（数据不会丢失，保存在本地），需要的时候直接在右边点击复制
-            </div>
-            <div class="form-group">
-                <label>项目名称</label>
-                <input type="text" id="projectName" placeholder="输入项目名称">
-            </div>
-            <div class="form-group">
-                <label>项目开发人员</label>
-                <input type="text" id="developer" placeholder="输入开发人员姓名">
-            </div>
-            <div class="form-group">
-                <label>项目PM</label>
-                <input type="text" id="pm" placeholder="输入项目PM">
-            </div>
-            <div class="form-group">
-                <label>IC服务器</label>
-                <input type="text" id="icServer" placeholder="输入服务器地址">
-            </div>
-            <div class="form-group">
-                <label>项目年份</label>
-                <input type="text" id="year" placeholder="输入项目所在服务器年份文件夹">
-            </div>
-            <div class="form-group">
-                <label>uuid <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: normal;">(每个uuid代表一个版本)</span></label>
-                <div id="uuid-list" style="margin-bottom: 0.5rem;">
-                    <!-- UUID列表将在这里动态生成 -->
-                </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" id="uuid-input" placeholder="输入新的uuid" style="flex: 1;">
-                    <button onclick="addUuid()" style="padding: 0.5rem 1rem; background: var(--text-secondary); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.875rem;">添加</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>项目语言</label>
-                <div id="language-checkboxes">
-                    <label><input type="checkbox" name="language" value="HKEN"> HKEN</label><br>
-                    <label><input type="checkbox" name="language" value="HKTC"> HKTC</label><br>
-                    <label><input type="checkbox" name="language" value="MOTC"> MOTC</label><br>
-                    <label><input type="checkbox" name="language" value="TWTC"> TWTC</label><br>
-                    <label><input type="checkbox" name="language" value="CNSC"> CNSC</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label>radar</label>
-                <input type="text" id="radar" placeholder="输入merge图时的radar">
-            </div>
-            <div class="form-group">
-                <label>trunk提交号</label>
-                <input type="text" id="revision" placeholder="输入merge提交号">
-            </div>
-        </div>
+        <div class="workspace">
+            <aside class="drawer" id="drawer">
+                <div class="drawer-inner">
+                    <div class="drawer-head">
+                        <h2>项目信息</h2>
+                        <button class="icon-btn" id="closeDrawer" type="button" aria-label="收起">×</button>
+                    </div>
+                    <p class="hint" style="margin-bottom: 14px;">填一次就保存在这台电脑上。右边的卡片会马上更新。</p>
 
-        <!-- 生成结果 -->
-        <div class="result-panel" id="generatedResults">
-            <!-- 生成的结果将在这里显示 -->
+                    <div class="field-block">
+                        <h3>基本信息</h3>
+                        <div class="form-group">
+                            <label for="projectName">项目名称</label>
+                            <input type="text" id="projectName" placeholder="例如 K11p Announce" autocomplete="off">
+                        </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="developer">开发</label>
+                                <input type="text" id="developer" placeholder="姓名" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="pm">PM</label>
+                                <input type="text" id="pm" placeholder="PM" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-block">
+                        <h3>服务器</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="icServer">IC 服务器</label>
+                                <input type="text" id="icServer" placeholder="例如 ic04" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="year">ic的项目年份</label>
+                                <input type="text" id="year" placeholder="例如 26" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field-block">
+                        <h3>UUID <span class="hint">每个 UUID 一个版本</span></h3>
+                        <div id="uuid-list"></div>
+                        <div class="uuid-add">
+                            <input type="text" id="uuid-input" placeholder="粘贴新的 UUID，回车添加" autocomplete="off">
+                            <button class="btn" id="addUuidBtn" type="button">添加</button>
+                        </div>
+                    </div>
+
+                    <div class="field-block">
+                        <h3>语言</h3>
+                        <div class="lang-row" id="language-checkboxes">
+                            <label class="lang-chip"><input type="checkbox" name="language" value="HKEN">HKEN</label>
+                            <label class="lang-chip"><input type="checkbox" name="language" value="HKTC">HKTC</label>
+                            <label class="lang-chip"><input type="checkbox" name="language" value="MOTC">MOTC</label>
+                            <label class="lang-chip"><input type="checkbox" name="language" value="TWTC">TWTC</label>
+                            <label class="lang-chip"><input type="checkbox" name="language" value="CNSC">CNSC</label>
+                        </div>
+                    </div>
+
+                    <div class="field-block">
+                        <h3>跑图</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="radar">Radar</label>
+                                <input type="text" id="radar" placeholder="radar 号" autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="revision">Trunk 提交号</label>
+                                <input type="text" id="revision" placeholder="revision" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="danger-link" id="deleteProjectBtn" type="button">删除这个项目</button>
+                </div>
+            </aside>
+
+            <main class="board" id="board"></main>
         </div>
     </div>
+    <div class="toast" id="toast" role="status"></div>
 
     <script>
-        const formPanel = document.querySelector('.form-panel');
-        // 项目数据存储
+        const CATS = [
+            { id: 'svn', label: 'SVN 提交' },
+            { id: 'browser', label: '预览地址' },
+            { id: 'mcfly', label: '图片路径' },
+            { id: 'radar', label: 'Radar 回复' },
+            { id: 'file', label: '跑图文件' }
+        ];
+
+        const languageMap = {
+            HKEN: '/hk/en',
+            HKTC: '/hk',
+            MOTC: '/mo',
+            TWTC: '/tw',
+            CNSC: '.cn'
+        };
+
+        const app = document.getElementById('app');
+        const board = document.getElementById('board');
+        const tabsEl = document.getElementById('tabs');
+        const projectSelect = document.getElementById('projectSelect');
+        const searchInput = document.getElementById('searchInput');
+        const editToggle = document.getElementById('editToggle');
+        const toast = document.getElementById('toast');
+
         let projects = JSON.parse(localStorage.getItem('DM-copyNote')) || {};
         let currentProjectId = localStorage.getItem('DM-copyNote-currentProjectId');
+        let allItems = [];
+        let activeCat = 'all';
+        let copiedTimer = null;
+        let toastTimer = null;
 
-        if (projects && JSON.stringify(projects) != '{}') {
-            formPanel.style.visibility = 'visible';
+        function saveData() {
+            localStorage.setItem('DM-copyNote', JSON.stringify(projects));
         }
-        // 创建新项目
-        function createNewProject() {            
-            formPanel.style.visibility = 'visible';
+
+        function setEditing(open) {
+            app.classList.toggle('editing', open);
+            document.getElementById('drawer').inert = !open;
+            editToggle.classList.toggle('btn-active', open);
+            editToggle.textContent = open ? '收起编辑' : '编辑项目';
+            if (open) {
+                document.getElementById('projectName').focus();
+            }
+        }
+
+        function createNewProject() {
             const projectId = 'project_' + Date.now();
             projects[projectId] = {
                 name: '新项目',
@@ -397,345 +723,109 @@
                     developer: '',
                     pm: '',
                     icServer: '',
+                    year: '',
                     uuid: [],
-                    language: '',
+                    language: [],
                     radar: '',
-                    revision: '',
+                    revision: ''
                 }
             };
             currentProjectId = projectId;
             saveData();
-            renderProjects();
+            localStorage.setItem('DM-copyNote-currentProjectId', projectId);
             loadProject(projectId);
+            setEditing(true);
         }
 
-        // 修改 deleteProject 函数和项目列表渲染部分
-
-        // 渲染项目列表
-        function renderProjects() {
-
-            const list = document.getElementById('projectsList');
-            list.innerHTML = '';
-
-            Object.entries(projects).forEach(([id, project]) => {
-                const div = document.createElement('div');
-                div.className = `project-item ${id === currentProjectId ? 'active' : ''}`;
-                div.innerHTML = `
-            <span>${project.name}</span>
-            <button class="delete-project" data-id="${id}">×</button>
-        `;
-                // 分别添加点击事件
-                div.onclick = () => loadProject(id);
-                div.querySelector('.delete-project').onclick = (e) => {
-                    e.stopPropagation();
-                    deleteProject(id);
-                };
-                list.appendChild(div);
-            });
-        }
-
-        // 删除项目
         function deleteProject(id) {
+            if (!id || !projects[id]) return;
             if (!confirm('确定要删除这个项目吗？')) return;
 
             delete projects[id];
-            if (currentProjectId === id) {
-                currentProjectId = Object.keys(projects)[0];
-                if (currentProjectId) {
-                    loadProject(currentProjectId);
-                } else {
-                    clearForm();
-                }
-            }
             saveData();
-            renderProjects();
 
-            if (!projects || JSON.stringify(projects) == '{}') {
-                formPanel.style.visibility = 'hidden';
+            const remaining = Object.keys(projects);
+            if (remaining.length === 0) {
+                currentProjectId = null;
+                localStorage.removeItem('DM-copyNote-currentProjectId');
+                clearForm();
+                setEditing(false);
+                renderProjectSelect();
+                allItems = [];
+                renderBoard();
+                return;
+            }
+
+            if (currentProjectId === id) {
+                loadProject(remaining[0]);
+            } else {
+                renderProjectSelect();
             }
         }
 
-        // 添加清空表单函数
         function clearForm() {
-            document.getElementById('projectName').value = '';
-            document.getElementById('developer').value = '';
-            document.getElementById('pm').value = '';
-            document.getElementById('icServer').value = '';
-            document.getElementById('uuid-input').value = '';
+            ['projectName', 'developer', 'pm', 'icServer', 'year', 'radar', 'revision', 'uuid-input'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
             document.getElementById('uuid-list').innerHTML = '';
-            document.getElementById('radar').value = '';
-            document.getElementById('revision').value = '';
-            document.getElementById('generatedResults').innerHTML = '';
-            currentProjectId = null;
-        }
-
-        // 加载项目
-        function loadProject(id) {
-            currentProjectId = id;
-            const project = projects[id].data;
-            console.log("🚀 ~ loadProject ~ project:", project)
-
-            document.getElementById('projectName').value = project.projectName;
-            document.getElementById('developer').value = project.developer;
-            document.getElementById('pm').value = project.pm;
-            document.getElementById('icServer').value = project.icServer;
-            document.getElementById('year').value = project.year;
-            document.getElementById('radar').value = project.radar;
-            document.getElementById('revision').value = project.revision;
-            
-            // 渲染UUID列表
-            renderUuidList();
-
-            // 处理语言多选
-            // 清除所有复选框的选中状态
             document.querySelectorAll('input[name="language"]').forEach(checkbox => {
                 checkbox.checked = false;
             });
-            
-            // 设置选中的语言
-            if (Array.isArray(project.language)) {
-                project.language.forEach(lang => {
-                    const checkbox = document.querySelector(`input[name="language"][value="${lang}"]`);
-                    if (checkbox) {
-                        checkbox.checked = true;
-                    }
-                });
-            } else if (project.language) {
-                // 兼容旧数据格式
-                const checkbox = document.querySelector(`input[name="language"][value="${project.language}"]`);
-                if (checkbox) {
-                    checkbox.checked = true;
-                }
+        }
+
+        function renderProjectSelect() {
+            const ids = Object.keys(projects);
+            if (ids.length === 0) {
+                projectSelect.innerHTML = '<option value="">还没有项目</option>';
+                projectSelect.disabled = true;
+                return;
             }
+            projectSelect.disabled = false;
+            projectSelect.innerHTML = ids.map(id => {
+                const name = projects[id].name || '未命名项目';
+                return `<option value="${id}">${escapeHtml(name)}</option>`;
+            }).join('');
+            if (currentProjectId && projects[currentProjectId]) {
+                projectSelect.value = currentProjectId;
+            }
+        }
+
+        function loadProject(id) {
+            if (!projects[id]) return;
+            currentProjectId = id;
+            const project = projects[id].data;
+
+            document.getElementById('projectName').value = project.projectName || '';
+            document.getElementById('developer').value = project.developer || '';
+            document.getElementById('pm').value = project.pm || '';
+            document.getElementById('icServer').value = project.icServer || '';
+            document.getElementById('year').value = project.year || '';
+            document.getElementById('radar').value = project.radar || '';
+            document.getElementById('revision').value = project.revision || '';
+
+            document.querySelectorAll('input[name="language"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            const langs = Array.isArray(project.language)
+                ? project.language
+                : (project.language ? [project.language] : []);
+            langs.forEach(lang => {
+                const checkbox = document.querySelector(`input[name="language"][value="${lang}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
 
             localStorage.setItem('DM-copyNote-currentProjectId', id);
-            renderProjects();
-            generateResults();
-        }
-
-
-
-        // 保存数据
-        function saveData() {
-            localStorage.setItem('DM-copyNote', JSON.stringify(projects));
-        }
-
-        // 生成结果
-        function generateResults() {
-            if (!currentProjectId) return;
-
-            const project = projects[currentProjectId].data;
-            const results = document.getElementById('generatedResults');
-            results.innerHTML = '';
-
-            // 处理语言显示
-            const languages = Array.isArray(project.language) ? project.language.join('&') : project.language;
-            
-            // 语言代码映射
-            const languageMap = {
-                'HKEN': '/hk/en',
-                'HKTC': '/hk',
-                'MOTC': '/mo',
-                'TWTC': '/tw',
-                'CNSC': '.cn'
-            };
-
-            // 生成浏览器使用的items
-            const browserItems = [];
-            const uuids = Array.isArray(project.uuid) ? project.uuid : (project.uuid ? [project.uuid] : []);
-            
-            if (Array.isArray(project.language) && project.language.length > 0 && uuids.length > 0) {
-                uuids.forEach((uuid, uuidIndex) => {
-                    project.language.forEach(lang => {
-                        const langCode = languageMap[lang];
-                        const versionLabel = uuids.length > 1 ? ` (版本${uuidIndex + 1})` : '';
-                        browserItems.push({
-                            label: `${lang}${versionLabel} 项目ic预览平台地址`,
-                            value: `https://${project.icServer}.preview.apple.com${langCode}/dm/?id=${uuid.substring(0, 8)}`
-                        });
-                    });
-                });
-            } 
-
-            // 按使用场景分组的数据结构
-            const sections = [
-                {
-                    title: 'SVN 提交使用',
-                    items: [
-                        { label: 'svn提交信息', value: `Update ${project.projectName} code By ${project.developer}` },
-                        { label: '图片merge到trunk提交信息', value: `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}` }
-                    ]
-                },
-                {
-                    title: '浏览器使用',
-                    items: browserItems
-                },
-                {
-                    title: 'mcfly 使用',
-                    items: uuids.map((uuid, index) => {
-                        const versionLabel = uuids.length > 1 ? ` (版本${index + 1})` : '';
-                        return {
-                            label: `项目ic预览平台img的src${versionLabel}`,
-                            value: `https://${project.icServer}.preview.apple.com/hk/en/dm/${project.year}/${uuid}/i`
-                        };
-                    })
-                },
-                {
-                    title: 'radar 使用',
-                    items: [
-                        { label: 'ISV radar回复信息', value: `Hi XXXX,\n\nUpdated your feedback, please help to review. Thanks.\n\nBest,\n${project.developer}` },
-                        { label: '跑图radar回复信息', value: `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}` }
-                    ]
-                },
-                {
-                    title: '跑图文件命名',
-                    items: [
-                        { label: 'Merge List 文件名', value: `Merge List_${project.projectName}_${languages}_r${project.revision}.txt` },
-                        { label: 'Contact Sheet 文件名', value: `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html` }
-                    ]
-                }
-            ];
-
-            // 渲染分组结果
-            sections.forEach(section => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'result-section';
-                
-                const titleDiv = document.createElement('div');
-                titleDiv.className = 'section-title';
-                titleDiv.textContent = section.title;
-                sectionDiv.appendChild(titleDiv);
-
-                section.items.forEach(item => {
-                    const div = document.createElement('div');
-                    div.className = 'result-item';
-                    div.innerHTML = `
-                        <div class="result-content">
-                            <div class="result-label">${item.label}</div>
-                            <div class="result-value">${item.value.replace(/\n/g, '<br>')}</div>
-                        </div>
-                        <button class="copy-btn" onclick="copyText('${item.value.replace(/\n/g, '\\n')}', this)">复制</button>
-                    `;
-                    sectionDiv.appendChild(div);
-                });
-
-                results.appendChild(sectionDiv);
-            });
-        }
-
-        // 复制文本
-        function copyText(text, button) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = button.textContent;
-                button.textContent = '已复制';
-                button.style.background = 'var(--success-color)';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = 'var(--primary-color)';
-                }, 1500);
-            });
-        }
-
-        // 添加UUID相关函数
-        function addUuid() {
-            if (!currentProjectId) return;
-            
-            const input = document.getElementById('uuid-input');
-            const uuid = input.value.trim();
-            
-            if (!uuid) {
-                alert('请输入UUID');
-                return;
-            }
-            
-            // 确保uuid是数组
-            if (!Array.isArray(projects[currentProjectId].data.uuid)) {
-                projects[currentProjectId].data.uuid = [];
-            }
-            
-            // 检查是否已存在
-            if (projects[currentProjectId].data.uuid.includes(uuid)) {
-                alert('该UUID已存在');
-                return;
-            }
-            
-            projects[currentProjectId].data.uuid.push(uuid);
-            input.value = '';
-            
-            saveData();
             renderUuidList();
+            renderProjectSelect();
             generateResults();
         }
 
-        function removeUuid(index) {
-            if (!currentProjectId) return;
-            
-            if (confirm('确定要删除这个UUID吗？')) {
-                projects[currentProjectId].data.uuid.splice(index, 1);
-                saveData();
-                renderUuidList();
-                generateResults();
-            }
+        function selectedLanguages() {
+            return Array.from(document.querySelectorAll('input[name="language"]:checked')).map(cb => cb.value);
         }
 
-        function renderUuidList() {
-            if (!currentProjectId) return;
-            
-            const uuidList = document.getElementById('uuid-list');
-            const uuids = projects[currentProjectId].data.uuid || [];
-            
-            // 兼容旧数据：如果uuid是字符串，转换为数组
-            if (typeof uuids === 'string' && uuids) {
-                projects[currentProjectId].data.uuid = [uuids];
-                saveData();
-            }
-            
-            const uuidArray = Array.isArray(projects[currentProjectId].data.uuid) 
-                ? projects[currentProjectId].data.uuid 
-                : [];
-            
-            if (uuidArray.length === 0) {
-                uuidList.innerHTML = '<div style="font-size: 0.75rem; color: var(--text-secondary); padding: 0.5rem;">暂无UUID</div>';
-                return;
-            }
-            
-            uuidList.innerHTML = uuidArray.map((uuid, index) => `
-                <div class="uuid-item">
-                    <span class="uuid-version">版本${index + 1}</span>
-                    <span class="uuid-text">${uuid}</span>
-                    <button onclick="removeUuid(${index})">删除</button>
-                </div>
-            `).join('');
-        }
-
-        // 监听表单变化
-        ['projectName', 'developer', 'pm', 'icServer','year', 'radar','revision'].forEach(id => {
-            document.getElementById(id).addEventListener('input', () => {
-                updateProjectData();
-            });
-        });
-        
-        // UUID输入框支持回车添加
-        document.getElementById('uuid-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                addUuid();
-            }
-        });
-
-        // 为语言复选框添加事件监听
-        document.querySelectorAll('input[name="language"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                updateProjectData();
-            });
-        });
-
-        // 更新项目数据的函数
         function updateProjectData() {
-            if (!currentProjectId) return;
-
-            // 获取选中的语言
-            const selectedLanguages = Array.from(document.querySelectorAll('input[name="language"]:checked'))
-                                          .map(cb => cb.value);
+            if (!currentProjectId || !projects[currentProjectId]) return;
 
             const formData = {
                 projectName: document.getElementById('projectName').value,
@@ -743,27 +833,365 @@
                 pm: document.getElementById('pm').value,
                 icServer: document.getElementById('icServer').value,
                 year: document.getElementById('year').value,
-                language: selectedLanguages, // 保存为数组
+                language: selectedLanguages(),
                 radar: document.getElementById('radar').value,
-                uuid: projects[currentProjectId].data.uuid || [], // 保持UUID数组不变
-                revision: document.getElementById('revision').value,
+                uuid: projects[currentProjectId].data.uuid || [],
+                revision: document.getElementById('revision').value
             };
 
             projects[currentProjectId].data = formData;
             projects[currentProjectId].name = formData.projectName || '未命名项目';
-
             saveData();
-            renderProjects();
+            renderProjectSelect();
             generateResults();
         }
 
-        // 初始化
+        function addUuid() {
+            if (!currentProjectId) return;
+            const input = document.getElementById('uuid-input');
+            const uuid = input.value.trim();
+            if (!uuid) return;
+
+            if (!Array.isArray(projects[currentProjectId].data.uuid)) {
+                projects[currentProjectId].data.uuid = [];
+            }
+            if (projects[currentProjectId].data.uuid.includes(uuid)) {
+                input.select();
+                return;
+            }
+
+            projects[currentProjectId].data.uuid.push(uuid);
+            input.value = '';
+            saveData();
+            renderUuidList();
+            generateResults();
+        }
+
+        function removeUuid(index) {
+            if (!currentProjectId) return;
+            projects[currentProjectId].data.uuid.splice(index, 1);
+            saveData();
+            renderUuidList();
+            generateResults();
+        }
+
+        function renderUuidList() {
+            const uuidList = document.getElementById('uuid-list');
+            if (!currentProjectId) {
+                uuidList.innerHTML = '';
+                return;
+            }
+
+            let uuids = projects[currentProjectId].data.uuid || [];
+            if (typeof uuids === 'string') {
+                uuids = uuids ? [uuids] : [];
+                projects[currentProjectId].data.uuid = uuids;
+                saveData();
+            }
+
+            if (uuids.length === 0) {
+                uuidList.innerHTML = '<div class="hint" style="margin-bottom:8px;">还没有 UUID</div>';
+                return;
+            }
+
+            uuidList.innerHTML = uuids.map((uuid, index) => `
+                <div class="uuid-item">
+                    <span class="uuid-version">版本 ${index + 1}</span>
+                    <span class="uuid-text">${escapeHtml(uuid)}</span>
+                    <button type="button" data-remove-uuid="${index}">删除</button>
+                </div>
+            `).join('');
+        }
+
+        function generateResults() {
+            if (!currentProjectId || !projects[currentProjectId]) {
+                allItems = [];
+                renderBoard();
+                return;
+            }
+
+            const project = projects[currentProjectId].data;
+            const languages = Array.isArray(project.language) ? project.language.join('&') : (project.language || '');
+            const uuids = Array.isArray(project.uuid) ? project.uuid : (project.uuid ? [project.uuid] : []);
+            const items = [];
+
+            items.push({
+                cat: 'svn',
+                catLabel: 'SVN',
+                title: '代码提交',
+                hint: 'svn commit 信息',
+                value: `Update ${project.projectName} code By ${project.developer}`
+            });
+            items.push({
+                cat: 'svn',
+                catLabel: 'SVN',
+                title: '图片 Merge',
+                hint: 'merge 到 trunk 的提交信息',
+                value: `${project.pm} ask to merge ${project.projectName} from ${project.icServer} to ictrunk for ${project.radar} By ${project.developer}`
+            });
+
+            if (Array.isArray(project.language) && project.language.length > 0 && uuids.length > 0) {
+                uuids.forEach((uuid, uuidIndex) => {
+                    project.language.forEach(lang => {
+                        const langCode = languageMap[lang];
+                        items.push({
+                            cat: 'browser',
+                            catLabel: '预览',
+                            title: lang,
+                            hint: 'IC 预览平台',
+                            badge: uuids.length > 1 ? `版本 ${uuidIndex + 1}` : '',
+                            value: `https://${project.icServer}.preview.apple.com${langCode}/dm/?id=${uuid.substring(0, 8)}&tab=local`
+                        });
+                    });
+                });
+            }
+
+            uuids.forEach((uuid, index) => {
+                items.push({
+                    cat: 'mcfly',
+                    catLabel: '图片',
+                    title: uuids.length > 1 ? `版本 ${index + 1}` : '图片 src',
+                    hint: 'mcfly 里 img 的 src 前缀',
+                    value: `https://${project.icServer}.preview.apple.com/hk/en/dm/${project.year}/${uuid}/i`
+                });
+            });
+
+            items.push({
+                cat: 'radar',
+                catLabel: 'Radar',
+                title: 'ISV 回复',
+                hint: '回复审阅反馈',
+                value: `Hi XXXX,\n\nUpdated your feedback, please help to review. Thanks.\n\nBest,\n${project.developer}`
+            });
+            items.push({
+                cat: 'radar',
+                catLabel: 'Radar',
+                title: '跑图回复',
+                hint: 'merge 图片之后回复',
+                value: `Merge ${project.projectName} images from ${project.icServer} to trunk for ${languages}.\nRevision: ${project.revision}`
+            });
+
+            items.push({
+                cat: 'file',
+                catLabel: '文件',
+                title: 'Merge List',
+                hint: '跑图文件名',
+                value: `Merge List_${project.projectName}_${languages}_r${project.revision}.txt`
+            });
+            items.push({
+                cat: 'file',
+                catLabel: '文件',
+                title: 'Contact Sheet',
+                hint: '跑图文件名',
+                value: `Contact Sheet_${project.projectName}_${languages}_r${project.revision}.html`
+            });
+
+            allItems = items;
+            renderBoard();
+        }
+
+        function visibleItems() {
+            const q = searchInput.value.trim().toLowerCase();
+            return allItems.filter(item => {
+                if (activeCat !== 'all' && item.cat !== activeCat) return false;
+                if (!q) return true;
+                return [item.catLabel, item.title, item.hint, item.badge, item.value]
+                    .join('\n')
+                    .toLowerCase()
+                    .includes(q);
+            });
+        }
+
+        function renderTabs() {
+            const counts = { all: allItems.length };
+            CATS.forEach(cat => {
+                counts[cat.id] = allItems.filter(item => item.cat === cat.id).length;
+            });
+
+            const tabs = [{ id: 'all', label: '全部' }, ...CATS];
+            tabsEl.innerHTML = tabs.map(tab => `
+                <button class="tab ${tab.id === activeCat ? 'active' : ''}" type="button" data-cat="${tab.id}" role="tab" aria-selected="${tab.id === activeCat}">
+                    ${tab.label}<span class="count">${counts[tab.id] || 0}</span>
+                </button>
+            `).join('');
+        }
+
+        function renderBoard() {
+            renderTabs();
+            const items = visibleItems();
+
+            if (!currentProjectId || Object.keys(projects).length === 0) {
+                board.innerHTML = `
+                    <div class="empty">
+                        <strong>还没有项目</strong>
+                        <p>新建一个项目，填好名称、服务器和 UUID，这里会出现可以直接复制的提交信息、预览地址和文件名。</p>
+                        <button class="btn btn-primary" id="emptyCreate" type="button">新建项目</button>
+                    </div>`;
+                document.getElementById('emptyCreate').onclick = createNewProject;
+                return;
+            }
+
+            if (items.length === 0) {
+                const missing = emptyReason();
+                board.innerHTML = `
+                    <div class="empty">
+                        <strong>${searchInput.value.trim() ? '没有匹配的内容' : '这一类还没有内容'}</strong>
+                        <p>${escapeHtml(missing)}</p>
+                    </div>`;
+                return;
+            }
+
+            board.innerHTML = `<div class="grid">${items.map(item => cardHtml(item)).join('')}</div>`;
+        }
+
+        function cardHtml(item) {
+            const index = allItems.indexOf(item);
+            const badge = item.badge ? `<span class="badge">${escapeHtml(item.badge)}</span>` : `<span class="badge">${escapeHtml(item.catLabel)}</span>`;
+            return `
+                <button class="card ${item.cat}" type="button" data-index="${index}" title="${escapeHtml(item.value)}">
+                    <span class="card-top">
+                        ${badge}
+                        <span class="copy-state">复制</span>
+                    </span>
+                    <span class="card-title">${escapeHtml(item.title)}</span>
+                    <span class="card-hint">${escapeHtml(item.hint || '')}</span>
+                    <span class="card-value">${escapeHtml(item.value)}</span>
+                </button>`;
+        }
+
+        function emptyReason() {
+            if (searchInput.value.trim()) return '换个关键词，或者切回「全部」。';
+            if (activeCat === 'browser') return '先在项目信息里添加 UUID，并勾选语言。';
+            if (activeCat === 'mcfly') return '先在项目信息里添加 UUID。';
+            return '这一类暂时没有可复制的内容。';
+        }
+
+        function writeClipboard(text) {
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.left = '-9999px';
+            document.body.appendChild(area);
+            area.select();
+            let ok = false;
+            try {
+                ok = document.execCommand('copy');
+            } catch (error) {
+                ok = false;
+            }
+            document.body.removeChild(area);
+            if (ok) return Promise.resolve();
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            }
+            return Promise.reject(new Error('copy failed'));
+        }
+
+        function copyItem(index, card) {
+            const item = allItems[index];
+            if (!item) return;
+            writeClipboard(item.value).then(() => {
+                board.querySelectorAll('.card.copied').forEach(el => {
+                    el.classList.remove('copied');
+                    const state = el.querySelector('.copy-state');
+                    if (state) state.textContent = '复制';
+                });
+                card.classList.add('copied');
+                card.querySelector('.copy-state').textContent = '已复制';
+                showToast(`已复制 ${item.title}`);
+                clearTimeout(copiedTimer);
+                copiedTimer = setTimeout(() => {
+                    card.classList.remove('copied');
+                    const state = card.querySelector('.copy-state');
+                    if (state) state.textContent = '复制';
+                }, 1400);
+            }).catch(() => {
+                showToast('复制失败，请检查浏览器权限');
+            });
+        }
+
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 1400);
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char]));
+        }
+
+        document.getElementById('newProjectBtn').onclick = createNewProject;
+        editToggle.onclick = () => setEditing(!app.classList.contains('editing'));
+        document.getElementById('closeDrawer').onclick = () => setEditing(false);
+        document.getElementById('deleteProjectBtn').onclick = () => deleteProject(currentProjectId);
+        document.getElementById('addUuidBtn').onclick = addUuid;
+
+        projectSelect.onchange = () => {
+            if (projectSelect.value) loadProject(projectSelect.value);
+        };
+
+        searchInput.addEventListener('input', renderBoard);
+        tabsEl.addEventListener('click', (event) => {
+            const tab = event.target.closest('.tab');
+            if (!tab) return;
+            activeCat = tab.dataset.cat;
+            renderBoard();
+        });
+
+        board.addEventListener('click', (event) => {
+            const card = event.target.closest('.card');
+            if (!card) return;
+            copyItem(Number(card.dataset.index), card);
+        });
+
+        document.getElementById('uuid-list').addEventListener('click', (event) => {
+            const button = event.target.closest('[data-remove-uuid]');
+            if (!button) return;
+            removeUuid(Number(button.dataset.removeUuid));
+        });
+
+        document.getElementById('uuid-input').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addUuid();
+            }
+        });
+
+        ['projectName', 'developer', 'pm', 'icServer', 'year', 'radar', 'revision'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateProjectData);
+        });
+
+        document.querySelectorAll('input[name="language"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateProjectData);
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === '/' && document.activeElement !== searchInput && !event.target.matches('input, textarea')) {
+                event.preventDefault();
+                searchInput.focus();
+            }
+            if (event.key === 'Escape' && app.classList.contains('editing')) {
+                setEditing(false);
+            }
+        });
+
+        document.getElementById('drawer').inert = true;
+        renderProjectSelect();
         if (currentProjectId && projects[currentProjectId]) {
             loadProject(currentProjectId);
         } else if (Object.keys(projects).length > 0) {
             loadProject(Object.keys(projects)[0]);
+        } else {
+            renderBoard();
         }
-        renderProjects();
     </script>
 </body>
 
