@@ -1,1736 +1,1480 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>便签</title>
-    <link rel="stylesheet" href="../../common/layui/css/layui.css" />
-    <link rel="stylesheet" href="../../css/index.css">
-    <script src="../../common/layui/layui.js"></script>
-    <script src="../../common/components/ShowMessage.js" defer></script>
-    <script src="../../common/components/Loading.js" defer></script>
+    <script src="../../common/components/ShowMessage.js"></script>
     <style>
-        .layui-elem-quote:hover {
-            color: #999;
-            cursor:copy;
+        :root {
+            --bg: #f4f6fb;
+            --card: #ffffff;
+            --line: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --soft: #f9fafb;
+            --ink: #111827;
+            --ok: #047857;
+            --general: #4f46e5;
+            --general-soft: #eef2ff;
+            --qa: #ea580c;
+            --qa-soft: #fff7ed;
         }
 
-        .content-block {
-            position: relative;
+        * { box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            margin: 0;
         }
 
-        .edit-icon {
-            position: absolute;
-            right: 10px;
-            top: 10px;
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        button, input { font-family: inherit; }
+
+        body.tone-general { background: linear-gradient(180deg, #e0e7ff 0%, var(--bg) 280px); }
+        body.tone-qa { background: linear-gradient(180deg, #ffedd5 0%, #fff7ed 180px, var(--bg) 320px); }
+
+        .app {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        header {
+            flex: none;
+            padding: 18px 20px 12px;
+        }
+
+        .title-row h1 {
+            margin: 0;
+            font-size: 20px;
+            letter-spacing: -0.03em;
+        }
+
+        .title-row p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .tab {
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 999px;
             cursor: pointer;
-            color: #009688;
-            font-size: 16px;
-            background: #f2f2f2;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+        }
+
+        .tab[data-tab="general"].active {
+            color: #3730a3;
+            background: #e0e7ff;
+            border-color: #a5b4fc;
+        }
+
+        .tab[data-tab="qa-emails"].active {
+            color: #c2410c;
+            background: #ffedd5;
+            border-color: #fdba74;
+        }
+
+        .search {
+            width: 100%;
+            margin-top: 12px;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0 14px;
+            font-size: 14px;
+            background: #fff;
+        }
+
+        .app.general .search:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .app.qa .search:focus {
+            border-color: #fdba74;
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.15);
+        }
+
+        .search:focus { outline: none; }
+
+        .filter-bar {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .quick-row, .chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid var(--line);
+            background: #fff;
+            color: var(--text);
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .set-name, .chip-mini {
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .chip-mini { font-size: 14px; line-height: 1; opacity: 0.75; padding: 0 2px; }
+        .chip-mini:hover { opacity: 1; }
+
+        .more { position: relative; display: inline-flex; }
+        .group .more, .note .more { opacity: 0; pointer-events: none; }
+        .group:hover .more, .note:hover .more, .more:focus-within { opacity: 1; pointer-events: auto; }
+
+        .menu {
+            position: fixed;
+            z-index: 30;
+            display: flex;
+            flex-direction: column;
+            min-width: 96px;
+            padding: 4px;
+            background: #fff;
+            color: #111827;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(17, 24, 39, 0.14);
+        }
+
+        .menu[hidden] { display: none; }
+
+        .menu button {
+            border: 0;
+            background: transparent;
+            color: #111827;
+            text-align: left;
+            padding: 7px 10px;
+            border-radius: 7px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .menu button:hover { background: #f3f4f6; }
+        .menu button.danger { color: #b91c1c; }
+
+        .set-name[contenteditable="true"] {
+            outline: none;
+            background: rgba(17, 24, 39, 0.08);
+            color: inherit;
+            border-radius: 4px;
+            padding: 0 4px;
+            cursor: text;
+            box-shadow: inset 0 0 0 1px currentColor;
+        }
+
+        .chip.on .set-name[contenteditable="true"] {
+            background: rgba(0, 0, 0, 0.28);
+            color: #fff;
+        }
+
+        .move-set {
+            margin-left: auto;
+            border: 1px solid var(--tone-line, #e5e7eb);
+            background: var(--tone-soft, #f3f4f6);
+            color: #111827;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            max-width: 160px;
+        }
+
+        .inbox {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin: 4px 0 14px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px dashed var(--tone-line, #c7d2fe);
+        }
+
+        .inbox span { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+        .inbox button {
+            border: 1px solid #c7d2fe;
+            background: #eef2ff;
+            color: #3730a3;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .chip.on { color: #fff; }
+
+        .chip[data-tone="0"] { color: #1d4ed8; border-color: #93c5fd; background: #eff6ff; }
+        .chip[data-tone="1"] { color: #7c3aed; border-color: #c4b5fd; background: #f5f3ff; }
+        .chip[data-tone="2"] { color: #0f766e; border-color: #5eead4; background: #f0fdfa; }
+        .chip[data-tone="3"] { color: #b45309; border-color: #fcd34d; background: #fffbeb; }
+        .chip[data-tone="4"] { color: #be123c; border-color: #fda4af; background: #fff1f2; }
+        .chip[data-tone="5"] { color: #047857; border-color: #6ee7b7; background: #ecfdf5; }
+        .chip[data-tone].on,
+        .chip[data-tone].on .set-name,
+        .chip[data-tone].on .chip-mini {
+            color: #fff;
+        }
+
+        .chip[data-tone="0"].on { background: #2563eb; border-color: #2563eb; }
+        .chip[data-tone="1"].on { background: #7c3aed; border-color: #7c3aed; }
+        .chip[data-tone="2"].on { background: #0f766e; border-color: #0f766e; }
+        .chip[data-tone="3"].on { background: #d97706; border-color: #d97706; }
+        .chip[data-tone="4"].on { background: #e11d48; border-color: #e11d48; }
+        .chip[data-tone="5"].on { background: #059669; border-color: #059669; }
+
+        .chip[data-platform="qq"] { color: #0877a8; border-color: #7dd3fc; background: #fff; }
+        .chip[data-platform="163"] { color: #b91c1c; border-color: #fca5a5; background: #fff; }
+        .chip[data-platform="sina"] { color: #c2410c; border-color: #fdba74; background: #fff; }
+        .chip[data-platform="outlook"] { color: #1d4ed8; border-color: #93c5fd; background: #fff; }
+        .chip[data-platform="gmail"] { color: #b91c1c; border-color: #fca5a5; background: #fff; }
+        .chip[data-platform="yahoo"] { color: #6d28d9; border-color: #c4b5fd; background: #fff; }
+        .chip[data-platform="apple"] { color: #374151; border-color: #d1d5db; background: #fff; }
+        .chip[data-platform="qq"].on { background: #0369a1; border-color: #0369a1; color: #fff; box-shadow: 0 0 0 3px #bae6fd; }
+        .chip[data-platform="163"].on { background: #b91c1c; border-color: #b91c1c; color: #fff; box-shadow: 0 0 0 3px #fecaca; }
+        .chip[data-platform="sina"].on { background: #c2410c; border-color: #c2410c; color: #fff; box-shadow: 0 0 0 3px #fed7aa; }
+        .chip[data-platform="outlook"].on { background: #1d4ed8; border-color: #1d4ed8; color: #fff; box-shadow: 0 0 0 3px #bfdbfe; }
+        .chip[data-platform="gmail"].on { background: #b91c1c; border-color: #b91c1c; color: #fff; box-shadow: 0 0 0 3px #fecaca; }
+        .chip[data-platform="yahoo"].on { background: #6d28d9; border-color: #6d28d9; color: #fff; box-shadow: 0 0 0 3px #ddd6fe; }
+        .chip[data-platform="apple"].on { background: #111827; border-color: #111827; color: #fff; box-shadow: 0 0 0 3px #e5e7eb; }
+
+        .chip.preset {
+            font-size: 12px;
+            color: #9a3412;
+            border-color: #fdba74;
+            background: #fff;
+        }
+
+        .chip.preset.on {
+            background: var(--qa);
+            border-color: var(--qa);
+            color: #fff;
+            box-shadow: 0 0 0 3px #fed7aa;
+        }
+
+        .app.qa .chip[data-platform],
+        .app.qa .chip.preset { gap: 6px; }
+        .app.qa .chip[data-platform]::before,
+        .app.qa .chip.preset::before {
+            content: "";
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            border: 1.5px solid currentColor;
+            background: transparent;
+            flex: none;
+            box-sizing: border-box;
+        }
+        .app.qa .chip[data-platform].on::before,
+        .app.qa .chip.preset.on::before {
+            content: "✓";
+            display: grid;
+            place-items: center;
+            border-color: #fff;
+            color: #fff;
+            font-size: 11px;
+            line-height: 1;
+            font-weight: 700;
+        }
+        .app.qa .chip.all:not(.on) {
+            background: #fff;
+            color: #9a3412;
+            border-color: #fdba74;
+        }
+        .app.qa .chip.all.on { box-shadow: 0 0 0 3px #fed7aa; }
+        .chip.all.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+        .app.general .chip.all.on { background: var(--general); border-color: var(--general); }
+        .app.qa .chip.all.on { background: var(--qa); border-color: var(--qa); }
+
+        .chip.add {
+            border-style: dashed;
+            color: var(--general);
+            background: #fff;
+        }
+
+        .copy-selected {
+            flex: none;
+            height: 34px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--general);
+            color: #fff;
+            padding: 0 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .app.qa .copy-selected { background: var(--qa); }
+
+        .copy-selected:disabled {
+            background: #d1d5db;
+            cursor: default;
+        }
+
+        main {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            padding: 4px 20px 28px;
+        }
+
+        .group {
+            background: var(--card);
+            border: 1px solid var(--tone-line, var(--line));
+            border-radius: 14px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            border-top: 3px solid var(--tone, #6366f1);
+        }
+
+        .group[data-tone="0"] { --tone: #2563eb; --tone-soft: #eff6ff; --tone-line: #bfdbfe; }
+        .group[data-tone="1"] { --tone: #7c3aed; --tone-soft: #f5f3ff; --tone-line: #ddd6fe; }
+        .group[data-tone="2"] { --tone: #0f766e; --tone-soft: #f0fdfa; --tone-line: #99f6e4; }
+        .group[data-tone="3"] { --tone: #d97706; --tone-soft: #fffbeb; --tone-line: #fde68a; }
+        .group[data-tone="4"] { --tone: #e11d48; --tone-soft: #fff1f2; --tone-line: #fecdd3; }
+        .group[data-tone="5"] { --tone: #059669; --tone-soft: #ecfdf5; --tone-line: #a7f3d0; }
+        .group.picked { box-shadow: 0 0 0 2px var(--tone, #4f46e5); }
+
+        .group.dragging { opacity: 0.45; }
+        .group.drag-above { box-shadow: inset 0 2px 0 var(--ink); }
+        .group.drag-below { box-shadow: inset 0 -2px 0 var(--ink); }
+
+        .group-head {
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            opacity: 0.6;
-            z-index: 2;
+            gap: 8px;
+            padding: 12px 12px 8px;
         }
 
-        .edit-icon:hover {
+        .grip {
+            width: 22px;
+            height: 22px;
+            border: 0;
+            background: transparent;
+            color: #9ca3af;
+            cursor: grab;
+            font-size: 14px;
+            letter-spacing: -1px;
+            padding: 0;
+        }
+
+        .group-title {
+            flex: 1;
+            margin: 0;
+            font-size: 15px;
+            min-width: 0;
+        }
+
+        .group-title { color: var(--tone, var(--text)); }
+        .group-title[contenteditable="true"] {
+            outline: none;
+            background: var(--tone-soft, #eef2ff);
+            color: #111827;
+            box-shadow: inset 0 0 0 1px var(--tone, #a5b4fc);
+            border-radius: 6px;
+            padding: 2px 6px;
+        }
+
+        .group-actions, .note-actions, .qa-actions {
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+        }
+
+        .group:hover .group-actions,
+        .note:hover .note-actions,
+        .qa-card:hover .qa-actions,
+        .note.is-editing .note-actions,
+        .group.is-editing .group-actions,
+        .qa-card.is-editing .qa-actions {
             opacity: 1;
-            background: #e6e6e6;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .editable {
-            min-height: 20px;
+        .text-btn, .add-btn, .more-btn {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
             padding: 4px 6px;
-            border-radius: 4px;
-            transition: all 0.3s;
-            max-height: 100px;
+            border-radius: 6px;
+        }
+
+        .text-btn:hover, .add-btn:hover, .more-btn:hover { background: var(--soft); color: var(--text); }
+        .text-btn.danger:hover { color: #b91c1c; }
+
+        .note {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin: 0 8px 8px;
+            padding: 10px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            background: var(--tone-soft, var(--soft));
+        }
+
+        .note:hover { filter: saturate(1.05) brightness(0.98); }
+
+        .note.copied {
+            background: #ecfdf5;
+        }
+
+        .note-body {
+            flex: 1;
+            min-width: 0;
+            font-size: 14px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
-            position: relative;
         }
 
-        .editable.has-overflow::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 25px;
-            background: linear-gradient(to bottom, rgba(242, 242, 242, 0), rgba(255, 255, 255, 0.5));
-            pointer-events: none;
-            z-index: 1;
-            border-radius: 0 0 4px 4px;
-        }
-
-        .editable.expanded {
-            max-height: 1000px;
+        .note.is-open .note-body,
+        .note.is-editing .note-body {
+            display: block;
+            -webkit-line-clamp: unset;
             overflow: visible;
         }
 
-        .editable:focus {
-            outline: none;
-            background-color: #f8f8f8;
-            box-shadow: inset 0 0 0 2px #009688;
-        }
+        .note.is-editing { cursor: text; background: var(--tone-soft, #f3f4f6); color: #111827; outline: 1px solid var(--tone, #d1d5db); }
+        .note.is-editing .note-body { color: #111827; }
 
-        .editing {
-            background-color: #f8f8f8;
-            box-shadow: inset 0 0 0 2px #009688;
-        }
-
-        .edit-active {
-            background: #009688;
-            color: white;
-            opacity: 1;
-        }
-
-        .tip-container {
-            padding: 10px 15px 10px 20px;
-            margin: 10px 0 15px;
-            background-color: #f8f8f8;
-            border-left: 3px solid #009688;
-            color: #666;
-            font-size: 13px;
-            line-height: 1.6;
-            border-radius: 0 2px 2px 0;
-        }
-
-        .tip-icon {
-            color: #009688;
-            margin-right: 5px;
-        }
-
-        .legend-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        legend .editable-legend {
-            display: inline-block;
-            min-width: 20px;
-            padding: 0 4px;
-            border-radius: 2px;
-        }
-
-        legend .edit-icon {
-            position: relative;
-            top: 0;
-            right: 0;
-            margin-left: 5px;
-            width: 20px;
-            height: 20px;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        /* 添加模块删除图标样式 */
-        .field-delete-icon {
-            position: relative;
-            margin-left: 5px;
-            cursor: pointer;
-            color: #FF5722;
-            font-size: 14px;
-            background: #f2f2f2;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            opacity: 0.6;
-        }
-
-        .field-delete-icon:hover {
-            opacity: 1;
-            background: #e6e6e6;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .email-group {
-            margin-bottom: 15px;
-        }
-
-        .email-checkbox {
-            margin-right: 10px;
-        }
-
-        .email-section-title {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .batch-copy-btn {
-            margin-left: 15px;
-            background-color: #009688;
-            color: white;
-            border: none;
-            padding: 3px 10px;
-            border-radius: 2px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-
-        .batch-copy-btn:hover {
-            background-color: #00877a;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .copy-options {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .select-all {
-            margin-right: 15px;
-            color: #1E9FFF;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .select-all:hover {
-            text-decoration: underline;
-        }
-
-        /* 新增样式 */
-        .platform-selector {
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: #f8f8f8;
-            padding: 15px;
-            border-radius: 4px;
-        }
-
-        .platform-checkboxes {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .platform-checkboxes label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .platform-checkboxes input {
-            margin-right: 5px;
-        }
-
-        .batch-copy-btn {
-            background-color: #009688;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            transition: all 0.3s;
-        }
-
-        .batch-copy-btn:hover {
-            background-color: #00877a;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .batch-copy-btn i {
-            margin-right: 5px;
-        }
-
-        .email-platforms {
+        .note-side {
+            flex: none;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            align-items: flex-end;
+            gap: 2px;
         }
 
-        .email-platform {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
+        .copy-hint {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--tone, #9ca3af);
         }
 
-        .platform-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #333;
-            transition: all 0.3s;
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 2px;
+        .note.copied .copy-hint { color: var(--ok); }
+        .note.is-editing .copy-hint { display: none; }
+
+        .add-row, .add-group {
+            display: flex;
         }
 
-        /* 添加删除按钮样式 */
-        .delete-icon {
-            position: absolute;
-            right: 40px;
-            top: 10px;
+        .add-row { padding: 0 8px 10px; }
+        .add-group { margin-top: 4px; }
+
+        .add-group .add-btn {
+            border: 1px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 12px;
+            width: 100%;
+            background: transparent;
+            font-size: 13px;
+        }
+
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .qa-card {
+            background: #fff;
+            border: 1px solid var(--tone-line, var(--line));
+            border-top: 3px solid var(--tone, #ea580c);
+            border-radius: 14px;
+            padding: 12px 14px 10px;
             cursor: pointer;
-            color: #FF5722;
-            font-size: 16px;
-            background: #f2f2f2;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .qa-card[data-platform="qq"] { --tone: #0ea5e9; --tone-line: #bae6fd; }
+        .qa-card[data-platform="163"] { --tone: #dc2626; --tone-line: #fecaca; }
+        .qa-card[data-platform="sina"] { --tone: #ea580c; --tone-line: #fed7aa; }
+        .qa-card[data-platform="outlook"] { --tone: #2563eb; --tone-line: #bfdbfe; }
+        .qa-card[data-platform="gmail"] { --tone: #dc2626; --tone-line: #fecaca; }
+        .qa-card[data-platform="yahoo"] { --tone: #7c3aed; --tone-line: #ddd6fe; }
+        .qa-card[data-platform="apple"] { --tone: #111827; --tone-line: #e5e7eb; }
+        .qa-card.picked { box-shadow: 0 0 0 2px var(--tone, #ea580c); }
+        .qa-head h3 { color: var(--tone, var(--text)); }
+        .qa-card.copied { background: #ecfdf5; }
+        .qa-card.is-editing { cursor: text; }
+
+        .qa-head {
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            opacity: 0.6;
-            z-index: 2;
+            gap: 8px;
         }
 
-        .delete-icon:hover {
-            opacity: 1;
-            background: #e6e6e6;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        .qa-head h3 {
+            margin: 0;
+            font-size: 15px;
         }
 
-        /* 添加新模块按钮样式 */
-        .add-field-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
+        .qa-count {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
         }
 
-        .add-field-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #009688;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
+        .qa-actions { margin-left: auto; }
+
+        .qa-body {
+            margin-top: 8px;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #374151;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .qa-card.is-editing .qa-body {
+            outline: none;
+            background: var(--soft);
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .qa-foot {
+            margin-top: auto;
+            padding-top: 8px;
+            font-size: 12px;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .qa-card.copied .qa-foot { color: var(--ok); }
+        .qa-card.is-editing .qa-foot { display: none; }
+
+        .is-hidden { display: none !important; }
+
+        .empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 48px 16px;
             font-size: 14px;
-            transition: all 0.3s;
         }
 
-        .add-field-btn:hover {
-            background-color: #00877a;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .add-field-btn i {
-            margin-right: 8px;
-        }
-
-        /* 选项卡样式 */
-        .tab-container {
-            margin-bottom: 20px;
-        }
-
-        .tab-nav {
-            display: flex;
-            border-bottom: 1px solid #e6e6e6;
-            margin-bottom: 20px;
-        }
-
-        .tab-item {
-            padding: 10px 20px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 16px;
-            border-bottom: 2px solid transparent;
-        }
-
-        .tab-item.active {
-            color: #009688;
-            border-bottom-color: #009688;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* 修改添加便签按钮样式 */
-        .add-note-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin: 5px 0 5px 10px;
-            padding: 5px;
-            background-color: #f2f2f2;
-            border: 1px solid #e6e6e6;
-            border-radius: 50%;
-            color: #009688;
-            cursor: pointer;
-            width: 28px;
-            height: 28px;
-            transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .add-note-btn:hover {
-            background-color: #009688;
-            color: white;
-        }
-
-        .add-note-btn i {
-            font-size: 18px;
-        }
-
-        /* 添加包装器，确保按钮靠左 */
-        .note-btn-wrapper {
-            display: block;
-            text-align: left;
-            margin-top: 5px;
-        }
-
-        /* 拖拽排序样式 */
-        .dragging {
-            opacity: 0.6;
-            border: 2px dashed #009688;
-        }
-
-        .drag-above {
-            border-top: 2px solid #009688;
-        }
-
-        .drag-below {
-            border-bottom: 2px solid #009688;
-        }
-
-        .legend-container {
-            cursor: move;
-        }
-
-        /* 编辑状态下的光标样式 */
-        .layui-elem-quote:has(.editing) {
-            cursor: auto;
-        }
-
-        /* 对于不支持:has选择器的浏览器，可以添加备选方案 */
-        .layui-elem-quote.editing-parent {
-            cursor: auto;
-        }
-
-        /* 当便签处于编辑状态时隐藏删除图标 */
-        .layui-elem-quote.editing-parent .delete-icon {
-            display: none;
-        }
-
-        /* 对于使用:has选择器的浏览器 */
-        .layui-elem-quote:has(.editing) .delete-icon {
-            display: none;
-        }
-
-        /* 新增：展开/收起按钮样式 */
-        .expand-icon {
-            position: absolute;
-            right: 70px;
-            top: 10px;
-            cursor: pointer;
-            color: #1E9FFF;
-            font-size: 16px;
-            background: #f2f2f2;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            opacity: 0.8;
-            z-index: 2;
-        }
-
-        .expand-icon:hover {
-            opacity: 1;
-            background: #e6e6e6;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 当便签处于编辑状态时隐藏删除图标 和 展开图标 */
-        .layui-elem-quote.editing-parent .delete-icon,
-        .layui-elem-quote.editing-parent .expand-icon {
-            display: none;
-        }
-
-        /* 对于使用:has选择器的浏览器 */
-        .layui-elem-quote:has(.editing) .delete-icon,
-        .layui-elem-quote:has(.editing) .expand-icon {
-            display: none;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
     </style>
 </head>
 
 <body>
-    <div class="tip-container">
-        <i class="layui-icon layui-icon-tips tip-icon"></i>
-        你可以<span style="color: #ffb222;">自定义</span>删除、创建、编辑便签（点击便签即可复制到<span style="color: #2289ff;">剪贴板</span>，且复制出来的文本是没有任何格式的<span style="color: #ffb222;">纯文本</span>哦～）
-        <span style="color: #FF5722;">注意⚠️：你的便签始终存储在本地浏览器。</span>
-    </div>
-    
-    <!-- 添加选项卡导航 -->
-    <div class="tab-container">
-        <div class="tab-nav">
-            <div class="tab-item active" data-tab="general">常用便签 <i class="layui-icon layui-icon-note"></i></div>
-            <div class="tab-item" data-tab="qa-emails">QA邮箱 <i class="layui-icon layui-icon-email"></i></div>
-        </div>
-
-        <!-- 常用便签选项卡内容 -->
-        <div class="tab-content active" id="general-tab">
-            <!-- 原有便签内容 -->
-            <fieldset class="layui-elem-field note-field">
-                <legend class="legend-container">
-                    <span class="editable-legend" contenteditable="false">账号</span>
-                    <i class="layui-icon layui-icon-edit edit-icon"></i>
-                </legend>
-                <div class="layui-field-box">
-                    <blockquote class="layui-elem-quote content-block">
-                        <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-delete delete-icon"></i>
-                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                        <div class="editable" contenteditable="false">Lvan.Chen@mullenlowe.com</div>
-                    </blockquote>
-                    <blockquote class="layui-elem-quote content-block">
-                        <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-delete delete-icon"></i>
-                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                        <div class="editable" contenteditable="false">ivanyang_chen@apple.com</div>
-                    </blockquote>
-
-                    <!-- 添加便签按钮 -->
-                    <div class="note-btn-wrapper">
-                        <div class="add-note-btn" title="添加便签">
-                            <i class="layui-icon layui-icon-add-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset class="layui-elem-field note-field">
-                <legend class="legend-container">
-                    <span class="editable-legend" contenteditable="false">我的邮箱</span>
-                    <i class="layui-icon layui-icon-edit edit-icon"></i>
-                </legend>
-                <div class="layui-field-box">
-                    <blockquote class="layui-elem-quote content-block">
-                        <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-delete delete-icon"></i>
-                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                        <div class="editable" contenteditable="false">
-                            <div>ivanyang_chen@apple.com,</div>
-                            <div>ivanchenyang99@outlook.com,</div>
-                            <div>ivanchenyang@gmail.com,</div>
-                            <div>3815798907@qq.com,</div>
-                            <div>ivanchenyang@sina.com,</div>
-                            <div>17506120452@163.com,</div>
-                        </div>
-                    </blockquote>
-
-                    <!-- 添加便签按钮 -->
-                    <div class="note-btn-wrapper">
-                        <div class="add-note-btn" title="添加便签">
-                            <i class="layui-icon layui-icon-add-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset class="layui-elem-field note-field">
-                <legend class="legend-container">
-                    <span class="editable-legend" contenteditable="false">小组成员邮箱</span>
-                    <i class="layui-icon layui-icon-edit edit-icon"></i>
-                </legend>
-                <div class="layui-field-box">
-                    <blockquote class="layui-elem-quote content-block">
-                        <i class="layui-icon layui-icon-edit edit-icon"></i>
-                        <i class="layui-icon layui-icon-delete delete-icon"></i>
-                        <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                        <div class="editable" contenteditable="false">
-                            <div>chester_haisheng_zhao@apple.com,</div>
-                            <div>efforthongfei_zheng@apple.com,</div>
-                            <div>nicoleshutun_li@apple.com,</div>
-                        </div>
-                    </blockquote>
-
-                    <!-- 添加便签按钮 -->
-                    <div class="note-btn-wrapper">
-                        <div class="add-note-btn" title="添加便签">
-                            <i class="layui-icon layui-icon-add-1"></i>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-
-            <div class="add-field-container">
-                <button class="add-field-btn" id="add-field-btn">
-                    <i class="layui-icon layui-icon-add-1"></i>添加新模块
-                </button>
+    <div class="app" id="app">
+        <header>
+            <div class="title-row">
+                <h1>便签</h1>
+                <p>上面是组。把账号、邮箱这类模块放进组1、组2。点模块内容即可复制。</p>
             </div>
-        </div>
-
-        <!-- QA邮箱选项卡内容 -->
-        <div class="tab-content" id="qa-emails-tab">
-            <fieldset class="layui-elem-field note-field">
-                <legend class="legend-container">
-                    <span class="editable-legend" contenteditable="false">QA邮箱</span>
-                </legend>
-                <div class="layui-field-box">
-                    <div class="platform-selector">
-                        <div class="platform-checkboxes">
-                            <label><input type="checkbox" class="platform-checkbox" data-platform="qq">QQ</label>
-                            <label><input type="checkbox" class="platform-checkbox" data-platform="163">163</label>
-                            <label><input type="checkbox" class="platform-checkbox" data-platform="sina">新浪sina</label>
-                            <label><input type="checkbox" class="platform-checkbox"
-                                    data-platform="outlook">Outlook</label>
-                            <label><input type="checkbox" class="platform-checkbox" data-platform="gmail">Gmail</label>
-                            <label><input type="checkbox" class="platform-checkbox" data-platform="yahoo">Yahoo</label>
-                            <label><input type="checkbox" class="platform-checkbox"
-                                    data-platform="apple">Apple/iCloud</label>
-                            <label><input type="checkbox" class="platform-checkbox" data-platform="all">全选</label>
-                        </div>
-                        <button class="batch-copy-btn" id="batch-copy-btn">
-                            <i class="layui-icon layui-icon-form"></i> 一键复制所勾选的平台邮箱
-                        </button>
-                    </div>
-
-                    <div class="email-platforms">
-                        <div class="email-platform" data-platform="qq">
-                            <div class="platform-title">QQ</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="qq">
-                                    <div>1416413774@qq.com,</div>
-                                    <div>3904518116@qq.com,</div>
-                                    <div>gc_qatest@qq.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-
-                        <div class="email-platform" data-platform="163">
-                            <div class="platform-title">163</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="163">
-                                    <div>apple_gc_qatest@163.com,</div>
-                                    <div>apple_gc_testing@163.com,</div>
-                                    <div>apple_gc_testing2@163.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-
-                        <div class="email-platform" data-platform="sina">
-                            <div class="platform-title">新浪sina</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="sina">
-                                    <div>apple_gc_testing@sina.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-
-                        <div class="email-platform" data-platform="outlook">
-                            <div class="platform-title">Outlook</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="outlook">
-                                    <div>apple_gc_qatest1@outlook.com,</div>
-                                    <div>apple_gc_qatest3@outlook.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-
-                        <div class="email-platform" data-platform="gmail">
-                            <div class="platform-title">Gmail</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="gmail">
-                                    <div>apple.gc.testing@gmail.com,</div>
-                                    <div>apple.gc.qatest@gmail.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-
-                        <div class="email-platform" data-platform="yahoo">
-                            <div class="platform-title">Yahoo</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="yahoo">
-                                    <div>apple_gc_qatest@yahoo.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-
-                        <div class="email-platform" data-platform="apple">
-                            <div class="platform-title">Apple/iCloud</div>
-                            <blockquote class="layui-elem-quote content-block">
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                                <div class="editable" contenteditable="false" data-section="apple">
-                                    <div>apple_gc_testing4@icloud.com,</div>
-                                    <div>joe_le_jiang@apple.com,</div>
-                                    <div>blitzshaoming_zheng@apple.com,</div>
-                                    <div>cassie_wenjun_he@apple.com,</div>
-                                    <div>cw_chen@apple.com,</div>
-                                    <div>nicholaszhen_li@apple.com,</div>
-                                    <div>sophia_xiaoyun_shi@apple.com,</div>
-                                    <div>sherlockxiaoxin_zheng@apple.com,</div>
-                                    <div>wade_huaiqing_sun@apple.com,</div>
-                                </div>
-                            </blockquote>
-                        </div>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
+            <div class="tabs">
+                <button class="tab active" type="button" data-tab="general">常用</button>
+                <button class="tab" type="button" data-tab="qa-emails">QA 邮箱</button>
+            </div>
+            <input class="search" id="search" type="search" placeholder="搜索要复制的内容" autocomplete="off">
+            <div class="filter-bar">
+                <div class="chips" id="chips"></div>
+                <button class="copy-selected" id="copySelected" type="button" disabled>复制所选</button>
+            </div>
+        </header>
+        <main id="board"></main>
     </div>
 
     <script>
-        const quote = document.querySelectorAll('.layui-elem-quote');
-        const legends = document.querySelectorAll('.legend-container');
-        // 统一的存储键名
         const STORAGE_KEY = 'notes_data';
+        const PLATFORMS = [
+            { id: 'qq', label: 'QQ' },
+            { id: '163', label: '163' },
+            { id: 'sina', label: '新浪' },
+            { id: 'outlook', label: 'Outlook' },
+            { id: 'gmail', label: 'Gmail' },
+            { id: 'yahoo', label: 'Yahoo' },
+            { id: 'apple', label: 'Apple' }
+        ];
 
-        // 初始化，从localStorage加载内容
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAllDataFromStorage();
-            initBatchCopyFeature();
-            setupAllEvents();
-            setupTabs();
-        });
+        const PRESETS = [
+            { id: 'hk', label: 'HKEN&HKTC&MOTC&TWTC', platforms: ['gmail', 'yahoo', 'outlook', 'apple'] },
+            { id: 'cn', label: 'CNSC', platforms: ['qq', '163', 'sina', 'outlook', 'apple'] }
+        ];
 
-        // 获取所有保存的数据
-        function getAllDataFromStorage() {
-            const savedData = localStorage.getItem(STORAGE_KEY);
-            return savedData ? JSON.parse(savedData) : {
-                notes: {},
-                legends: {},
-                fields: [],
-                activeTab: 'general' // 添加默认选项卡状态
-            };
-        }
-
-        // 从localStorage加载所有数据
-        function loadAllDataFromStorage() {
-            const savedData = getAllDataFromStorage();
-
-            // 检查是否有新版本的数据格式
-            if (savedData.fields && savedData.fields.length > 0) {
-                loadFromNewFormat(savedData);
-            } else {
-                // 兼容旧格式
-                loadFromOldFormat(savedData);
+        const DEFAULT_GROUPS = [
+            {
+                title: '账号',
+                notes: ['Lvan.Chen@mullenlowe.com', 'ivanyang_chen@apple.com']
+            },
+            {
+                title: '我的邮箱',
+                notes: [
+                    '<div>ivanyang_chen@apple.com,</div><div>ivanchenyang99@outlook.com,</div><div>ivanchenyang@gmail.com,</div><div>3815798907@qq.com,</div><div>ivanchenyang@sina.com,</div><div>17506120452@163.com,</div>'
+                ]
+            },
+            {
+                title: '小组成员邮箱',
+                notes: [
+                    '<div>chester_haisheng_zhao@apple.com,</div><div>efforthongfei_zheng@apple.com,</div><div>nicoleshutun_li@apple.com,</div>'
+                ]
             }
-        }
+        ];
 
-        // 从新格式加载数据
-        function loadFromNewFormat(savedData) {
-            // 清空常用便签内容，重新构建
-            const generalTab = document.getElementById('general-tab');
+        const DEFAULT_QA = {
+            qq: '<div>1416413774@qq.com,</div><div>3904518116@qq.com,</div><div>gc_qatest@qq.com,</div>',
+            '163': '<div>apple_gc_qatest@163.com,</div><div>apple_gc_testing@163.com,</div><div>apple_gc_testing2@163.com,</div>',
+            sina: '<div>apple_gc_testing@sina.com,</div>',
+            outlook: '<div>apple_gc_qatest1@outlook.com,</div><div>apple_gc_qatest3@outlook.com,</div>',
+            gmail: '<div>apple.gc.testing@gmail.com,</div><div>apple.gc.qatest@gmail.com,</div>',
+            yahoo: '<div>apple_gc_qatest@yahoo.com,</div>',
+            apple: '<div>apple_gc_testing4@icloud.com,</div><div>joe_le_jiang@apple.com,</div><div>blitzshaoming_zheng@apple.com,</div><div>cassie_wenjun_he@apple.com,</div><div>cw_chen@apple.com,</div><div>nicholaszhen_li@apple.com,</div><div>sophia_xiaoyun_shi@apple.com,</div><div>sherlockxiaoxin_zheng@apple.com,</div><div>wade_huaiqing_sun@apple.com,</div>'
+        };
 
-            // 保存原始内容作为备份
-            const originalContent = generalTab.innerHTML;
+        const app = document.getElementById('app');
+        const board = document.getElementById('board');
+        const searchInput = document.getElementById('search');
+        const copySelectedBtn = document.getElementById('copySelected');
+        const originals = new WeakMap();
 
+        let state = { activeTab: 'general', groups: [], sets: [], qa: {} };
+        let picked = new Set();
+        let pickedSets = new Set();
+        let dragIndex = null;
+        let focusAfterRender = null;
+
+        function readRaw() {
             try {
-                // 保留添加模块按钮
-                const addFieldBtn = generalTab.querySelector('.add-field-container');
-                if (!addFieldBtn) throw new Error('找不到添加模块按钮');
-
-                // 清空当前内容
-                generalTab.innerHTML = '';
-                generalTab.appendChild(addFieldBtn);
-
-                // 重新创建所有模块
-                savedData.fields.forEach((field, index) => {
-                    const fieldTitle = savedData.legends[field.title] || '未命名模块';
-                    const fieldHtml = `
-                    <fieldset class="layui-elem-field note-field">
-                        <legend class="legend-container">
-                            <span class="editable-legend" contenteditable="false">${fieldTitle}</span>
-                            <i class="layui-icon layui-icon-edit edit-icon"></i>
-                            <i class="layui-icon layui-icon-delete field-delete-icon"></i>
-                        </legend>
-                        <div class="layui-field-box">
-                            <!-- 便签内容将在这里添加 -->
-                            <div class="note-btn-wrapper">
-                                <div class="add-note-btn" title="添加便签">
-                                    <i class="layui-icon layui-icon-add-1"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </fieldset>
-                    `;
-
-                    // 插入到添加按钮前面
-                    addFieldBtn.insertAdjacentHTML('beforebegin', fieldHtml);
-
-                    // 获取刚刚创建的模块
-                    const newField = generalTab.querySelector('.layui-elem-field:nth-last-child(2)');
-                    const fieldBox = newField.querySelector('.layui-field-box');
-                    const addNoteBtn = fieldBox.querySelector('.note-btn-wrapper');
-
-                    // 添加该模块下的所有便签
-                    field.notes.forEach(noteKey => {
-                        const noteContent = savedData.notes[noteKey] || '空便签';
-                        const noteHtml = `
-                        <blockquote class="layui-elem-quote content-block">
-                            <i class="layui-icon layui-icon-edit edit-icon"></i>
-                            <i class="layui-icon layui-icon-delete delete-icon"></i>
-                            <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                            <div class="editable" contenteditable="false">${noteContent}</div>
-                        </blockquote>
-                        `;
-
-                        // 插入到添加便签按钮前面
-                        addNoteBtn.insertAdjacentHTML('beforebegin', noteHtml);
-                    });
-                });
+                return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
             } catch (error) {
-                console.error('加载新格式数据失败:', error);
-                // 恢复原始内容
-                generalTab.innerHTML = originalContent;
-            }
-
-            // 单独加载QA邮箱内容，不影响其结构
-            loadQAEmailSections(savedData);
-        }
-
-        // 从旧格式加载数据（兼容旧版本）
-        function loadFromOldFormat(savedData) {
-            // 加载便签内容
-            quote.forEach((o, index) => {
-                const editableDiv = o.querySelector('.editable');
-                const noteKey = 'note_' + index;
-
-                // 如果有保存的内容，则加载
-                if (savedData.notes && savedData.notes[noteKey]) {
-                    editableDiv.innerHTML = savedData.notes[noteKey];
-                } else {
-                    // 首次使用，保存当前内容
-                    saveContentToStorage('notes', noteKey, editableDiv.innerHTML);
-                }
-            });
-
-            // 加载标题内容
-            legends.forEach((legend, index) => {
-                const editableSpan = legend.querySelector('.editable-legend');
-                const legendKey = 'legend_' + index;
-
-                // 如果有保存的内容，则加载
-                if (savedData.legends && savedData.legends[legendKey]) {
-                    editableSpan.textContent = savedData.legends[legendKey];
-                } else {
-                    // 首次使用，保存当前内容
-                    saveContentToStorage('legends', legendKey, editableSpan.textContent);
-                }
-            });
-
-            // 加载QA邮箱内容
-            loadQAEmailSections(savedData);
-        }
-
-        // 加载QA邮箱部分
-        function loadQAEmailSections(savedData) {
-            document.querySelectorAll('.email-platform .editable').forEach(editableDiv => {
-                const sectionType = editableDiv.getAttribute('data-section');
-                const emailSectionKey = 'email_section_' + sectionType;
-
-                // 如果有保存的内容，则加载
-                if (savedData.notes && savedData.notes[emailSectionKey]) {
-                    editableDiv.innerHTML = savedData.notes[emailSectionKey];
-                } else {
-                    // 首次使用，保存当前内容
-                    saveContentToStorage('notes', emailSectionKey, editableDiv.innerHTML);
-                }
-            });
-        }
-
-        // 设置所有事件
-        function setupAllEvents() {
-            // 设置各种事件
-            setupEditableForEmailSections();
-            setupDeleteFeature();
-            setupAddFieldFeature();
-            setupAddNoteButtons();
-
-            // 为已有模块添加删除图标
-            document.querySelectorAll('#general-tab .layui-elem-field').forEach((field) => {
-                const legend = field.querySelector('.legend-container');
-                // 检查是否已有删除图标
-                if (!legend.querySelector('.field-delete-icon')) {
-                    // 添加删除图标
-                    const deleteIcon = document.createElement('i');
-                    deleteIcon.className = 'layui-icon layui-icon-delete field-delete-icon';
-                    legend.appendChild(deleteIcon);
-                }
-            });
-
-            // 设置常用便签的事件
-            document.querySelectorAll('#general-tab .layui-elem-quote').forEach((note) => {
-                setupNoteEvents(note);
-            });
-
-            document.querySelectorAll('#general-tab .legend-container').forEach((legend) => {
-                setupLegendEvents(legend);
-            });
-            
-            // 为模块设置删除事件
-            document.querySelectorAll('#general-tab .field-delete-icon').forEach((icon) => {
-                icon.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    const field = icon.closest('.layui-elem-field');
-                    if (field) {
-                        const confirmDelete = window.confirm('确定要删除这个模块及其所有便签吗？');
-                        if (confirmDelete) {
-                            field.remove();
-                            showMessage({ msg: '模块已删除', type: 'success' });
-                            updateAndSaveAllData();
-                        }
-                    }
-                });
-            });
-
-            // 添加拖拽排序功能
-            setupDragSort();
-        }
-
-        function upDateClipboard(finalText) {
-            navigator.clipboard.writeText(finalText).then(function () {
-                showMessage({ msg: '复制成功', type: 'success' })
-            }).catch(function (err) {
-                alert('复制失败: ' + err);
-            });
-        }
-
-        quote.forEach((o, index) => {
-            const editableDiv = o.querySelector('.editable');
-
-            // 点击内容区域复制文本
-            editableDiv.addEventListener('click', (event) => {
-                if (editableDiv.getAttribute('contenteditable') === 'false') {
-                    upDateClipboard(editableDiv.textContent.replace(/\s+/g, ''));
-                }
-            });
-
-            // 获取编辑图标
-            const editIcon = o.querySelector('.edit-icon');
-
-            // 点击编辑图标切换编辑状态
-            editIcon.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const currentState = editableDiv.getAttribute('contenteditable');
-                const quoteElement = editableDiv.closest('.layui-elem-quote');
-
-                if (currentState === 'false') {
-                    // 进入编辑状态
-                    editableDiv.setAttribute('contenteditable', 'true');
-                    editIcon.classList.remove('layui-icon-edit');
-                    editIcon.classList.add('layui-icon-ok');
-                    editIcon.classList.add('edit-active');
-                    editableDiv.classList.add('editing');
-                    // 添加这一行来改变父元素的cursor并隐藏删除图标
-                    quoteElement.classList.add('editing-parent');
-                    editableDiv.focus();
-                } else {
-                    // 保存并退出编辑状态
-                    editableDiv.setAttribute('contenteditable', 'false');
-                    editIcon.classList.remove('layui-icon-ok');
-                    editIcon.classList.add('layui-icon-edit');
-                    editIcon.classList.remove('edit-active');
-                    editableDiv.classList.remove('editing');
-                    // 移除editing-parent类，使删除图标重新显示
-                    quoteElement.classList.remove('editing-parent');
-
-                    // 保存到localStorage
-                    updateAndSaveAllData();
-                    showMessage({ msg: '内容已保存', type: 'success' });
-                }
-            });
-        });
-
-        // 为标题添加编辑功能
-        legends.forEach((legend, index) => {
-            const editableSpan = legend.querySelector('.editable-legend');
-            const editIcon = legend.querySelector('.edit-icon');
-
-            // 点击编辑图标切换编辑状态
-            editIcon?.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const currentState = editableSpan.getAttribute('contenteditable');
-
-                if (currentState === 'false') {
-                    // 进入编辑状态
-                    editableSpan.setAttribute('contenteditable', 'true');
-                    editIcon.classList.remove('layui-icon-edit');
-                    editIcon.classList.add('layui-icon-ok');
-                    editIcon.classList.add('edit-active');
-                    editableSpan.classList.add('editing');
-                    editableSpan.focus();
-                } else {
-                    // 保存并退出编辑状态
-                    editableSpan.setAttribute('contenteditable', 'false');
-                    editIcon.classList.remove('layui-icon-ok');
-                    editIcon.classList.add('layui-icon-edit');
-                    editIcon.classList.remove('edit-active');
-                    editableSpan.classList.remove('editing');
-
-                    // 保存到localStorage
-                    saveContentToStorage('legends', 'legend_' + index, editableSpan.textContent);
-                    showMessage({ msg: '标题已保存', type: 'success' });
-                }
-            });
-        });
-
-        // 批量复制邮箱相关代码
-        function initBatchCopyFeature() {
-            const batchCopyBtn = document.getElementById('batch-copy-btn');
-            const platformCheckboxes = document.querySelectorAll('.platform-checkbox');
-            const allPlatformsCheckbox = document.querySelector('.platform-checkbox[data-platform="all"]');
-
-            // 全选复选框
-            allPlatformsCheckbox.onclick = function () {
-                const isChecked = this.checked;
-                platformCheckboxes.forEach(checkbox => {
-                    if (checkbox !== allPlatformsCheckbox) {
-                        checkbox.checked = isChecked;
-                    }
-                });
-            };
-
-            // 其他平台复选框更新全选状态
-            platformCheckboxes.forEach(checkbox => {
-                if (checkbox !== allPlatformsCheckbox) {
-                    checkbox.onclick = function () {
-                        const allChecked = Array.from(platformCheckboxes)
-                            .filter(cb => cb !== allPlatformsCheckbox)
-                            .every(cb => cb.checked);
-
-                        allPlatformsCheckbox.checked = allChecked;
-                    };
-                }
-            });
-
-            // 批量复制按钮
-            batchCopyBtn.onclick = function () {
-                const selectedPlatforms = [];
-                let selectedEmails = [];
-
-                // 获取选中的平台
-                platformCheckboxes.forEach(checkbox => {
-                    if (checkbox.checked && checkbox !== allPlatformsCheckbox) {
-                        selectedPlatforms.push(checkbox.getAttribute('data-platform'));
-                    }
-                });
-
-                console.log('选中的平台:', selectedPlatforms);
-
-                // 如果没有选择平台，显示提示
-                if (selectedPlatforms.length === 0) {
-                    showMessage({ msg: '请先选择要复制的邮箱平台', type: 'warning' });
-                    return;
-                }
-
-                // 收集选定平台的所有邮箱
-                selectedPlatforms.forEach(platform => {
-                    const platformEmails = [];
-                    const emailDivs = document.querySelectorAll(`.email-platform[data-platform="${platform}"] .editable div`);
-
-                    emailDivs.forEach(div => {
-                        const emailText = div.textContent.trim();
-                        if (emailText) {
-                            // 提取邮箱地址（移除末尾的逗号）
-                            const email = emailText.replace(/,\s*$/, '');
-                            platformEmails.push(email);
-                        }
-                    });
-
-                    selectedEmails = selectedEmails.concat(platformEmails);
-                });
-
-                console.log('要复制的邮箱:', selectedEmails);
-
-                // 复制邮箱到剪贴板
-                if (selectedEmails.length > 0) {
-                    const emailText = selectedEmails.join(',');
-                    navigator.clipboard.writeText(emailText).then(function () {
-                        showMessage({ msg: `已复制 ${selectedEmails.length} 个邮箱`, type: 'success' });
-                    }).catch(function (err) {
-                        console.error('复制失败:', err);
-                        showMessage({ msg: '复制失败，请重试', type: 'error' });
-                    });
-                } else {
-                    showMessage({ msg: '没有找到邮箱', type: 'warning' });
-                }
-            };
-        }
-
-        // 编辑邮箱部分
-        function setupEditableForEmailSections() {
-            const emailSections = document.querySelectorAll('.email-platform .content-block');
-
-            emailSections.forEach(function (section) {
-                const editIcon = section.querySelector('.edit-icon');
-                const editableDiv = section.querySelector('.editable');
-                const sectionType = editableDiv.getAttribute('data-section');
-                const platform = section.closest('.email-platform').getAttribute('data-platform');
-
-                // 保存编辑前的状态
-                let originalContent;
-
-                // 移除可能存在的旧事件监听器
-                const newEditIcon = editIcon.cloneNode(true);
-                editIcon.parentNode.replaceChild(newEditIcon, editIcon);
-
-                // 为新的编辑图标添加事件监听器
-                newEditIcon.addEventListener('click', function (event) {
-                    console.log('编辑按钮被点击:', sectionType);
-
-                    event.stopPropagation();
-                    const currentState = editableDiv.getAttribute('contenteditable');
-
-                    if (currentState === 'false') {
-                        console.log('进入编辑状态');
-
-                        // 进入编辑状态前，保存原始内容
-                        originalContent = editableDiv.innerHTML;
-
-                        // 进入编辑状态
-                        editableDiv.setAttribute('contenteditable', 'true');
-                        newEditIcon.classList.remove('layui-icon-edit');
-                        newEditIcon.classList.add('layui-icon-ok');
-                        newEditIcon.classList.add('edit-active');
-                        editableDiv.classList.add('editing');
-                        editableDiv.focus();
-                    } else {
-                        console.log('退出编辑状态');
-
-                        // 保存并退出编辑状态
-                        editableDiv.setAttribute('contenteditable', 'false');
-                        newEditIcon.classList.remove('layui-icon-ok');
-                        newEditIcon.classList.add('layui-icon-edit');
-                        newEditIcon.classList.remove('edit-active');
-                        editableDiv.classList.remove('editing');
-
-                        // 保存到localStorage
-                        saveContentToStorage('notes', 'email_section_' + sectionType, editableDiv.innerHTML);
-
-                        showMessage({ msg: '内容已保存', type: 'success' });
-                    }
-                });
-
-                // 修改点击事件，点击区域复制该平台下所有邮箱
-                editableDiv.addEventListener('click', function (event) {
-                    if (editableDiv.getAttribute('contenteditable') === 'false') {
-                        event.stopPropagation();
-
-                        // 获取当前平台下所有邮箱
-                        const allEmails = [];
-                        const emailDivs = document.querySelectorAll(`.email-platform[data-platform="${platform}"] .editable div`);
-
-                        emailDivs.forEach(div => {
-                            const emailText = div.textContent.trim();
-                            if (emailText) {
-                                // 提取邮箱地址（移除末尾的逗号）
-                                const email = emailText.replace(/,\s*$/, '');
-                                allEmails.push(email);
-                            }
-                        });
-
-                        // 复制所有邮箱
-                        if (allEmails.length > 0) {
-                            const emailText = allEmails.join(',');
-                            upDateClipboard(emailText);
-                            showMessage({ msg: `已复制 ${platform} 平台的 ${allEmails.length} 个邮箱`, type: 'success' });
-                        }
-                    }
-                });
-
-            });
-        }
-
-        // 设置删除功能
-        function setupDeleteFeature() {
-            // 先移除所有可能的旧事件监听器
-            document.querySelectorAll('.delete-icon').forEach(icon => {
-                // 创建新的删除图标替换旧的，清除所有事件监听器
-                const newIcon = icon.cloneNode(true);
-                icon.parentNode.replaceChild(newIcon, icon);
-
-                // 为新图标添加事件监听器
-                newIcon.addEventListener('click', function (event) {
-                    // 阻止事件冒泡，防止触发其他点击事件
-                    event.stopPropagation();
-                    event.preventDefault();
-
-                    const contentBlock = this.closest('.content-block');
-                    if (contentBlock) {
-                        // 询问确认，只弹出一次确认框
-                        const confirmDelete = window.confirm('确定要删除这条便签吗？');
-                        if (confirmDelete) {
-                            // 删除并保存状态
-                            contentBlock.remove();
-                            showMessage({ msg: '便签已删除', type: 'success' });
-
-                            // 更新索引并保存
-                            updateAndSaveAllData();
-                        }
-                    }
-                });
-            });
-        }
-
-        // 设置添加新模块功能
-        function setupAddFieldFeature() {
-            const addBtn = document.getElementById('add-field-btn');
-            if (addBtn) {
-                addBtn.addEventListener('click', function () {
-                    // 弹出输入对话框获取模块名称
-                    const fieldName = window.prompt('请输入新模块名称:', '新模块');
-                    if (fieldName) {
-                        // 创建新模块
-                        const newFieldHtml = `
-                        <fieldset class="layui-elem-field note-field">
-                            <legend class="legend-container">
-                                <span class="editable-legend" contenteditable="false">${fieldName}</span>
-                                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                                <i class="layui-icon layui-icon-delete field-delete-icon"></i>
-                            </legend>
-                            <div class="layui-field-box">
-                                ${createNewNoteHtml()}
-                                <div class="note-btn-wrapper">
-                                    <div class="add-note-btn" title="添加便签">
-                                        <i class="layui-icon layui-icon-add-1"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-                        `;
-
-                        // 插入到添加按钮的后面
-                        const addContainer = document.querySelector('.add-field-container');
-                        addContainer.insertAdjacentHTML('afterend', newFieldHtml);
-
-                        // 为新添加的模块绑定各种事件
-                        const newField = document.querySelector('.layui-elem-field:last-of-type');
-                        if (newField) {
-                            setupFieldEvents(newField);
-                        }
-
-                        // 保存状态 - 确保调用新的更新函数
-                        updateAndSaveAllData();
-
-                        showMessage({ msg: '新模块已添加', type: 'success' });
-                    }
-                });
+                return null;
             }
         }
 
-        // 为每个模块中的"添加便签"按钮添加事件处理
-        function setupAddNoteButtons() {
-            document.querySelectorAll('.add-note-btn').forEach(button => {
-                // 移除可能的旧事件监听器
-                const newButton = button.cloneNode(true);
-                button.parentNode.replaceChild(newButton, button);
-
-                // 添加点击事件
-                newButton.addEventListener('click', function () {
-                    // 获取父级元素 - 需要向上两级才能找到.layui-field-box
-                    const fieldBox = this.closest('.note-btn-wrapper').parentNode;
-
-                    // 创建新便签
-                    const newNoteHtml = createNewNoteHtml();
-
-                    // 插入到按钮包装器之前
-                    const wrapper = this.closest('.note-btn-wrapper');
-                    wrapper.insertAdjacentHTML('beforebegin', newNoteHtml);
-
-                    // 为新添加的便签绑定事件
-                    const newNote = wrapper.previousElementSibling;
-                    setupNoteEvents(newNote);
-
-                    // 保存状态 - 确保调用新的更新函数
-                    updateAndSaveAllData();
-
-                    showMessage({ msg: '便签已添加', type: 'success' });
-                });
-            });
-        }
-
-        // 为单个模块设置所有事件
-        function setupFieldEvents(field) {
-            // 设置标题编辑
-            const legend = field.querySelector('.legend-container');
-            const editableSpan = legend.querySelector('.editable-legend');
-            const editIcon = legend.querySelector('.edit-icon');
-            const deleteIcon = legend.querySelector('.field-delete-icon');
-
-            // 设置删除模块功能
-            if (deleteIcon) {
-                deleteIcon.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    const confirmDelete = window.confirm('确定要删除这个模块及其所有便签吗？');
-                    if (confirmDelete) {
-                        field.remove();
-                        showMessage({ msg: '模块已删除', type: 'success' });
-                        updateAndSaveAllData();
-                    }
-                });
-            }
-
-            editIcon.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const currentState = editableSpan.getAttribute('contenteditable');
-
-                if (currentState === 'false') {
-                    // 进入编辑状态
-                    editableSpan.setAttribute('contenteditable', 'true');
-                    editIcon.classList.remove('layui-icon-edit');
-                    editIcon.classList.add('layui-icon-ok');
-                    editIcon.classList.add('edit-active');
-                    editableSpan.classList.add('editing');
-                    editableSpan.focus();
-                } else {
-                    // 保存并退出编辑状态
-                    editableSpan.setAttribute('contenteditable', 'false');
-                    editIcon.classList.remove('layui-icon-ok');
-                    editIcon.classList.add('layui-icon-edit');
-                    editIcon.classList.remove('edit-active');
-                    editableSpan.classList.remove('editing');
-
-                    // 保存到localStorage
-                    updateAndSaveAllData();
-                    showMessage({ msg: '标题已保存', type: 'success' });
-                }
-            });
-
-            // 设置便签事件
-            const notes = field.querySelectorAll('.content-block');
-            notes.forEach(note => setupNoteEvents(note));
-
-            // 设置添加便签按钮
-            const addNoteBtn = field.querySelector('.add-note-btn');
-            if (addNoteBtn) {
-                // --- 为添加便签按钮创建新的克隆并添加事件监听 ---
-                const newAddNoteBtn = addNoteBtn.cloneNode(true);
-                addNoteBtn.parentNode.replaceChild(newAddNoteBtn, addNoteBtn);
-
-                newAddNoteBtn.addEventListener('click', function () {
-                    const fieldBox = this.closest('.layui-field-box');
-                    const newNoteHtml = createNewNoteHtml();
-                    const wrapper = this.closest('.note-btn-wrapper');
-                    wrapper.insertAdjacentHTML('beforebegin', newNoteHtml);
-
-                    const newNote = wrapper.previousElementSibling;
-                    if (newNote) {
-                        setupNoteEvents(newNote);
-                    }
-
-                    updateAndSaveAllData();
-                    showMessage({ msg: '便签已添加', type: 'success' });
-                });
-            }
-        }
-
-        // 为单个便签设置事件
-        function setupNoteEvents(note) {
-            const editableDiv = note.querySelector('.editable');
-            const editIcon = note.querySelector('.edit-icon');
-            const deleteIcon = note.querySelector('.delete-icon');
-            const expandIcon = note.querySelector('.expand-icon');
-
-            // 检查内容是否溢出，决定是否显示展开按钮和底部渐变
-            function checkOverflow() {
-                // 总是先移除，再根据条件添加
-                editableDiv.classList.remove('has-overflow');
-                if (!expandIcon) return; // 如果没有展开图标，直接返回
-
-                // 确保元素可见且不是编辑状态
-                if (editableDiv.offsetParent !== null && editableDiv.contentEditable === 'false') {
-                    const computedStyle = window.getComputedStyle(editableDiv);
-                    // 检查 max-height 是否是 'none' 或无效值，避免NaN
-                    let maxHeight = parseInt(computedStyle.maxHeight, 10);
-                    if (isNaN(maxHeight) || computedStyle.maxHeight === 'none') {
-                        // 如果没有有效的 max-height (例如已展开)，则不应显示展开按钮或渐变
-                        expandIcon.style.display = 'none';
-                        return;
-                    }
-
-                    // 比较滚动高度和最大高度
-                    if (editableDiv.scrollHeight > maxHeight + 1) { // 加1像素容差
-                        expandIcon.style.display = 'flex'; // 显示展开按钮
-                        // 只有在未展开时才添加渐变效果
-                        if (!editableDiv.classList.contains('expanded')) {
-                            editableDiv.classList.add('has-overflow');
-                        }
-                    } else {
-                        expandIcon.style.display = 'none'; // 隐藏展开按钮
-                    }
-                } else {
-                     expandIcon.style.display = 'none'; // 不可见或编辑中则隐藏
-                }
-            }
-
-            // 初始检查
-            setTimeout(checkOverflow, 50); // 稍作延迟以确保样式计算准确
-
-            // --- 原有的删除按钮逻辑 ---
-            if (deleteIcon) {
-                const newDeleteIcon = deleteIcon.cloneNode(true);
-                if (deleteIcon.parentNode) {
-                    deleteIcon.parentNode.replaceChild(newDeleteIcon, deleteIcon);
-                }
-                newDeleteIcon.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    const confirmDelete = window.confirm('确定要删除这条便签吗？');
-                    if (confirmDelete) {
-                        note.remove();
-                        showMessage({ msg: '便签已删除', type: 'success' });
-                        updateAndSaveAllData();
-                    }
-                });
-            }
-
-            // --- 原有的点击内容复制逻辑 ---
-            editableDiv.addEventListener('click', (event) => {
-                if (editableDiv.getAttribute('contenteditable') === 'false' && !editableDiv.classList.contains('expanded')) {
-                    // 只有在未展开状态下点击才复制，避免展开时误触
-                     upDateClipboard(editableDiv.textContent);
-                } else if (editableDiv.classList.contains('expanded')) {
-                     // 如果已展开，阻止冒泡，防止点击内容区域也触发复制（如果需要展开后仍能复制，移除此else if）
-                     event.stopPropagation();
-                }
-            });
-
-            // --- 修改后的编辑按钮逻辑 ---
-            editIcon.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const currentState = editableDiv.getAttribute('contenteditable');
-                const quoteElement = editableDiv.closest('.layui-elem-quote');
-
-                if (currentState === 'false') {
-                    // 进入编辑状态
-                    editableDiv.setAttribute('contenteditable', 'true');
-                    editableDiv.classList.add('editing');
-                    editableDiv.classList.remove('expanded');
-                    editableDiv.classList.remove('has-overflow'); // 编辑时移除渐变
-                    editIcon.classList.remove('layui-icon-edit');
-                    editIcon.classList.add('layui-icon-ok');
-                    editIcon.classList.add('edit-active');
-                    quoteElement.classList.add('editing-parent');
-                    editableDiv.focus();
-                    if(expandIcon) expandIcon.style.display = 'none';
-                } else {
-                    // 保存并退出编辑状态
-                    editableDiv.setAttribute('contenteditable', 'false');
-                    editableDiv.classList.remove('editing');
-                    editIcon.classList.remove('layui-icon-ok');
-                    editIcon.classList.add('layui-icon-edit');
-                    editIcon.classList.remove('edit-active');
-                    quoteElement.classList.remove('editing-parent');
-
-                    updateAndSaveAllData();
-                    showMessage({ msg: '内容已保存', type: 'success' });
-
-                    // 退出编辑后，重新检查是否需要显示展开按钮和渐变
-                    checkOverflow();
-                }
-            });
-
-            // --- 修改后的展开/收起按钮点击逻辑 ---
-            if (expandIcon) {
-                expandIcon.addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    const isExpanded = editableDiv.classList.toggle('expanded');
-
-                    if (isExpanded) {
-                        expandIcon.classList.remove('layui-icon-down');
-                        expandIcon.classList.add('layui-icon-up');
-                        expandIcon.title = '收起';
-                        editableDiv.classList.remove('has-overflow'); // 展开时移除渐变
-                    } else {
-                        expandIcon.classList.remove('layui-icon-up');
-                        expandIcon.classList.add('layui-icon-down');
-                        expandIcon.title = '展开';
-                        // 收起后，需要重新检查是否溢出以决定是否显示渐变
-                        // 使用 setTimeout 确保 max-height 过渡完成后再检查
-                        setTimeout(checkOverflow, 300); // 300ms 匹配 CSS 过渡时间
-                    }
-                });
-            }
-        }
-
-        // 为标题添加编辑功能
-        function setupLegendEvents(legend) {
-            const editableSpan = legend.querySelector('.editable-legend');
-            const editIcon = legend.querySelector('.edit-icon');
-
-            // 移除可能存在的旧事件监听器
-            const newEditIcon = editIcon.cloneNode(true);
-            editIcon.parentNode.replaceChild(newEditIcon, editIcon);
-
-            // 点击编辑图标切换编辑状态
-            newEditIcon.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const currentState = editableSpan.getAttribute('contenteditable');
-
-                if (currentState === 'false') {
-                    // 进入编辑状态
-                    editableSpan.setAttribute('contenteditable', 'true');
-                    newEditIcon.classList.remove('layui-icon-edit');
-                    newEditIcon.classList.add('layui-icon-ok');
-                    newEditIcon.classList.add('edit-active');
-                    editableSpan.classList.add('editing');
-                    editableSpan.focus();
-                } else {
-                    // 保存并退出编辑状态
-                    editableSpan.setAttribute('contenteditable', 'false');
-                    newEditIcon.classList.remove('layui-icon-ok');
-                    newEditIcon.classList.add('layui-icon-edit');
-                    newEditIcon.classList.remove('edit-active');
-                    editableSpan.classList.remove('editing');
-
-                    // 保存到localStorage
-                    updateAndSaveAllData();
-                    showMessage({ msg: '标题已保存', type: 'success' });
-                }
-            });
-        }
-
-        // 更新索引并保存所有数据
-        function updateAndSaveAllData() {
-            // 先获取旧的数据，保留QA邮箱部分
-            const oldData = getAllDataFromStorage();
-
-            // 创建新的数据对象
-            const newData = {
-                notes: {},
-                legends: {},
-                fields: [], // 用于保存模块结构
-                activeTab: oldData.activeTab // 保留当前选项卡状态
-            };
-
-            // 保留QA邮箱相关数据
-            Object.keys(oldData.notes || {}).forEach(key => {
-                if (key.startsWith('email_section_')) {
-                    newData.notes[key] = oldData.notes[key];
-                }
-            });
-
-            // 首先保存所有常用便签模块结构
-            const generalTab = document.getElementById('general-tab');
-            const fields = generalTab.querySelectorAll('.layui-elem-field');
-
-            fields.forEach((field, fieldIndex) => {
-                const fieldTitle = field.querySelector('.editable-legend').textContent;
-                const notes = [];
-
-                // 获取该模块下的所有便签
-                field.querySelectorAll('.content-block').forEach((block, blockIndex) => {
-                    const noteContent = block.querySelector('.editable').innerHTML;
-                    const noteKey = `note_${fieldIndex}_${blockIndex}`;
-
-                    // 保存便签内容
-                    newData.notes[noteKey] = noteContent;
-                    notes.push(noteKey);
-                });
-
-                // 保存模块标题
-                const legendKey = `legend_${fieldIndex}`;
-                newData.legends[legendKey] = fieldTitle;
-
-                // 记录模块结构
-                newData.fields.push({
-                    title: legendKey,
-                    notes: notes
-                });
-            });
-
-            // 保存到localStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(newData));
-        }
-
-        // 选项卡切换功能
-        function setupTabs() {
-            // 直接获取DOM元素引用
-            const tabGeneral = document.querySelector('.tab-item[data-tab="general"]');
-            const tabQaEmails = document.querySelector('.tab-item[data-tab="qa-emails"]');
-            console.log("🚀 ~ setupTabs ~ tabQaEmails:", tabQaEmails)
-            const generalContent = document.getElementById('general-tab');
-            const qaEmailsContent = document.getElementById('qa-emails-tab');
-
-            // 检查是否找到所有需要的元素
-            if (!tabGeneral || !tabQaEmails || !generalContent || !qaEmailsContent) {
-                console.error('找不到选项卡相关元素');
+        function load() {
+            const raw = readRaw();
+            if (!raw) {
+                const setId = 'set_1';
+                state.sets = [{ id: setId, name: '组1' }];
+                state.groups = DEFAULT_GROUPS.map(group => ({ title: group.title, notes: group.notes.slice(), setId }));
+                state.qa = { ...DEFAULT_QA };
+                state.activeTab = 'general';
+                pickedSets = new Set([setId]);
+                persist();
                 return;
             }
 
+            state.activeTab = raw.activeTab === 'qa-emails' ? 'qa-emails' : 'general';
 
-            // 通用切换函数
-            function setActiveTab(activeTab, activeContent, inactiveTab, inactiveContent) {
-                activeTab.classList.add('active');
-                activeContent.classList.add('active');
-                inactiveTab.classList.remove('active');
-                inactiveContent.classList.remove('active');
-            }
-
-            // 直接为每个选项卡添加单独的点击处理函数
-            tabGeneral.onclick = function () {
-                setActiveTab(tabGeneral, generalContent, tabQaEmails, qaEmailsContent);
-                
-                // 获取保存的数据并更新选项卡状态
-                const savedData = getAllDataFromStorage();
-                savedData.activeTab = 'general';
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
-            };
-
-            tabQaEmails.onclick = function () {
-                setActiveTab(tabQaEmails, qaEmailsContent, tabGeneral, generalContent);
-                
-                // 获取保存的数据并更新选项卡状态
-                const savedData = getAllDataFromStorage();
-                savedData.activeTab = 'qa-emails';
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
-            };
-
-            // 加载保存的选项卡状态
-            const savedData = getAllDataFromStorage();
-            const savedTab = savedData.activeTab;
-            
-            if (savedTab === 'qa-emails') {
-                tabQaEmails.onclick();
+            if (Array.isArray(raw.fields) && raw.fields.length) {
+                state.groups = raw.fields.map(field => ({
+                    title: (raw.legends && raw.legends[field.title]) || '未命名模块',
+                    notes: (field.notes || []).map(key => (raw.notes && raw.notes[key]) || ''),
+                    setId: field.setId || ''
+                }));
             } else {
-                tabGeneral.onclick();
-            }
-
-        }
-
-        // 添加这个函数
-        function saveContentToStorage(category, key, content) {
-            const savedData = getAllDataFromStorage();
-
-            // 如果该类别不存在，创建一个空对象
-            if (!savedData[category]) {
-                savedData[category] = {};
-            }
-
-            // 保存内容
-            savedData[category][key] = content;
-
-            // 写回localStorage
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
-        }
-
-        // 添加新函数实现拖拽排序
-        function setupDragSort() {
-            const generalTab = document.getElementById('general-tab');
-            const fields = generalTab.querySelectorAll('.layui-elem-field');
-            
-            fields.forEach(field => {
-                // 为每个legend添加可拖拽属性
-                const legend = field.querySelector('legend');
-                legend.draggable = true;
-                legend.style.cursor = 'move';
-                
-                // 拖拽开始时记录被拖拽的元素
-                legend.addEventListener('dragstart', e => {
-                    e.dataTransfer.setData('text/plain', '');
-                    e.target.closest('.layui-elem-field').classList.add('dragging');
-                });
-                
-                // 拖拽结束时移除标记
-                legend.addEventListener('dragend', e => {
-                    e.target.closest('.layui-elem-field').classList.remove('dragging');
-                });
-                
-                // 在可放置区域悬停时的视觉反馈
-                field.addEventListener('dragover', e => {
-                    e.preventDefault();
-                    const draggingField = generalTab.querySelector('.dragging');
-                    if (draggingField && draggingField !== field) {
-                        const rect = field.getBoundingClientRect();
-                        const midY = rect.top + rect.height / 2;
-                        
-                        if (e.clientY < midY) {
-                            field.classList.add('drag-above');
-                            field.classList.remove('drag-below');
-                        } else {
-                            field.classList.add('drag-below');
-                            field.classList.remove('drag-above');
-                        }
+                state.groups = DEFAULT_GROUPS.map(group => ({ title: group.title, notes: group.notes.slice(), setId: '' }));
+                const oldNotes = raw.notes || {};
+                const counts = [2, 1, 1];
+                let cursor = 0;
+                state.groups.forEach((group, index) => {
+                    if (raw.legends && raw.legends['legend_' + index]) {
+                        group.title = raw.legends['legend_' + index];
+                    }
+                    for (let i = 0; i < counts[index]; i++) {
+                        const saved = oldNotes['note_' + cursor];
+                        if (saved) group.notes[i] = saved;
+                        cursor++;
                     }
                 });
-                
-                // 离开时移除视觉反馈
-                field.addEventListener('dragleave', e => {
-                    field.classList.remove('drag-above', 'drag-below');
+            }
+
+            let migratedSets = false;
+            if (Array.isArray(raw.sets) && raw.sets.length) {
+                state.sets = raw.sets.map(set => ({ id: set.id, name: set.name || '未命名组' }));
+            } else {
+                const setId = 'set_1';
+                state.sets = [{ id: setId, name: '组1' }];
+                state.groups.forEach(group => {
+                    if (!group.setId) group.setId = setId;
                 });
-                
-                // 放置时执行排序
-                field.addEventListener('drop', e => {
-                    e.preventDefault();
-                    const draggingField = generalTab.querySelector('.dragging');
-                    if (draggingField && draggingField !== field) {
-                        const rect = field.getBoundingClientRect();
-                        const midY = rect.top + rect.height / 2;
-                        
-                        if (e.clientY < midY) {
-                            field.before(draggingField);
-                        } else {
-                            field.after(draggingField);
-                        }
-                        
-                        // 保存新顺序
-                        updateAndSaveAllData();
-                        showMessage({ msg: '排序已更新', type: 'success' });
+                migratedSets = true;
+            }
+            pickedSets = new Set(state.sets.map(set => set.id));
+
+            state.qa = {};
+            PLATFORMS.forEach((platform, index) => {
+                const saved = raw.notes && (raw.notes['email_section_' + platform.id] || raw.notes['note_' + (4 + index)]);
+                state.qa[platform.id] = saved || DEFAULT_QA[platform.id];
+            });
+            if (migratedSets) persist();
+        }
+
+        function persist() {
+            const data = { notes: {}, legends: {}, fields: [], sets: state.sets, activeTab: state.activeTab };
+            state.groups.forEach((group, fieldIndex) => {
+                const legendKey = 'legend_' + fieldIndex;
+                data.legends[legendKey] = group.title;
+                const noteKeys = group.notes.map((html, noteIndex) => {
+                    const noteKey = `note_${fieldIndex}_${noteIndex}`;
+                    data.notes[noteKey] = html;
+                    return noteKey;
+                });
+                data.fields.push({ title: legendKey, notes: noteKeys, setId: group.setId || '' });
+            });
+            PLATFORMS.forEach(platform => {
+                data.notes['email_section_' + platform.id] = state.qa[platform.id] || '';
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function esc(value) {
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[char]));
+        }
+
+        function plainFrom(el) {
+            const parts = [];
+            const walk = node => {
+                node.childNodes.forEach(child => {
+                    if (child.nodeType === 3) {
+                        parts.push(child.textContent);
+                    } else if (child.nodeName === 'BR') {
+                        parts.push('\n');
+                    } else if (child.nodeType === 1) {
+                        const block = /^(DIV|P|LI|H[1-6]|TR)$/.test(child.nodeName);
+                        if (block && parts.length && !parts[parts.length - 1].endsWith('\n')) parts.push('\n');
+                        walk(child);
+                        if (block && parts.length && !parts[parts.length - 1].endsWith('\n')) parts.push('\n');
                     }
-                    
-                    // 移除所有视觉反馈
-                    generalTab.querySelectorAll('.layui-elem-field').forEach(field => {
-                        field.classList.remove('drag-above', 'drag-below');
-                    });
                 });
+            };
+            walk(el);
+            return parts.join('').replace(/\u00a0/g, ' ').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+        }
+
+        function copyPayload(el) {
+            const lines = plainFrom(el).split('\n').map(line => line.trim()).filter(Boolean);
+            if (lines.length > 1 && lines.every(line => line.includes('@'))) {
+                return lines.map(line => line.replace(/[,，]\s*$/, '')).join(',');
+            }
+            return lines.join('\n');
+        }
+
+        function emailsFrom(el) {
+            return plainFrom(el).split('\n').map(line => line.trim().replace(/[,，]\s*$/, '')).filter(Boolean);
+        }
+
+        function writeClipboard(text) {
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.left = '-9999px';
+            document.body.appendChild(area);
+            area.select();
+            let ok = false;
+            try { ok = document.execCommand('copy'); } catch (error) { ok = false; }
+            document.body.removeChild(area);
+            if (ok) return Promise.resolve();
+            if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+            return Promise.reject(new Error('copy failed'));
+        }
+
+        function flash(el, hint) {
+            el.classList.add('copied');
+            if (hint) hint.textContent = '已复制';
+            setTimeout(() => {
+                el.classList.remove('copied');
+                if (hint) hint.textContent = el.classList.contains('qa-card') ? hint.dataset.label : '复制';
+            }, 1200);
+        }
+
+        function renderChips() {
+            const box = document.getElementById('chips');
+            if (state.activeTab === 'qa-emails') {
+                const allOn = PLATFORMS.every(platform => picked.has(platform.id));
+                const presets = PRESETS.map(preset => {
+                    const on = preset.platforms.length === picked.size && preset.platforms.every(id => picked.has(id));
+                    return `<button class="chip preset ${on ? 'on' : ''}" type="button" data-preset="${preset.id}">${preset.label}</button>`;
+                }).join('');
+                const platforms = PLATFORMS.map(platform =>
+                    `<button class="chip ${picked.has(platform.id) ? 'on' : ''}" type="button" data-platform="${platform.id}">${platform.label}</button>`
+                ).join('') + `<button class="chip all ${allOn ? 'on' : ''}" type="button" data-platform="all">全选</button>`;
+                box.innerHTML = `<div class="quick-row">${presets}</div><div class="chip-row">${platforms}</div>`;
+                copySelectedBtn.disabled = picked.size === 0;
+                copySelectedBtn.textContent = picked.size ? `复制 ${picked.size} 个平台` : '复制所选';
+                return;
+            }
+
+            const allOn = state.sets.length > 0 && state.sets.every(set => pickedSets.has(set.id));
+            box.innerHTML = state.sets.map((set, index) => `
+                <span class="chip ${pickedSets.has(set.id) ? 'on' : ''}" data-set="${esc(set.id)}" data-tone="${index % 6}">
+                    <span class="set-name">${esc(set.name)}</span>
+                    <span class="more">
+                        <button class="chip-mini" type="button" data-action="menu" aria-label="更多">···</button>
+                        <span class="menu" hidden>
+                            <button type="button" data-action="rename-set" data-set="${esc(set.id)}">改名</button>
+                            <button class="danger" type="button" data-action="delete-set" data-set="${esc(set.id)}">删除</button>
+                        </span>
+                    </span>
+                </span>
+            `).join('') + `<button class="chip all ${allOn ? 'on' : ''}" type="button" data-set="all">全选</button>`
+                + `<button class="chip add" type="button" data-action="add-set">+ 组</button>`;
+            copySelectedBtn.disabled = pickedSets.size === 0;
+            copySelectedBtn.textContent = pickedSets.size ? `复制 ${pickedSets.size} 个组` : '复制所选';
+        }
+
+        function render() {
+            const qa = state.activeTab === 'qa-emails';
+            app.classList.toggle('qa', qa);
+            app.classList.toggle('general', !qa);
+            document.body.classList.toggle('tone-qa', qa);
+            document.body.classList.toggle('tone-general', !qa);
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === state.activeTab);
+            });
+            renderChips();
+            board.innerHTML = '';
+            if (state.activeTab === 'general') board.appendChild(renderGeneral());
+            else board.appendChild(renderQA());
+            markOverflow();
+            applySearch();
+            board.scrollTop = 0;
+            if (focusAfterRender) {
+                const target = board.querySelector(focusAfterRender);
+                if (target) beginEdit(target);
+                focusAfterRender = null;
+            }
+        }
+
+        function groupVisible(group) {
+            if (pickedSets.size === 0) return true;
+            if (!group.setId) return pickedSets.size === state.sets.length;
+            return pickedSets.has(group.setId);
+        }
+
+        function renderGeneral() {
+            const wrap = document.createElement('div');
+            const singleSet = pickedSets.size === 1 ? state.sets.find(set => pickedSets.has(set.id)) : null;
+            state.groups.forEach((group, gi) => {
+                if (!groupVisible(group)) return;
+                const section = document.createElement('section');
+                section.className = 'group';
+                section.dataset.gi = String(gi);
+                section.dataset.tone = String(gi % 6);
+                const options = state.sets.map(set =>
+                    `<option value="${esc(set.id)}" ${group.setId === set.id ? 'selected' : ''}>${esc(set.name)}</option>`
+                ).join('');
+
+                const head = document.createElement('div');
+                head.className = 'group-head';
+                head.innerHTML = `
+                    <button class="grip" type="button" draggable="true" title="拖动排序" aria-label="拖动排序">⋮⋮</button>
+                    <h2 class="group-title">${esc(group.title)}</h2>
+                    <select class="move-set" data-action="move-set" aria-label="放入哪个组">
+                        <option value="" ${group.setId ? '' : 'selected'}>未放入组</option>
+                        ${options}
+                    </select>
+                    <span class="more">
+                        <button class="text-btn" type="button" data-action="menu" aria-label="更多">···</button>
+                        <span class="menu" hidden>
+                            <button type="button" data-action="rename">改名</button>
+                            <button class="danger" type="button" data-action="delete-group">删除</button>
+                        </span>
+                    </span>`;
+                section.appendChild(head);
+
+                group.notes.forEach((html, ni) => {
+                    const note = document.createElement('div');
+                    note.className = 'note';
+                    note.dataset.gi = String(gi);
+                    note.dataset.ni = String(ni);
+                    const body = document.createElement('div');
+                    body.className = 'note-body';
+                    body.innerHTML = html;
+                    const side = document.createElement('div');
+                    side.className = 'note-side';
+                    side.innerHTML = `
+                        <span class="copy-hint">复制</span>
+                        <span class="more">
+                            <button class="text-btn" type="button" data-action="menu" aria-label="更多">···</button>
+                            <span class="menu" hidden>
+                                <button type="button" data-action="edit">编辑</button>
+                                <button class="danger" type="button" data-action="delete-note">删除</button>
+                            </span>
+                        </span>
+                        <button class="more-btn is-hidden" type="button" data-action="expand">展开</button>`;
+                    note.append(body, side);
+                    section.appendChild(note);
+                });
+
+                const add = document.createElement('div');
+                add.className = 'add-row';
+                add.innerHTML = `<button class="add-btn" type="button" data-action="add-note">+ 添加一条</button>`;
+                section.appendChild(add);
+                wrap.appendChild(section);
+            });
+
+            const create = document.createElement('div');
+            create.className = 'add-group';
+            create.innerHTML = `<button class="add-btn" type="button" data-action="add-group">+ 添加模块</button>`;
+            wrap.appendChild(create);
+
+            if (singleSet) {
+                const outside = state.groups
+                    .map((group, gi) => ({ group, gi }))
+                    .filter(item => item.group.setId !== singleSet.id);
+                if (!state.groups.some(group => group.setId === singleSet.id)) {
+                    const empty = document.createElement('div');
+                    empty.className = 'empty';
+                    empty.textContent = `${singleSet.name} 还是空的，把下面的模块放进来。`;
+                    wrap.insertBefore(empty, create);
+                }
+                if (outside.length) {
+                    const inbox = document.createElement('div');
+                    inbox.className = 'inbox';
+                    inbox.innerHTML = `<span>放进「${esc(singleSet.name)}」</span>` + outside.map(item =>
+                        `<button type="button" data-action="assign" data-gi="${item.gi}">${esc(item.group.title)}</button>`
+                    ).join('');
+                    wrap.insertBefore(inbox, create);
+                }
+            }
+            return wrap;
+        }
+
+        function renderQA() {
+            const grid = document.createElement('div');
+            grid.className = 'qa-grid';
+            PLATFORMS.forEach(platform => {
+                const card = document.createElement('article');
+                card.className = 'qa-card' + (picked.has(platform.id) ? ' picked' : '');
+                card.dataset.platform = platform.id;
+                const emails = emailsFromHtml(state.qa[platform.id]);
+                card.innerHTML = `
+                    <div class="qa-head">
+                        <h3>${platform.label}</h3>
+                        <span class="qa-count">${emails.length} 个</span>
+                        <div class="qa-actions">
+                            <button class="text-btn" type="button" data-action="edit-qa">编辑</button>
+                        </div>
+                    </div>`;
+                const body = document.createElement('div');
+                body.className = 'qa-body';
+                body.innerHTML = state.qa[platform.id] || '';
+                const foot = document.createElement('div');
+                foot.className = 'qa-foot';
+                foot.dataset.label = '点击复制';
+                foot.textContent = '点击复制';
+                card.append(body, foot);
+                grid.appendChild(card);
+            });
+            return grid;
+        }
+
+        function emailsFromHtml(html) {
+            const holder = document.createElement('div');
+            holder.innerHTML = html || '';
+            return emailsFrom(holder);
+        }
+
+        function markOverflow() {
+            board.querySelectorAll('.note').forEach(note => {
+                const body = note.querySelector('.note-body');
+                const more = note.querySelector('[data-action="expand"]');
+                if (body.scrollHeight > body.clientHeight + 4) more.classList.remove('is-hidden');
             });
         }
 
-        // 修改：确保添加新便签时包含展开图标
-        function createNewNoteHtml() {
-            return `
-            <blockquote class="layui-elem-quote content-block">
-                <i class="layui-icon layui-icon-edit edit-icon"></i>
-                <i class="layui-icon layui-icon-delete delete-icon"></i>
-                <i class="layui-icon layui-icon-down expand-icon" title="展开"></i>
-                <div class="editable" contenteditable="false">点击右侧编辑图标修改内容</div>
-            </blockquote>
-            `;
+        function applySearch() {
+            const query = searchInput.value.trim().toLowerCase();
+            let visible = 0;
+            if (state.activeTab === 'general') {
+                board.querySelectorAll('.group').forEach(group => {
+                    let shown = 0;
+                    const title = group.querySelector('.group-title').textContent.toLowerCase();
+                    group.querySelectorAll('.note').forEach(note => {
+                        const text = note.querySelector('.note-body').textContent.toLowerCase();
+                        const match = !query || title.includes(query) || text.includes(query);
+                        note.classList.toggle('is-hidden', !match);
+                        if (match) shown++;
+                    });
+                    const titleMatch = !query || title.includes(query);
+                    group.classList.toggle('is-hidden', !titleMatch && shown === 0);
+                    if (!group.classList.contains('is-hidden')) visible++;
+                });
+            } else {
+                board.querySelectorAll('.qa-card').forEach(card => {
+                    const text = (card.querySelector('h3').textContent + ' ' + card.querySelector('.qa-body').textContent).toLowerCase();
+                    const match = !query || text.includes(query);
+                    card.classList.toggle('is-hidden', !match);
+                    if (match) visible++;
+                });
+            }
+            let empty = board.querySelector('.search-empty');
+            if (query && visible === 0) {
+                if (!empty) {
+                    empty = document.createElement('div');
+                    empty.className = 'empty search-empty';
+                    empty.textContent = '没有匹配的内容';
+                    board.appendChild(empty);
+                }
+            } else if (empty) {
+                empty.remove();
+            }
         }
 
+        function beginEdit(body) {
+            const host = body.closest('.note, .qa-card, .group');
+            originals.set(body, body.classList.contains('group-title') ? body.textContent : body.innerHTML);
+            body.contentEditable = 'true';
+            host.classList.add('is-editing');
+            if (host.classList.contains('note')) {
+                const more = host.querySelector('[data-action="expand"]');
+                if (more) more.classList.add('is-hidden');
+            }
+            body.focus();
+            const range = document.createRange();
+            range.selectNodeContents(body);
+            range.collapse(false);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        function finishEdit(body, cancel) {
+            const host = body.closest('.note, .qa-card, .group');
+            if (!host || !host.classList.contains('is-editing')) return;
+            if (cancel && originals.has(body)) {
+                if (body.classList.contains('group-title')) body.textContent = originals.get(body);
+                else body.innerHTML = originals.get(body);
+            }
+            body.contentEditable = 'false';
+            host.classList.remove('is-editing');
+            originals.delete(body);
+
+            if (body.classList.contains('group-title')) {
+                const gi = Number(host.dataset.gi);
+                state.groups[gi].title = body.textContent.trim() || '未命名模块';
+                body.textContent = state.groups[gi].title;
+            } else if (host.classList.contains('note')) {
+                const gi = Number(host.dataset.gi);
+                const ni = Number(host.dataset.ni);
+                state.groups[gi].notes[ni] = body.innerHTML;
+            } else if (host.classList.contains('qa-card')) {
+                state.qa[host.dataset.platform] = body.innerHTML;
+                const count = host.querySelector('.qa-count');
+                count.textContent = emailsFrom(body).length + ' 个';
+            }
+            persist();
+            if (!cancel) showMessage({ msg: '已保存', type: 'success' });
+            if (host.classList.contains('note')) markOverflow();
+        }
+
+        function copyNote(note) {
+            const text = copyPayload(note.querySelector('.note-body'));
+            if (!text) {
+                showMessage({ msg: '这条还没有内容', type: 'warning' });
+                return;
+            }
+            writeClipboard(text).then(() => {
+                flash(note, note.querySelector('.copy-hint'));
+                showMessage({ msg: '已复制', type: 'success' });
+            }).catch(() => showMessage({ msg: '复制失败', type: 'error' }));
+        }
+
+        function copyPlatform(id, card) {
+            const body = card ? card.querySelector('.qa-body') : null;
+            const list = body ? emailsFrom(body) : emailsFromHtml(state.qa[id]);
+            if (!list.length) {
+                showMessage({ msg: '没有邮箱', type: 'warning' });
+                return;
+            }
+            writeClipboard(list.join(',')).then(() => {
+                if (card) flash(card, card.querySelector('.qa-foot'));
+                const label = PLATFORMS.find(item => item.id === id).label;
+                showMessage({ msg: `已复制 ${label} 的 ${list.length} 个邮箱`, type: 'success' });
+            }).catch(() => showMessage({ msg: '复制失败', type: 'error' }));
+        }
+
+        document.querySelector('.tabs').addEventListener('click', event => {
+            const tab = event.target.closest('.tab');
+            if (!tab || tab.dataset.tab === state.activeTab) return;
+            state.activeTab = tab.dataset.tab;
+            persist();
+            render();
+        });
+
+        searchInput.addEventListener('input', applySearch);
+
+        function payloadFromHtml(html) {
+            const holder = document.createElement('div');
+            holder.innerHTML = html || '';
+            return copyPayload(holder);
+        }
+
+        function closeMenus() {
+            document.querySelectorAll('.menu').forEach(menu => { menu.hidden = true; });
+        }
+
+        function toggleMenu(trigger) {
+            const menu = trigger.closest('.more').querySelector('.menu');
+            const willOpen = menu.hidden;
+            closeMenus();
+            if (!willOpen) return;
+            menu.hidden = false;
+            const rect = trigger.getBoundingClientRect();
+            const width = menu.offsetWidth;
+            const height = menu.offsetHeight;
+            let top = rect.bottom + 6;
+            if (top + height > window.innerHeight - 8) top = Math.max(8, rect.top - height - 6);
+            let left = rect.right - width;
+            if (left < 8) left = 8;
+            if (left + width > window.innerWidth - 8) left = window.innerWidth - width - 8;
+            menu.style.top = top + 'px';
+            menu.style.left = left + 'px';
+        }
+
+        document.addEventListener('click', event => {
+            if (event.target.closest('[data-action="menu"]') || event.target.closest('.menu')) return;
+            closeMenus();
+        });
+        board.addEventListener('scroll', closeMenus);
+
+        document.getElementById('chips').addEventListener('click', event => {
+            const menuBtn = event.target.closest('[data-action="menu"]');
+            if (menuBtn) {
+                toggleMenu(menuBtn);
+                return;
+            }
+            const rename = event.target.closest('[data-action="rename-set"]');
+            if (rename) {
+                closeMenus();
+                const name = rename.closest('.chip').querySelector('.set-name');
+                name.contentEditable = 'true';
+                name.focus();
+                const range = document.createRange();
+                range.selectNodeContents(name);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                return;
+            }
+            const remove = event.target.closest('[data-action="delete-set"]');
+            if (remove) {
+                closeMenus();
+                const id = remove.dataset.set;
+                const set = state.sets.find(item => item.id === id);
+                if (!set || !confirm(`删除「${set.name}」？里面的模块会变成未放入组。`)) return;
+                state.sets = state.sets.filter(item => item.id !== id);
+                state.groups.forEach(group => {
+                    if (group.setId === id) group.setId = '';
+                });
+                pickedSets.delete(id);
+                persist();
+                render();
+                return;
+            }
+            if (event.target.closest('[data-action="add-set"]')) {
+                const id = 'set_' + Date.now();
+                state.sets.push({ id, name: '组' + (state.sets.length + 1) });
+                pickedSets = new Set([id]);
+                persist();
+                render();
+                const name = document.querySelector(`.chip[data-set="${id}"] .set-name`);
+                if (name) {
+                    name.contentEditable = 'true';
+                    name.focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(name);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+                return;
+            }
+            if (event.target.classList.contains('set-name') && event.target.isContentEditable) return;
+            const chip = event.target.closest('.chip');
+            if (!chip) return;
+            if (state.activeTab === 'qa-emails') {
+                if (chip.dataset.preset) {
+                    const preset = PRESETS.find(item => item.id === chip.dataset.preset);
+                    if (!preset) return;
+                    const exact = preset.platforms.length === picked.size && preset.platforms.every(id => picked.has(id));
+                    picked = exact ? new Set() : new Set(preset.platforms);
+                } else if (chip.dataset.platform === 'all') {
+                    if (picked.size === PLATFORMS.length) picked.clear();
+                    else PLATFORMS.forEach(platform => picked.add(platform.id));
+                } else if (picked.has(chip.dataset.platform)) {
+                    picked.delete(chip.dataset.platform);
+                } else {
+                    picked.add(chip.dataset.platform);
+                }
+                renderChips();
+                board.querySelectorAll('.qa-card').forEach(card => {
+                    card.classList.toggle('picked', picked.has(card.dataset.platform));
+                });
+                return;
+            }
+            if (chip.dataset.set === 'all') {
+                if (pickedSets.size === state.sets.length) pickedSets.clear();
+                else pickedSets = new Set(state.sets.map(set => set.id));
+            } else if (chip.dataset.set) {
+                const id = chip.dataset.set;
+                if (pickedSets.has(id)) pickedSets.delete(id);
+                else pickedSets.add(id);
+            }
+            render();
+        });
+
+        document.getElementById('chips').addEventListener('focusout', event => {
+            const name = event.target;
+            if (!name.classList || !name.classList.contains('set-name') || !name.isContentEditable) return;
+            const set = state.sets.find(item => item.id === name.closest('.chip').dataset.set);
+            if (!set) return;
+            set.name = name.textContent.trim() || '未命名组';
+            name.contentEditable = 'false';
+            persist();
+            renderChips();
+        });
+
+        document.getElementById('chips').addEventListener('keydown', event => {
+            if (!event.target.classList.contains('set-name') || !event.target.isContentEditable) return;
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                event.target.blur();
+            }
+        });
+
+        copySelectedBtn.addEventListener('click', () => {
+            if (state.activeTab === 'qa-emails') {
+                const list = [];
+                PLATFORMS.forEach(platform => {
+                    if (picked.has(platform.id)) list.push(...emailsFromHtml(state.qa[platform.id]));
+                });
+                if (!list.length) {
+                    showMessage({ msg: '没有找到邮箱', type: 'warning' });
+                    return;
+                }
+                writeClipboard(list.join(',')).then(() => {
+                    showMessage({ msg: `已复制 ${list.length} 个邮箱`, type: 'success' });
+                }).catch(() => showMessage({ msg: '复制失败', type: 'error' }));
+                return;
+            }
+            const chunks = [];
+            state.groups.forEach(group => {
+                if (!pickedSets.has(group.setId)) return;
+                group.notes.forEach(html => {
+                    const text = payloadFromHtml(html);
+                    if (text) chunks.push(text);
+                });
+            });
+            if (!chunks.length) {
+                showMessage({ msg: '所选组里没有内容', type: 'warning' });
+                return;
+            }
+            writeClipboard(chunks.join('\n')).then(() => {
+                showMessage({ msg: `已复制 ${chunks.length} 条`, type: 'success' });
+            }).catch(() => showMessage({ msg: '复制失败', type: 'error' }));
+        });
+
+        board.addEventListener('click', event => {
+            const action = event.target.closest('[data-action]');
+            if (action) {
+                event.stopPropagation();
+                if (action.dataset.action === 'menu') {
+                    toggleMenu(action);
+                    return;
+                }
+                closeMenus();
+                const group = action.closest('.group');
+                const note = action.closest('.note');
+                const card = action.closest('.qa-card');
+                if (action.dataset.action === 'rename') {
+                    beginEdit(group.querySelector('.group-title'));
+                } else if (action.dataset.action === 'delete-group') {
+                    if (confirm('确定删除这个模块和里面的便签吗？')) {
+                        state.groups.splice(Number(group.dataset.gi), 1);
+                        persist();
+                        render();
+                    }
+                } else if (action.dataset.action === 'add-note') {
+                    const gi = Number(group.dataset.gi);
+                    state.groups[gi].notes.push('');
+                    persist();
+                    focusAfterRender = `.note[data-gi="${gi}"][data-ni="${state.groups[gi].notes.length - 1}"] .note-body`;
+                    render();
+                } else if (action.dataset.action === 'add-group') {
+                    const setId = pickedSets.size === 1 ? [...pickedSets][0] : (state.sets[0] ? state.sets[0].id : '');
+                    state.groups.push({ title: '新模块', notes: [''], setId });
+                    persist();
+                    focusAfterRender = `.group[data-gi="${state.groups.length - 1}"] .group-title`;
+                    render();
+                } else if (action.dataset.action === 'assign') {
+                    const setId = pickedSets.size === 1 ? [...pickedSets][0] : '';
+                    if (!setId) return;
+                    state.groups[Number(action.dataset.gi)].setId = setId;
+                    persist();
+                    render();
+                } else if (action.dataset.action === 'edit') {
+                    beginEdit(note.querySelector('.note-body'));
+                } else if (action.dataset.action === 'delete-note') {
+                    if (confirm('确定删除这条便签吗？')) {
+                        state.groups[Number(note.dataset.gi)].notes.splice(Number(note.dataset.ni), 1);
+                        persist();
+                        render();
+                    }
+                } else if (action.dataset.action === 'expand') {
+                    const open = note.classList.toggle('is-open');
+                    action.textContent = open ? '收起' : '展开';
+                } else if (action.dataset.action === 'edit-qa') {
+                    beginEdit(card.querySelector('.qa-body'));
+                }
+                return;
+            }
+
+            const note = event.target.closest('.note');
+            if (note && !note.classList.contains('is-editing')) {
+                copyNote(note);
+                return;
+            }
+            const card = event.target.closest('.qa-card');
+            if (card && !card.classList.contains('is-editing')) copyPlatform(card.dataset.platform, card);
+        });
+
+        board.addEventListener('change', event => {
+            const select = event.target.closest('[data-action="move-set"]');
+            if (!select) return;
+            state.groups[Number(select.closest('.group').dataset.gi)].setId = select.value;
+            persist();
+            render();
+        });
+
+        board.addEventListener('focusout', event => {
+            const body = event.target;
+            if (body.isContentEditable) finishEdit(body, false);
+        });
+
+        board.addEventListener('keydown', event => {
+            const body = event.target;
+            if (!body.isContentEditable) return;
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                finishEdit(body, true);
+                body.blur();
+            } else if (event.key === 'Enter' && (body.classList.contains('group-title') || event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                body.blur();
+            }
+        });
+
+        board.addEventListener('dragstart', event => {
+            const grip = event.target.closest('.grip');
+            if (!grip) return;
+            dragIndex = Number(grip.closest('.group').dataset.gi);
+            grip.closest('.group').classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', String(dragIndex));
+        });
+
+        board.addEventListener('dragend', () => {
+            dragIndex = null;
+            board.querySelectorAll('.group').forEach(group => group.classList.remove('dragging', 'drag-above', 'drag-below'));
+        });
+
+        board.addEventListener('dragover', event => {
+            const group = event.target.closest('.group');
+            if (!group || dragIndex === null) return;
+            event.preventDefault();
+            const rect = group.getBoundingClientRect();
+            const before = event.clientY < rect.top + rect.height / 2;
+            board.querySelectorAll('.group').forEach(item => item.classList.remove('drag-above', 'drag-below'));
+            group.classList.add(before ? 'drag-above' : 'drag-below');
+        });
+
+        board.addEventListener('drop', event => {
+            const group = event.target.closest('.group');
+            if (!group || dragIndex === null) return;
+            event.preventDefault();
+            const target = Number(group.dataset.gi);
+            if (target === dragIndex) return;
+            const rect = group.getBoundingClientRect();
+            const before = event.clientY < rect.top + rect.height / 2;
+            const [moved] = state.groups.splice(dragIndex, 1);
+            let insertAt = target;
+            if (dragIndex < target) insertAt--;
+            if (!before) insertAt++;
+            state.groups.splice(insertAt, 0, moved);
+            dragIndex = null;
+            persist();
+            render();
+            showMessage({ msg: '顺序已更新', type: 'success' });
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === '/' && document.activeElement !== searchInput && !event.target.isContentEditable) {
+                event.preventDefault();
+                searchInput.focus();
+            }
+        });
+
+        load();
+        render();
     </script>
 </body>
 
