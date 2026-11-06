@@ -578,7 +578,7 @@
             }
         };
 
-        const CLASH_META_YAML = `mixed-port: 7890
+        let CLASH_META_YAML = `mixed-port: 7890
 allow-lan: true
 bind-address: "*"
 mode: rule
@@ -694,6 +694,14 @@ rules:
   - DOMAIN-SUFFIX,douyin.com,DIRECT
   - DOMAIN-SUFFIX,feishu.cn,DIRECT
   - MATCH,PROXY`;
+
+        fetch('./clash-meta.yaml?t=' + Date.now())
+            .then(r => r.ok ? r.text() : Promise.reject())
+            .then(txt => {
+                CLASH_META_YAML = txt;
+                document.getElementById('yamlContent').textContent = txt;
+            })
+            .catch(() => {});
 
         let currentSource = 'vps';
         let currentQrMode = 'node';
