@@ -6,22 +6,10 @@ log-level: info
 ipv6: false
 unified-delay: true
 tcp-concurrent: true
-global-client-fingerprint: chrome
 
 profile:
   store-selected: true
   store-fake-ip: true
-
-sniffer:
-  enable: true
-  sniff:
-    HTTP:
-      ports: [80, 8080-8880]
-      override-destination: true
-    TLS:
-      ports: [443, 8443]
-    QUIC:
-      ports: [443, 8443]
 
 dns:
   enable: true
@@ -31,17 +19,31 @@ dns:
   fake-ip-filter:
     - "*.lan"
     - "*.local"
+    - "localhost.ptlogin2.qq.com"
     - "+.msftconnecttest.com"
     - "+.msftncsi.com"
   default-nameserver:
     - 223.5.5.5
     - 119.29.29.29
   nameserver:
-    - https://dns.alidns.com/dns-query
-    - https://doh.pub/dns-query
+    - 223.5.5.5
+    - 119.29.29.29
 
 proxies:
-  - name: "VPS-VLESS-Reality"
+  - name: "⚡ VPS-80-VMess直连"
+    type: vmess
+    server: 192.220.21.39
+    port: 80
+    uuid: aff9497a-050e-48b5-bf41-205112072d90
+    alterId: 0
+    cipher: auto
+    udp: true
+    tls: false
+    network: ws
+    ws-opts:
+      path: /ray
+
+  - name: "🚀 VPS-443-Reality"
     type: vless
     server: 192.220.21.39
     port: 443
@@ -56,20 +58,40 @@ proxies:
       public-key: iB1xt7fsDEdDBSKdE7dqRBZq5Z8yb4U2c3x-FnvUb1c
       short-id: 21a62e22
 
+  - name: "🛡️ VPS-8443-Reality"
+    type: vless
+    server: 192.220.21.39
+    port: 8443
+    uuid: aff9497a-050e-48b5-bf41-205112072d90
+    network: tcp
+    tls: true
+    udp: true
+    flow: xtls-rprx-vision
+    servername: www.microsoft.com
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: iB1xt7fsDEdDBSKdE7dqRBZq5Z8yb4U2c3x-FnvUb1c
+      short-id: 21a62e22
+
 proxy-groups:
   - name: "PROXY"
     type: select
     proxies:
-      - "VPS-VLESS-Reality"
       - "AUTO"
+      - "⚡ VPS-80-VMess直连"
+      - "🚀 VPS-443-Reality"
+      - "🛡️ VPS-8443-Reality"
       - DIRECT
+
   - name: "AUTO"
     type: url-test
     url: http://www.gstatic.com/generate_204
-    interval: 300
+    interval: 60
     tolerance: 50
     proxies:
-      - "VPS-VLESS-Reality"
+      - "⚡ VPS-80-VMess直连"
+      - "🚀 VPS-443-Reality"
+      - "🛡️ VPS-8443-Reality"
 
 rules:
   - DOMAIN-SUFFIX,local,DIRECT
@@ -78,16 +100,17 @@ rules:
   - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
   - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
   - DOMAIN-SUFFIX,cn,DIRECT
-  - DOMAIN-SUFFIX,apple.com,DIRECT
-  - DOMAIN-SUFFIX,icloud.com,DIRECT
   - DOMAIN-SUFFIX,baidu.com,DIRECT
   - DOMAIN-SUFFIX,qq.com,DIRECT
   - DOMAIN-SUFFIX,weixin.qq.com,DIRECT
   - DOMAIN-SUFFIX,taobao.com,DIRECT
   - DOMAIN-SUFFIX,tmall.com,DIRECT
   - DOMAIN-SUFFIX,alipay.com,DIRECT
+  - DOMAIN-SUFFIX,alicdn.com,DIRECT
   - DOMAIN-SUFFIX,jd.com,DIRECT
   - DOMAIN-SUFFIX,bilibili.com,DIRECT
   - DOMAIN-SUFFIX,163.com,DIRECT
-  - GEOIP,CN,DIRECT
+  - DOMAIN-SUFFIX,126.com,DIRECT
+  - DOMAIN-SUFFIX,douyin.com,DIRECT
+  - DOMAIN-SUFFIX,feishu.cn,DIRECT
   - MATCH,PROXY
