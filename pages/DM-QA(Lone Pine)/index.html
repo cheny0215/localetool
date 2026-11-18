@@ -175,18 +175,11 @@
             const resetButton = document.getElementById('resetButton');
 
             let html_doc = '';
-            let hiddenPreContent = [];
-            let hiddenFontContent = '';
-            let dynamicContent = '';
-            function hiddenPreDivRe() {
-                return /<div style="display: none; max-height: 0px; overflow: hidden;">([\s\S]*?)<\/div>/g;
-            }
-            const whitespaceEntityTokens = {
-                '&nbsp;': '[[[QA_ENTITY_NBSP]]]',
-                '&ensp;': '[[[QA_ENTITY_ENSP]]]',
-                '&emsp;': '[[[QA_ENTITY_EMSP]]]',
-                '&thinsp;': '[[[QA_ENTITY_THINSP]]]',
-            };
+            let sourceTagMap = new Map();
+            const voidOrRootTags = new Set([
+                'html', 'head', 'body', 'meta', 'link', 'title', 'base',
+                'br', 'hr', 'img', 'input', 'col', 'area', 'param', 'source', 'track', 'wbr'
+            ]);
 
 
 
@@ -218,12 +211,7 @@
             submitButton.onclick = async () => {
                 // localStorage.setItem('cy_outputButton_current_html', '')
                 LoadingModule.show()
-                hiddenPreContent = [];
-                html_doc = dataInput.value.replace(hiddenPreDivRe(), (match) => {
-                    hiddenPreContent.push(match);
-                    return `<!-- [[PRE_PLACEHOLDER_${hiddenPreContent.length - 1}]] -->`;
-                });
-                html_doc = preserveWhitespaceEntities(html_doc);
+                html_doc = injectQaTagIds(dataInput.value);
                 // 禁用输入框
                 dataInput.disabled = true;
                 dataInput.style.backgroundColor = '#f5f5f5';
@@ -253,19 +241,8 @@
                 outputButton.disabled = true;
                 outputButton.style.setProperty('background', '#ccc', 'important');
                 outputButton.style.cursor = 'not-allowed';
-                
-                // 去除占位符
-                let iframeOutHtml = iframeDoc.documentElement.outerHTML
-                iframeOutHtml = restoreWhitespaceEntities(iframeOutHtml)
-                // 将零宽连字符转换回 &zwj; 实体
-                iframeOutHtml = iframeOutHtml.replace(/\u200D/g, '&zwj;')
-                hiddenPreContent.forEach((block, i) => {
-                    iframeOutHtml = iframeOutHtml.replace(`<!-- [[PRE_PLACEHOLDER_${i}]] -->`, () => block);
-                });
-                const originalPreDivs = dataInput.value.match(hiddenPreDivRe()) || [];
-                let originalPreIdx = 0;
-                iframeOutHtml = iframeOutHtml.replace(hiddenPreDivRe(), () => originalPreDivs[originalPreIdx++] ?? '');
-                dataOutput.value = dynamicContent + '<!DOCTYPE html>' + iframeOutHtml;
+
+                dataOutput.value = buildOutputFromOriginalHtml(dataInput.value);
                 console.log("🚀 ~ 输出的 ~ iframeDoc:", iframeDoc.documentElement);
 
                 // 存储到会话存储
@@ -288,8 +265,7 @@
 
                 
                 // 清空所有变量
-                hiddenPreContent = [];
-                hiddenFontContent = '';
+                sourceTagMap.clear();
                 html_doc = '';
                 
                 // 清空输入输出框
@@ -321,18 +297,80 @@
                 iframeDoc.write(html_doc);
                 iframeDoc.close();
             }
-            function preserveWhitespaceEntities(html) {
-                return Object.entries(whitespaceEntityTokens).reduce((result, [entity, token]) => {
-                    return result.replace(new RegExp(escapeRegExp(entity), 'g'), token);
-                }, html);
-            }
-            function restoreWhitespaceEntities(html) {
-                return Object.entries(whitespaceEntityTokens).reduce((result, [entity, token]) => {
-                    return result.replace(new RegExp(escapeRegExp(token), 'g'), entity);
-                }, html);
-            }
             function escapeRegExp(string) {
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+            // 为原始HTML中的开始标签注入临时定位ID，以便只修改命中QA规则的标签，其余代码100%保持原样
+            function injectQaTagIds(rawHtml) {
+                sourceTagMap.clear();
+                let nextId = 0;
+                const tokenRegex = /<!--[\s\S]*?-->|<style\b(?:[^>"']|"[^"]*"|'[^']*')*>[\s\S]*?<\/style\s*>|<script\b(?:[^>"']|"[^"]*"|'[^']*')*>[\s\S]*?<\/script\s*>|<([a-zA-Z][a-zA-Z0-9:-]*)((?:\s+[^\s/>"'=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s"'=<>`]+))?)*\s*)(\/?>)/gi;
+                return rawHtml.replace(tokenRegex, (match, tagName, attrs, closeBracket, offset) => {
+                    if (!tagName || voidOrRootTags.has(tagName.toLowerCase())) {
+                        return match;
+                    }
+                    const id = String(nextId++);
+                    sourceTagMap.set(id, {
+                        start: offset,
+                        end: offset + match.length,
+                        originalTag: match,
+                    });
+                    return `<${tagName} data-qa-id="${id}"${attrs}${closeBracket}`;
+                });
+            }
+            // 仅将QA新增的行内样式写入style属性字符串，避免触发浏览器CSSOM重排/展开既有样式（如border: medium;）
+            function applyQaStyles(el, entries) {
+                let rawStyle = el.getAttribute('style') || '';
+                entries.forEach(([prop, val]) => {
+                    if (!rawStyle.trim()) {
+                        rawStyle = `${prop}: ${val};`;
+                        return;
+                    }
+                    const propRegex = new RegExp(`(^|;\\s*)${escapeRegExp(prop)}\\s*:\\s*[^;]*`, 'i');
+                    if (propRegex.test(rawStyle)) {
+                        rawStyle = rawStyle.replace(propRegex, `$1${prop}: ${val}`);
+                    } else {
+                        const trimmed = rawStyle.trimEnd();
+                        const separator = trimmed.endsWith(';') ? ' ' : '; ';
+                        rawStyle = `${trimmed}${separator}${prop}: ${val};`;
+                    }
+                });
+                el.setAttribute('style', rawStyle);
+                el.setAttribute('data-qa-modified', '1');
+            }
+            function updateTagStyleAttribute(originalTag, newStyleValue) {
+                const styleAttrRegex = /(\sstyle\s*=\s*)(?:"([^"]*)"|'([^']*)')/i;
+                if (styleAttrRegex.test(originalTag)) {
+                    return originalTag.replace(styleAttrRegex, (match, prefix, dblVal) => {
+                        const quote = dblVal !== undefined ? '"' : "'";
+                        return `${prefix}${quote}${newStyleValue}${quote}`;
+                    });
+                }
+                return originalTag.replace(/(\s*\/?>$)/, ` style="${newStyleValue}"$1`);
+            }
+            function buildOutputFromOriginalHtml(rawHtml) {
+                const modifiedElements = iframeDoc.querySelectorAll('[data-qa-modified="1"]');
+                const replacements = [];
+                modifiedElements.forEach(el => {
+                    const id = el.getAttribute('data-qa-id');
+                    const tagInfo = id !== null ? sourceTagMap.get(id) : null;
+                    if (!tagInfo) return;
+                    const newStyle = el.getAttribute('style') || '';
+                    const updatedTag = updateTagStyleAttribute(tagInfo.originalTag, newStyle);
+                    if (updatedTag !== tagInfo.originalTag) {
+                        replacements.push({
+                            start: tagInfo.start,
+                            end: tagInfo.end,
+                            text: updatedTag,
+                        });
+                    }
+                });
+                replacements.sort((a, b) => b.start - a.start);
+                let outputHtml = rawHtml;
+                replacements.forEach(({ start, end, text }) => {
+                    outputHtml = outputHtml.slice(0, start) + text + outputHtml.slice(end);
+                });
+                return outputHtml;
             }
             // 给h1~h6,p标签加上margin：0；
             function addMargin() {
@@ -341,7 +379,7 @@
                 elements.forEach(dom => {
                     if (!dom.style.margin && !dom.style.marginTop && !dom.style.marginRight && !dom.style.marginBottom && !dom.style.marginLeft) {
                         console.log('加 margin');
-                        dom.style.margin = '0';
+                        applyQaStyles(dom, [['margin', '0']]);
                     }
                 });
             }
@@ -353,7 +391,7 @@
                     if (!a.style.textDecoration) {
                         const computedTextDecoration = window.getComputedStyle(a).textDecorationLine
                         console.log('a标签计算样式', computedTextDecoration, 'a标签行内样式', a.style.textDecoration);
-                        a.style.textDecoration = computedTextDecoration;
+                        applyQaStyles(a, [['text-decoration', computedTextDecoration]]);
                     }
                 });
             }
@@ -364,7 +402,7 @@
                 elements.forEach(img => {
                     const hideSmallParent = img.parentElement && img.parentElement.closest('.hideSmall');
                     if (hideSmallParent) {
-                        hideSmallParent.style.display = 'none';
+                        applyQaStyles(hideSmallParent, [['display', 'none']]);
                     }
                 });
             }
@@ -373,9 +411,11 @@
             function supNormalSize() {
                 const sups = iframeDoc.querySelectorAll('sup');
                 sups.forEach(o => {
-                    o.style.fontSize = '0.65em'
-                    o.style.lineHeight = '0'
-                    o.style.verticalAlign = 'super'
+                    applyQaStyles(o, [
+                        ['font-size', '0.65em'],
+                        ['line-height', '0'],
+                        ['vertical-align', 'super']
+                    ]);
                 })
             }
 

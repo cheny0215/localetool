@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>节点一键订阅 · Clash Meta & Shadowrocket</title>
+    <title>节点一键订阅 · ClashX Pro / Clash Meta / Shadowrocket</title>
     <script src="./qrcode.min.js"></script>
     <style>
         :root {
@@ -14,10 +14,6 @@
             --border: #e5e7eb;
             --primary: #0071e3;
             --primary-hover: #0077ed;
-            --clash: #2563eb;
-            --rocket: #f97316;
-            --stash: #7c3aed;
-            --success: #10b981;
             --code-bg: #0f172a;
             --code-text: #e2e8f0;
         }
@@ -45,8 +41,8 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #1d4ed8 100%);
             color: #fff;
             border-radius: 18px;
-            padding: 28px 30px;
-            margin-bottom: 20px;
+            padding: 26px 30px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -63,7 +59,7 @@
         }
 
         .hero-left p {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.82);
             font-size: 14px;
         }
 
@@ -94,9 +90,180 @@
             box-shadow: 0 0 8px #34d399;
         }
 
+        /* 认证卡片 */
+        .auth-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 32px 28px;
+            max-width: 540px;
+            margin: 32px auto;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .auth-tab {
+            border: none;
+            background: transparent;
+            padding: 9px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .auth-tab.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            margin-bottom: 14px;
+            outline: none;
+        }
+
+        .auth-input:focus {
+            border-color: var(--primary);
+        }
+
+        .auth-error {
+            color: #dc2626;
+            font-size: 12.5px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        /* 客户端切换栏 */
+        .client-bar {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+            display: none;
+        }
+
+        .client-bar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .client-bar-title {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .client-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .client-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 10px;
+        }
+
+        .client-item {
+            border: 1.5px solid var(--border);
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .client-item:hover {
+            border-color: #93c5fd;
+            background: #fff;
+        }
+
+        .client-item.active {
+            border-color: var(--primary);
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(0, 113, 227, 0.1);
+        }
+
+        .client-item-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .client-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .client-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .client-tag.active-tag {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .client-tag.expire-tag {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .client-tag.disabled-tag {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .client-meta {
+            font-size: 11.5px;
+            color: #64748b;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #mainDashboard {
+            display: none;
+        }
+
         .grid {
             display: grid;
-            grid-template-columns: 1.35fr 0.85fr;
+            grid-template-columns: 1.4fr 0.8fr;
             gap: 20px;
             margin-bottom: 20px;
         }
@@ -128,7 +295,7 @@
         .card-desc {
             font-size: 13px;
             color: var(--subtext);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         .source-switch {
@@ -137,7 +304,7 @@
             padding: 3px;
             border-radius: 10px;
             gap: 4px;
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             width: 100%;
         }
 
@@ -163,8 +330,8 @@
         .launch-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 18px;
         }
 
         @media (max-width: 520px) {
@@ -177,10 +344,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 14px 16px;
+            gap: 8px;
+            padding: 13px 14px;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             text-decoration: none;
             color: #fff;
@@ -194,7 +361,12 @@
             opacity: 0.96;
         }
 
-        .launch-btn.clash {
+        .launch-btn.clash-pro {
+            background: linear-gradient(135deg, #059669, #047857);
+            box-shadow: 0 6px 16px rgba(5, 150, 105, 0.25);
+        }
+
+        .launch-btn.clash-meta {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
         }
@@ -212,10 +384,17 @@
         .launch-btn.stash {
             background: linear-gradient(135deg, #7c3aed, #6d28d9);
             box-shadow: 0 6px 16px rgba(124, 58, 237, 0.25);
+            grid-column: span 2;
+        }
+
+        @media (max-width: 520px) {
+            .launch-btn.stash {
+                grid-column: span 1;
+            }
         }
 
         .url-box {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
 
         .url-box:last-child {
@@ -226,9 +405,24 @@
             font-size: 12px;
             font-weight: 600;
             color: #475569;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        .tag-pill {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 600;
+        }
+
+        .tag-pill.green {
+            background: #d1fae5;
+            color: #047857;
         }
 
         .url-row {
@@ -238,23 +432,23 @@
 
         .url-input {
             flex: 1;
-            padding: 10px 12px;
+            padding: 9px 12px;
             border: 1px solid var(--border);
             border-radius: 10px;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 12.5px;
+            font-size: 12px;
             background: #f8fafc;
             color: #1e293b;
             outline: none;
         }
 
         .copy-btn {
-            padding: 0 14px;
+            padding: 7px 14px;
             border-radius: 10px;
             border: 1px solid var(--border);
             background: #fff;
             color: #1e293b;
-            font-size: 13px;
+            font-size: 12.5px;
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
@@ -277,16 +471,16 @@
         }
 
         .qr-tabs {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
             gap: 6px;
             background: #f1f5f9;
-            padding: 3px;
+            padding: 4px;
             border-radius: 10px;
             margin-bottom: 16px;
         }
 
         .qr-tab {
-            flex: 1;
             border: none;
             background: transparent;
             padding: 7px 8px;
@@ -312,7 +506,7 @@
             background: #f8fafc;
             border: 1px dashed #cbd5e1;
             border-radius: 14px;
-            min-height: 230px;
+            min-height: 245px;
         }
 
         #qrcode {
@@ -347,6 +541,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         pre.yaml-box {
@@ -355,10 +550,10 @@
             padding: 16px;
             border-radius: 12px;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-            font-size: 12.5px;
+            font-size: 12px;
             line-height: 1.55;
             overflow-x: auto;
-            max-height: 360px;
+            max-height: 340px;
             border: 1px solid #1e293b;
         }
 
@@ -417,136 +612,197 @@
     <div class="container">
         <div class="hero">
             <div class="hero-left">
-                <h1>VPS 节点一键订阅中心</h1>
-                <p>VLESS + XTLS-Vision + Reality · 兼容 Clash Meta (Mihomo) / Clash Verge / Stash / Shadowrocket</p>
+                <h1 id="heroTitle">VPS 节点一键订阅中心</h1>
+                <p>实时同步 3x-ui 客户端 · 支持 ClashX Pro / Clash Meta / Shadowrocket / Stash</p>
             </div>
             <div class="badge-group">
-                <span class="badge"><span class="dot"></span> 192.220.21.39 : 443</span>
-                <span class="badge">TLS 1.3 · Reality</span>
-                <span class="badge">TCP BBR 已开启</span>
+                <span class="badge"><span class="dot"></span> 192.220.21.39 (80 / 443 / 8443)</span>
+                <span class="badge" id="currentClientBadge">请验证身份或使用专属链接</span>
             </div>
         </div>
 
-        <div class="grid">
-            <div class="card">
-                <div class="card-title">
-                    <span>客户端一键拉起导入</span>
-                </div>
-                <div class="card-desc">选择订阅源后，点击对应客户端按钮即可直接唤醒客户端并自动添加配置。</div>
-
-                <div class="source-switch">
-                    <button class="source-btn active" id="srcVps" onclick="switchSource('vps')">
-                        VPS 实时直连源 (192.220.21.39 立即生效)
-                    </button>
-                    <button class="source-btn" id="srcHttps" onclick="switchSource('https')">
-                        HTTPS 镜像源 (apple-dm.xyz)
-                    </button>
-                </div>
-
-                <div class="launch-grid">
-                    <a class="launch-btn clash" id="btnLaunchClash" href="javascript:;">
-                        <span>🚀 一键导入 Clash Meta</span>
-                    </a>
-                    <a class="launch-btn rocket" id="btnLaunchRocketSub" href="javascript:;">
-                        <span>📡 一键导入 Shadowrocket 订阅</span>
-                    </a>
-                    <a class="launch-btn rocket-node" id="btnLaunchRocketNode" href="javascript:;">
-                        <span>⚡ Shadowrocket 单节点直连</span>
-                    </a>
-                    <a class="launch-btn stash" id="btnLaunchStash" href="javascript:;">
-                        <span>🟣 一键导入 Stash</span>
-                    </a>
-                </div>
-
-                <div class="url-box">
-                    <div class="url-label">
-                        <span>Clash Meta (Mihomo) 远程订阅链接 (HTTP/HTTPS)</span>
-                        <span id="clashSourceTag">HTTPS 源</span>
-                    </div>
-                    <div class="url-row">
-                        <input class="url-input" id="inputClashUrl" readonly value="">
-                        <button class="copy-btn primary" onclick="copyInput('inputClashUrl', '已复制 Clash Meta 订阅链接')">复制链接</button>
-                    </div>
-                </div>
-
-                <div class="url-box">
-                    <div class="url-label">
-                        <span>Shadowrocket / v2rayN 通用 Base64 订阅链接</span>
-                    </div>
-                    <div class="url-row">
-                        <input class="url-input" id="inputSubUrl" readonly value="">
-                        <button class="copy-btn" onclick="copyInput('inputSubUrl', '已复制通用订阅链接')">复制链接</button>
-                    </div>
-                </div>
-
-                <div class="url-box">
-                    <div class="url-label">
-                        <span>VLESS Reality 原始节点链接 (剪贴板直接导入)</span>
-                    </div>
-                    <div class="url-row">
-                        <input class="url-input" id="inputVlessUri" readonly value="">
-                        <button class="copy-btn" onclick="copyInput('inputVlessUri', '已复制 VLESS 节点链接')">复制节点</button>
-                    </div>
-                </div>
+        <!-- 身份验证卡片（无 URL 参数且未登录时显示，源码中不包含任何明文 UUID） -->
+        <div class="auth-card" id="authCard">
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabAdmin" onclick="switchAuthTab('admin')">🔐 管理员同步 (3x-ui)</button>
+                <button class="auth-tab" id="tabSub" onclick="switchAuthTab('sub')">🎫 专属订阅码提取</button>
             </div>
 
-            <div class="card">
-                <div class="card-title">
-                    <span>手机扫码秒连</span>
+            <div id="adminAuthPane">
+                <div style="font-size:13px;color:#475569;margin-bottom:10px;">
+                    输入你的 <b>3x-ui 面板密码</b>，即可实时从 VPS 数据库自动拉取所有已创建的客户端列表：
                 </div>
-                <div class="card-desc">使用 iOS Shadowrocket、Stash 或 Android 客户端直接扫描二维码。</div>
+                <input type="password" class="auth-input" id="adminKeyInput" placeholder="请输入 3x-ui 管理员密码" onkeydown="if(event.key==='Enter')loginAdmin()">
+                <div class="auth-error" id="adminError"></div>
+                <button class="launch-btn clash-meta" style="width:100%;" onclick="loginAdmin()">同步 3x-ui 全部客户端</button>
+            </div>
 
-                <div class="qr-tabs">
-                    <button class="qr-tab active" id="qrTabNode" onclick="switchQr('node')">小火箭节点码</button>
-                    <button class="qr-tab" id="qrTabSub" onclick="switchQr('sub')">小火箭订阅码</button>
-                    <button class="qr-tab" id="qrTabClash" onclick="switchQr('clash')">Clash 订阅码</button>
+            <div id="subAuthPane" style="display:none;">
+                <div style="font-size:13px;color:#475569;margin-bottom:10px;">
+                    输入分配给您的 <b>16 位专属订阅码 (subId)</b> 即可加载您的个人订阅链接与二维码：
                 </div>
-
-                <div class="qr-wrap">
-                    <div id="qrcode"></div>
-                    <div class="qr-caption" id="qrCaption">打开 Shadowrocket 左上角扫码即可直接添加节点</div>
-                </div>
+                <input type="text" class="auth-input" id="subCodeInput" placeholder="例如: r0ja819yv64jq1j0" onkeydown="if(event.key==='Enter')loginBySubId()">
+                <div class="auth-error" id="subError"></div>
+                <button class="launch-btn clash-pro" style="width:100%;" onclick="loginBySubId()">加载专属节点配置</button>
             </div>
         </div>
 
-        <div class="card">
-            <div class="code-header">
-                <div>
-                    <div class="card-title">Clash Meta (Mihomo) 完整配置 Content (YAML)</div>
-                    <div class="card-desc" style="margin-bottom: 0;">支持直接在 Clash 客户端中选择 Content / 本地配置粘贴，或下载为 .yaml 配置文件导入。</div>
+        <!-- 管理员客户端实时列表栏 (仅管理员登录时显示，朋友分享链接不显示) -->
+        <div class="client-bar" id="clientManagerBar">
+            <div class="client-bar-header">
+                <div class="client-bar-title">
+                    <span>👥 3x-ui 实时客户端列表 (在 3x-ui 新增客户端后点“刷新同步”即可自动出现)</span>
                 </div>
-                <div class="btn-row">
-                    <button class="copy-btn primary" onclick="copyYaml()">复制完整 YAML (Content)</button>
-                    <button class="copy-btn" onclick="downloadYaml()">下载 clash-meta.yaml</button>
+                <div class="client-actions">
+                    <button class="copy-btn primary" onclick="copyShareUrl()">🔗 复制当前客户端专属分享页 (发给朋友)</button>
+                    <button class="copy-btn" onclick="refreshAdminClients()">🔄 刷新同步 3x-ui</button>
+                    <button class="copy-btn" onclick="logoutAdmin()">退出管理</button>
+                </div>
+            </div>
+            <div class="client-list" id="clientListContainer"></div>
+        </div>
+
+        <!-- 订阅主面板 -->
+        <div id="mainDashboard">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">
+                        <span>客户端一键拉起导入</span>
+                        <span class="tag-pill" id="activeClientPill">-</span>
+                    </div>
+                    <div class="card-desc">Mac 旧版 <b>ClashX Pro</b> 请点击绿色按钮；<b>Clash Meta / Mihomo / Clash Verge</b> 请点击蓝色按钮。</div>
+
+                    <div class="source-switch">
+                        <button class="source-btn active" id="srcHttps" onclick="switchSource('https')">
+                            HTTPS 动态源 (apple-dm.xyz 推荐)
+                        </button>
+                        <button class="source-btn" id="srcVps" onclick="switchSource('vps')">
+                            VPS 直连动态源 (192.220.21.39)
+                        </button>
+                    </div>
+
+                    <div class="launch-grid">
+                        <a class="launch-btn clash-pro" id="btnLaunchClashPro" href="javascript:;">
+                            <span>💻 一键导入 ClashX Pro</span>
+                        </a>
+                        <a class="launch-btn clash-meta" id="btnLaunchClashMeta" href="javascript:;">
+                            <span>🚀 一键导入 Clash Meta</span>
+                        </a>
+                        <a class="launch-btn rocket" id="btnLaunchRocketSub" href="javascript:;">
+                            <span>📡 一键导入 Shadowrocket 订阅</span>
+                        </a>
+                        <a class="launch-btn rocket-node" id="btnLaunchRocketNode" href="javascript:;">
+                            <span>⚡ Shadowrocket 单节点直连</span>
+                        </a>
+                        <a class="launch-btn stash" id="btnLaunchStash" href="javascript:;">
+                            <span>🟣 一键导入 Stash (iOS / macOS)</span>
+                        </a>
+                    </div>
+
+                    <div class="url-box">
+                        <div class="url-label">
+                            <span>ClashX Pro 专用订阅链接 (纯 VMess 兼容版，不含 vless)</span>
+                            <span class="tag-pill green">ClashX Pro / 旧版 Clash</span>
+                        </div>
+                        <div class="url-row">
+                            <input class="url-input" id="inputClashProUrl" readonly value="">
+                            <button class="copy-btn primary" onclick="copyInput('inputClashProUrl', '已复制 ClashX Pro 订阅链接')">复制链接</button>
+                        </div>
+                    </div>
+
+                    <div class="url-box">
+                        <div class="url-label">
+                            <span>Clash Meta (Mihomo) 远程订阅链接 (含 VLESS+Reality & VMess)</span>
+                            <span class="tag-pill">Clash Meta / Verge / Party</span>
+                        </div>
+                        <div class="url-row">
+                            <input class="url-input" id="inputClashMetaUrl" readonly value="">
+                            <button class="copy-btn primary" onclick="copyInput('inputClashMetaUrl', '已复制 Clash Meta 订阅链接')">复制链接</button>
+                        </div>
+                    </div>
+
+                    <div class="url-box">
+                        <div class="url-label">
+                            <span>Shadowrocket / v2rayN 通用 Base64 订阅链接 (含全部 3 个节点)</span>
+                        </div>
+                        <div class="url-row">
+                            <input class="url-input" id="inputSubUrl" readonly value="">
+                            <button class="copy-btn" onclick="copyInput('inputSubUrl', '已复制通用订阅链接')">复制链接</button>
+                        </div>
+                    </div>
+
+                    <div class="url-box">
+                        <div class="url-label">
+                            <span>VLESS Reality 443 原始节点链接 (剪贴板直接导入)</span>
+                        </div>
+                        <div class="url-row">
+                            <input class="url-input" id="inputVlessUri" readonly value="">
+                            <button class="copy-btn" onclick="copyInput('inputVlessUri', '已复制 VLESS 节点链接')">复制节点</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <span>手机扫码秒连</span>
+                    </div>
+                    <div class="card-desc">使用 iOS Shadowrocket、Stash 或 Android 客户端直接扫描二维码。</div>
+
+                    <div class="qr-tabs">
+                        <button class="qr-tab active" id="qrTabNode" onclick="switchQr('node')">小火箭节点码</button>
+                        <button class="qr-tab" id="qrTabSub" onclick="switchQr('sub')">小火箭订阅码</button>
+                        <button class="qr-tab" id="qrTabClashMeta" onclick="switchQr('clash-meta')">Clash Meta 码</button>
+                        <button class="qr-tab" id="qrTabClashPro" onclick="switchQr('clash-pro')">ClashX Pro 码</button>
+                    </div>
+
+                    <div class="qr-wrap">
+                        <div id="qrcode"></div>
+                        <div class="qr-caption" id="qrCaption">打开 Shadowrocket 左上角扫码即可直接添加节点</div>
+                    </div>
                 </div>
             </div>
 
-            <pre class="yaml-box" id="yamlContent"></pre>
+            <div class="card">
+                <div class="code-header">
+                    <div>
+                        <div class="card-title">配置文件 Content (YAML) 实时预览与下载</div>
+                        <div class="card-desc" style="margin-bottom: 0;">由 VPS 实时根据当前客户端动态生成（已内置微信/国内直连分流规则）。</div>
+                    </div>
+                    <div class="btn-row">
+                        <button class="copy-btn" id="yamlTabPro" onclick="switchYamlPreview('pro')" style="border-color:#059669;color:#047857;">查看 ClashX Pro 版</button>
+                        <button class="copy-btn" id="yamlTabMeta" onclick="switchYamlPreview('meta')">查看 Clash Meta 版</button>
+                        <button class="copy-btn primary" onclick="copyYaml()">复制当前 YAML</button>
+                        <button class="copy-btn" onclick="downloadYaml()">下载 .yaml 文件</button>
+                    </div>
+                </div>
 
-            <div class="param-grid">
-                <div class="param-item">
-                    <div class="param-key">地址 (Server) / 端口</div>
-                    <div class="param-val">192.220.21.39 : 443</div>
-                </div>
-                <div class="param-item">
-                    <div class="param-key">UUID</div>
-                    <div class="param-val">aff9497a-050e-48b5-bf41-205112072d90</div>
-                </div>
-                <div class="param-item">
-                    <div class="param-key">Flow / 传输安全</div>
-                    <div class="param-val">xtls-rprx-vision / reality</div>
-                </div>
-                <div class="param-item">
-                    <div class="param-key">SNI / Fingerprint</div>
-                    <div class="param-val">www.apple.com / chrome</div>
-                </div>
-                <div class="param-item">
-                    <div class="param-key">PublicKey (pbk)</div>
-                    <div class="param-val">iB1xt7fsDEdDBSKdE7dqRBZq5Z8yb4U2c3x-FnvUb1c</div>
-                </div>
-                <div class="param-item">
-                    <div class="param-key">ShortId (sid)</div>
-                    <div class="param-val">21a62e22</div>
+                <pre class="yaml-box" id="yamlContent">正在加载配置文件内容...</pre>
+
+                <div class="param-grid">
+                    <div class="param-item">
+                        <div class="param-key">当前客户端账号</div>
+                        <div class="param-val" id="paramClientName">-</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-key">已用流量 / 限额</div>
+                        <div class="param-val" id="paramTraffic">-</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-key">有效期状态</div>
+                        <div class="param-val" id="paramExpiry">-</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-key">专属 UUID</div>
+                        <div class="param-val" id="paramUuid">-</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-key">节点 1 (ClashX Pro 兼容)</div>
+                        <div class="param-val">192.220.21.39 : 80 (VMess+WS /ray)</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-key">节点 2 & 3 (Reality)</div>
+                        <div class="param-val">192.220.21.39 : 443 / 8443</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -555,175 +811,257 @@
     <div class="toast" id="toast">已复制到剪贴板</div>
 
     <script>
-        const PROFILE_NAME = 'VPS-192.220.21.39';
-        const VLESS_URI = 'vless://aff9497a-050e-48b5-bf41-205112072d90@192.220.21.39:443?encryption=none&flow=xtls-rprx-vision&security=reality&sni=www.apple.com&fp=chrome&pbk=iB1xt7fsDEdDBSKdE7dqRBZq5Z8yb4U2c3x-FnvUb1c&sid=21a62e22&type=tcp&headerType=none#VPS-192.220.21.39';
+        let allClients = [];
+        let currentClient = null;
+        let currentSource = 'https';
+        let currentQrMode = 'node';
+        let currentYamlMode = 'pro';
+        let yamlCache = { pro: '', meta: '' };
 
-        function getHttpsBase() {
+        function getApiCandidates() {
+            const list = [];
             if (location.protocol.startsWith('http') && !location.hostname.includes('127.0.0.1') && !location.hostname.includes('localhost')) {
-                return location.origin + '/vpn';
+                list.push(location.origin + '/vpn-api');
+                list.push(location.origin + '/vpn/api');
             }
-            return 'https://apple-dm.xyz/vpn';
+            list.push('http://192.220.21.39/vpn-api');
+            list.push('https://apple-dm.xyz/vpn/api');
+            return [...new Set(list)];
         }
 
-        const SOURCES = {
-            https: {
-                label: 'HTTPS 源 (apple-dm.xyz)',
-                clashUrl: getHttpsBase() + '/clash-meta.yaml',
-                subUrl: getHttpsBase() + '/sub.txt'
-            },
-            vps: {
-                label: 'VPS 面板源 (192.220.21.39)',
-                clashUrl: 'http://192.220.21.39/clash/defaultsub',
-                subUrl: 'http://192.220.21.39/sub/defaultsub'
+        async function apiFetchJson(subPath) {
+            const candidates = getApiCandidates();
+            let lastErr = null;
+            for (const base of candidates) {
+                try {
+                    const res = await fetch(base + subPath, { cache: 'no-store' });
+                    const data = await res.json();
+                    if (res.ok || data.msg) {
+                        return data;
+                    }
+                } catch (e) {
+                    lastErr = e;
+                }
             }
-        };
+            throw lastErr || new Error('无法连接至 VPS 同步接口');
+        }
 
-        let CLASH_META_YAML = `mixed-port: 7890
-allow-lan: true
-bind-address: "*"
-mode: rule
-log-level: info
-ipv6: false
-unified-delay: true
-tcp-concurrent: true
+        async function apiFetchText(subPath) {
+            const candidates = getApiCandidates();
+            for (const base of candidates) {
+                try {
+                    const res = await fetch(base + subPath, { cache: 'no-store' });
+                    if (res.ok) {
+                        return await res.text();
+                    }
+                } catch (e) {}
+            }
+            return '';
+        }
 
-profile:
-  store-selected: true
-  store-fake-ip: true
+        function formatBytes(bytes) {
+            if (!bytes || bytes <= 0) return '0 B';
+            const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+            let i = 0;
+            let val = bytes;
+            while (val >= 1024 && i < units.length - 1) {
+                val /= 1024;
+                i++;
+            }
+            return val.toFixed(i > 1 ? 2 : 0) + ' ' + units[i];
+        }
 
-dns:
-  enable: true
-  ipv6: false
-  enhanced-mode: fake-ip
-  fake-ip-range: 198.18.0.1/16
-  fake-ip-filter:
-    - "*.lan"
-    - "*.local"
-    - "localhost.ptlogin2.qq.com"
-    - "+.msftconnecttest.com"
-    - "+.msftncsi.com"
-  default-nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
-  nameserver:
-    - 223.5.5.5
-    - 119.29.29.29
+        function formatExpiry(ms) {
+            if (!ms || ms <= 0) return '永久有效';
+            const target = ms > 10000000000 ? ms : ms * 1000;
+            const diffDays = Math.ceil((target - Date.now()) / 86400000);
+            const dateStr = new Date(target).toISOString().slice(0, 10);
+            if (diffDays < 0) return `已过期 (${dateStr})`;
+            return `剩余 ${diffDays} 天 (${dateStr})`;
+        }
 
-proxies:
-  - name: "⚡ VPS-80-VMess直连"
-    type: vmess
-    server: 192.220.21.39
-    port: 80
-    uuid: aff9497a-050e-48b5-bf41-205112072d90
-    alterId: 0
-    cipher: auto
-    udp: true
-    tls: false
-    network: ws
-    ws-opts:
-      path: /ray
+        function switchAuthTab(mode) {
+            document.getElementById('tabAdmin').classList.toggle('active', mode === 'admin');
+            document.getElementById('tabSub').classList.toggle('active', mode === 'sub');
+            document.getElementById('adminAuthPane').style.display = mode === 'admin' ? 'block' : 'none';
+            document.getElementById('subAuthPane').style.display = mode === 'sub' ? 'block' : 'none';
+        }
 
-  - name: "🚀 VPS-443-Reality"
-    type: vless
-    server: 192.220.21.39
-    port: 443
-    uuid: aff9497a-050e-48b5-bf41-205112072d90
-    network: tcp
-    tls: true
-    udp: true
-    flow: xtls-rprx-vision
-    servername: www.apple.com
-    client-fingerprint: chrome
-    reality-opts:
-      public-key: iB1xt7fsDEdDBSKdE7dqRBZq5Z8yb4U2c3x-FnvUb1c
-      short-id: 21a62e22
+        async function loginAdmin(silentKey) {
+            const key = silentKey || document.getElementById('adminKeyInput').value.trim();
+            const errEl = document.getElementById('adminError');
+            errEl.style.display = 'none';
+            if (!key) {
+                errEl.textContent = '请输入 3x-ui 管理员密码';
+                errEl.style.display = 'block';
+                return;
+            }
+            try {
+                const data = await apiFetchJson(`/clients?key=${encodeURIComponent(key)}`);
+                if (!data.success) {
+                    if (silentKey) {
+                        localStorage.removeItem('vps_admin_key_v2');
+                        return;
+                    }
+                    errEl.textContent = data.msg || '管理员密码错误';
+                    errEl.style.display = 'block';
+                    return;
+                }
+                localStorage.setItem('vps_admin_key_v2', key);
+                allClients = data.clients || [];
+                if (allClients.length > 0) {
+                    currentClient = allClients[0];
+                    document.getElementById('authCard').style.display = 'none';
+                    document.getElementById('clientManagerBar').style.display = 'block';
+                    document.getElementById('mainDashboard').style.display = 'block';
+                    renderClientList();
+                    await selectClient(currentClient.subId);
+                    if (!silentKey) showToast(`已同步 ${allClients.length} 个客户端`);
+                }
+            } catch (e) {
+                if (!silentKey) {
+                    errEl.textContent = '连接同步服务失败，请检查网络';
+                    errEl.style.display = 'block';
+                }
+            }
+        }
 
-  - name: "🛡️ VPS-8443-Reality"
-    type: vless
-    server: 192.220.21.39
-    port: 8443
-    uuid: aff9497a-050e-48b5-bf41-205112072d90
-    network: tcp
-    tls: true
-    udp: true
-    flow: xtls-rprx-vision
-    servername: www.microsoft.com
-    client-fingerprint: chrome
-    reality-opts:
-      public-key: iB1xt7fsDEdDBSKdE7dqRBZq5Z8yb4U2c3x-FnvUb1c
-      short-id: 21a62e22
+        async function refreshAdminClients() {
+            const key = localStorage.getItem('vps_admin_key_v2');
+            if (!key) return;
+            await loginAdmin(key);
+            showToast('已从 3x-ui 刷新最新客户端列表');
+        }
 
-proxy-groups:
-  - name: "PROXY"
-    type: select
-    proxies:
-      - "AUTO"
-      - "⚡ VPS-80-VMess直连"
-      - "🚀 VPS-443-Reality"
-      - "🛡️ VPS-8443-Reality"
-      - DIRECT
+        function logoutAdmin() {
+            localStorage.removeItem('vps_admin_key_v2');
+            allClients = [];
+            currentClient = null;
+            document.getElementById('clientManagerBar').style.display = 'none';
+            document.getElementById('mainDashboard').style.display = 'none';
+            document.getElementById('authCard').style.display = 'block';
+            document.getElementById('currentClientBadge').textContent = '请验证身份或使用专属链接';
+        }
 
-  - name: "AUTO"
-    type: url-test
-    url: http://www.gstatic.com/generate_204
-    interval: 60
-    tolerance: 50
-    proxies:
-      - "⚡ VPS-80-VMess直连"
-      - "🚀 VPS-443-Reality"
-      - "🛡️ VPS-8443-Reality"
+        async function loginBySubId(subIdArg, isUrlShare) {
+            const subId = (subIdArg || document.getElementById('subCodeInput').value || '').trim();
+            const errEl = document.getElementById('subError');
+            errEl.style.display = 'none';
+            if (!subId) {
+                errEl.textContent = '请输入 16 位专属订阅码';
+                errEl.style.display = 'block';
+                return;
+            }
+            try {
+                const data = await apiFetchJson(`/client/${encodeURIComponent(subId)}`);
+                if (!data.success || !data.client) {
+                    errEl.textContent = data.msg || '未找到该订阅码';
+                    errEl.style.display = 'block';
+                    return;
+                }
+                currentClient = data.client;
+                allClients = [currentClient];
+                document.getElementById('authCard').style.display = 'none';
+                document.getElementById('clientManagerBar').style.display = 'none';
+                document.getElementById('mainDashboard').style.display = 'block';
+                if (isUrlShare) {
+                    document.getElementById('heroTitle').textContent = `${currentClient.name} · 专属节点一键订阅`;
+                }
+                await selectClient(currentClient.subId);
+            } catch (e) {
+                errEl.textContent = '无法加载该订阅码，请稍后重试';
+                errEl.style.display = 'block';
+            }
+        }
 
-rules:
-  - DOMAIN-SUFFIX,local,DIRECT
-  - IP-CIDR,127.0.0.0/8,DIRECT,no-resolve
-  - IP-CIDR,172.16.0.0/12,DIRECT,no-resolve
-  - IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
-  - IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
-  - DOMAIN-SUFFIX,cn,DIRECT
-  - DOMAIN-SUFFIX,baidu.com,DIRECT
-  - DOMAIN-SUFFIX,qq.com,DIRECT
-  - DOMAIN-SUFFIX,weixin.qq.com,DIRECT
-  - DOMAIN-SUFFIX,taobao.com,DIRECT
-  - DOMAIN-SUFFIX,tmall.com,DIRECT
-  - DOMAIN-SUFFIX,alipay.com,DIRECT
-  - DOMAIN-SUFFIX,alicdn.com,DIRECT
-  - DOMAIN-SUFFIX,jd.com,DIRECT
-  - DOMAIN-SUFFIX,bilibili.com,DIRECT
-  - DOMAIN-SUFFIX,163.com,DIRECT
-  - DOMAIN-SUFFIX,126.com,DIRECT
-  - DOMAIN-SUFFIX,douyin.com,DIRECT
-  - DOMAIN-SUFFIX,feishu.cn,DIRECT
-  - MATCH,PROXY`;
+        function renderClientList() {
+            const container = document.getElementById('clientListContainer');
+            container.innerHTML = allClients.map(c => {
+                const isActive = currentClient && c.subId === currentClient.subId;
+                const tagClass = !c.enable ? 'disabled-tag' : (c.isMaster ? 'active-tag' : 'expire-tag');
+                const tagText = !c.enable ? '已停用' : formatExpiry(c.expiryTime);
+                const quotaStr = c.totalBytes > 0 ? `${formatBytes(c.usedBytes)} / ${formatBytes(c.totalBytes)}` : `${formatBytes(c.usedBytes)} / ∞`;
+                return `
+                    <div class="client-item ${isActive ? 'active' : ''}" onclick="selectClient('${c.subId}')">
+                        <div class="client-item-top">
+                            <span class="client-name">${c.name}</span>
+                            <span class="client-tag ${tagClass}">${tagText}</span>
+                        </div>
+                        <div class="client-meta">流量: ${quotaStr} · subId: ${c.subId}</div>
+                    </div>
+                `;
+            }).join('');
+        }
 
-        fetch('./clash-meta.yaml?t=' + Date.now())
-            .then(r => r.ok ? r.text() : Promise.reject())
-            .then(txt => {
-                CLASH_META_YAML = txt;
-                document.getElementById('yamlContent').textContent = txt;
-            })
-            .catch(() => {});
-
-        let currentSource = 'vps';
-        let currentQrMode = 'node';
-        let qrInstance = null;
+        function getClientSources(client) {
+            const subId = client.subId;
+            return {
+                https: {
+                    clashProUrl: `https://apple-dm.xyz/vpn/api/clash-pro/${subId}.yaml`,
+                    clashMetaUrl: `https://apple-dm.xyz/vpn/api/clash-meta/${subId}.yaml`,
+                    subUrl: `https://apple-dm.xyz/vpn/api/sub/${subId}.txt`
+                },
+                vps: {
+                    clashProUrl: `http://192.220.21.39/vpn-api/clash-pro/${subId}.yaml`,
+                    clashMetaUrl: `http://192.220.21.39/vpn-api/clash-meta/${subId}.yaml`,
+                    subUrl: `http://192.220.21.39/vpn-api/sub/${subId}.txt`
+                }
+            };
+        }
 
         function toBase64UrlSafe(str) {
             return btoa(unescape(encodeURIComponent(str)));
         }
 
+        async function selectClient(subId) {
+            const found = allClients.find(c => c.subId === subId);
+            if (!found) return;
+            currentClient = found;
+            renderClientList();
+            updateLinks();
+
+            yamlCache = { pro: '正在加载...', meta: '正在加载...' };
+            switchYamlPreview(currentYamlMode);
+
+            const [proTxt, metaTxt] = await Promise.all([
+                apiFetchText(`/clash-pro/${encodeURIComponent(subId)}.yaml`),
+                apiFetchText(`/clash-meta/${encodeURIComponent(subId)}.yaml`)
+            ]);
+            yamlCache.pro = proTxt;
+            yamlCache.meta = metaTxt;
+            switchYamlPreview(currentYamlMode);
+        }
+
         function updateLinks() {
-            const src = SOURCES[currentSource];
-            document.getElementById('clashSourceTag').textContent = src.label;
-            document.getElementById('inputClashUrl').value = src.clashUrl;
+            if (!currentClient) return;
+            const sources = getClientSources(currentClient);
+            const src = sources[currentSource];
+            const vlessUri = currentClient.nodes ? currentClient.nodes.vless443 : '';
+            const tagSuffix = currentClient.isMaster ? '' : `-${currentClient.comment || currentClient.email}`;
+            const quotaStr = currentClient.totalBytes > 0
+                ? `${formatBytes(currentClient.usedBytes)} / ${formatBytes(currentClient.totalBytes)}`
+                : `${formatBytes(currentClient.usedBytes)} / 无限制`;
+
+            document.getElementById('currentClientBadge').textContent = `当前客户端: ${currentClient.name}`;
+            document.getElementById('activeClientPill').textContent = `${currentClient.name} (${currentClient.subId})`;
+            document.getElementById('paramClientName').textContent = `${currentClient.name} (subId: ${currentClient.subId})`;
+            document.getElementById('paramTraffic').textContent = quotaStr;
+            document.getElementById('paramExpiry').textContent = formatExpiry(currentClient.expiryTime);
+            document.getElementById('paramUuid').textContent = currentClient.uuid;
+
+            document.getElementById('inputClashProUrl').value = src.clashProUrl;
+            document.getElementById('inputClashMetaUrl').value = src.clashMetaUrl;
             document.getElementById('inputSubUrl').value = src.subUrl;
-            document.getElementById('inputVlessUri').value = VLESS_URI;
+            document.getElementById('inputVlessUri').value = vlessUri;
 
-            const clashScheme = `clash://install-config?url=${encodeURIComponent(src.clashUrl)}&name=${encodeURIComponent(PROFILE_NAME)}`;
-            const stashScheme = `stash://install-config?url=${encodeURIComponent(src.clashUrl)}&name=${encodeURIComponent(PROFILE_NAME)}`;
-            const rocketSubScheme = `shadowrocket://add/sub://${toBase64UrlSafe(src.subUrl)}?remark=${encodeURIComponent(PROFILE_NAME)}`;
-            const rocketNodeScheme = `shadowrocket://add/${VLESS_URI}`;
+            const clashProScheme = `clash://install-config?url=${encodeURIComponent(src.clashProUrl)}&name=${encodeURIComponent('VPS-ClashXPro' + tagSuffix)}`;
+            const clashMetaScheme = `clash://install-config?url=${encodeURIComponent(src.clashMetaUrl)}&name=${encodeURIComponent('VPS-ClashMeta' + tagSuffix)}`;
+            const stashScheme = `stash://install-config?url=${encodeURIComponent(src.clashMetaUrl)}&name=${encodeURIComponent('VPS-Stash' + tagSuffix)}`;
+            const rocketSubScheme = `shadowrocket://add/sub://${toBase64UrlSafe(src.subUrl)}?remark=${encodeURIComponent('VPS' + tagSuffix)}`;
+            const rocketNodeScheme = `shadowrocket://add/${vlessUri}`;
 
-            document.getElementById('btnLaunchClash').href = clashScheme;
+            document.getElementById('btnLaunchClashPro').href = clashProScheme;
+            document.getElementById('btnLaunchClashMeta').href = clashMetaScheme;
             document.getElementById('btnLaunchStash').href = stashScheme;
             document.getElementById('btnLaunchRocketSub').href = rocketSubScheme;
             document.getElementById('btnLaunchRocketNode').href = rocketNodeScheme;
@@ -742,30 +1080,37 @@ rules:
             currentQrMode = mode;
             document.getElementById('qrTabNode').classList.toggle('active', mode === 'node');
             document.getElementById('qrTabSub').classList.toggle('active', mode === 'sub');
-            document.getElementById('qrTabClash').classList.toggle('active', mode === 'clash');
+            document.getElementById('qrTabClashMeta').classList.toggle('active', mode === 'clash-meta');
+            document.getElementById('qrTabClashPro').classList.toggle('active', mode === 'clash-pro');
             renderQr();
         }
 
         function renderQr() {
-            const src = SOURCES[currentSource];
+            if (!currentClient) return;
+            const sources = getClientSources(currentClient);
+            const src = sources[currentSource];
+            const vlessUri = currentClient.nodes ? currentClient.nodes.vless443 : '';
             const container = document.getElementById('qrcode');
             const caption = document.getElementById('qrCaption');
             container.innerHTML = '';
 
-            let text = VLESS_URI;
+            let text = vlessUri;
             if (currentQrMode === 'node') {
-                text = VLESS_URI;
-                caption.textContent = 'Shadowrocket / v2rayNG 扫码直接添加 VLESS-Reality 节点';
+                text = vlessUri;
+                caption.textContent = `Shadowrocket / v2rayNG 扫码添加 [${currentClient.name}] 节点`;
             } else if (currentQrMode === 'sub') {
-                text = `sub://${toBase64UrlSafe(src.subUrl)}#${encodeURIComponent(PROFILE_NAME)}`;
-                caption.textContent = 'Shadowrocket 扫码自动添加远程订阅链接';
+                text = `sub://${toBase64UrlSafe(src.subUrl)}#VPS-${currentClient.comment || currentClient.email}`;
+                caption.textContent = `Shadowrocket 扫码添加 [${currentClient.name}] 全部 3 个节点订阅`;
+            } else if (currentQrMode === 'clash-meta') {
+                text = src.clashMetaUrl;
+                caption.textContent = `Clash Meta (Mihomo) [${currentClient.name}] 订阅链接二维码`;
             } else {
-                text = src.clashUrl;
-                caption.textContent = 'Clash Meta / Stash 扫码获取订阅地址';
+                text = src.clashProUrl;
+                caption.textContent = `ClashX Pro [${currentClient.name}] 专用订阅链接二维码`;
             }
 
-            if (typeof QRCode !== 'undefined') {
-                qrInstance = new QRCode(container, {
+            if (typeof QRCode !== 'undefined' && text) {
+                new QRCode(container, {
                     text: text,
                     width: 176,
                     height: 176,
@@ -774,6 +1119,31 @@ rules:
                     correctLevel: QRCode.CorrectLevel.M
                 });
             }
+        }
+
+        function switchYamlPreview(mode) {
+            currentYamlMode = mode;
+            const btnPro = document.getElementById('yamlTabPro');
+            const btnMeta = document.getElementById('yamlTabMeta');
+            if (mode === 'pro') {
+                btnPro.style.borderColor = '#059669';
+                btnPro.style.color = '#047857';
+                btnMeta.style.borderColor = '';
+                btnMeta.style.color = '';
+                document.getElementById('yamlContent').textContent = yamlCache.pro || '正在加载...';
+            } else {
+                btnMeta.style.borderColor = '#2563eb';
+                btnMeta.style.color = '#1d4ed8';
+                btnPro.style.borderColor = '';
+                btnPro.style.color = '';
+                document.getElementById('yamlContent').textContent = yamlCache.meta || '正在加载...';
+            }
+        }
+
+        function copyShareUrl() {
+            if (!currentClient) return;
+            const shareUrl = `https://apple-dm.xyz/vpn/?sub=${encodeURIComponent(currentClient.subId)}`;
+            copyText(shareUrl, `已复制 [${currentClient.name}] 的专属分享链接 (仅显示其个人节点)`);
         }
 
         function showToast(msg) {
@@ -812,24 +1182,40 @@ rules:
         }
 
         function copyYaml() {
-            copyText(CLASH_META_YAML, '已复制完整 Clash Meta YAML 配置');
+            const content = currentYamlMode === 'pro' ? yamlCache.pro : yamlCache.meta;
+            copyText(content, currentYamlMode === 'pro' ? '已复制 ClashX Pro YAML' : '已复制 Clash Meta YAML');
         }
 
         function downloadYaml() {
-            const blob = new Blob([CLASH_META_YAML], { type: 'text/yaml;charset=utf-8' });
+            if (!currentClient) return;
+            const content = currentYamlMode === 'pro' ? yamlCache.pro : yamlCache.meta;
+            const filename = `VPS-${currentClient.comment || currentClient.subId}-${currentYamlMode === 'pro' ? 'clash-pro' : 'clash-meta'}.yaml`;
+            const blob = new Blob([content], { type: 'text/yaml;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'VPS-192.220.21.39-clash-meta.yaml';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast('已开始下载 clash-meta.yaml');
+            showToast('已开始下载 ' + filename);
         }
 
-        document.getElementById('yamlContent').textContent = CLASH_META_YAML;
-        updateLinks();
+        (async function init() {
+            const params = new URLSearchParams(location.search);
+            const subParam = params.get('sub') || params.get('user');
+            if (subParam) {
+                switchAuthTab('sub');
+                document.getElementById('subCodeInput').value = subParam;
+                await loginBySubId(subParam, true);
+                return;
+            }
+            const savedAdminKey = localStorage.getItem('vps_admin_key_v2');
+            if (savedAdminKey) {
+                await loginAdmin(savedAdminKey);
+            }
+        })();
     </script>
 </body>
 </html>

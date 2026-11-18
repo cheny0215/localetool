@@ -1,0 +1,3 @@
+/vpn/api/*  http://192.220.21.39/vpn-api/:splat  200!
+/pages/vpn/api/*  http://192.220.21.39/vpn-api/:splat  200!
+/vpn-api/*  http://192.220.21.39/vpn-api/:splat  200!
