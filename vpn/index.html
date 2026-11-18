@@ -616,7 +616,7 @@
                 <p>实时同步 3x-ui 客户端 · 支持 ClashX Pro / Clash Meta / Shadowrocket / Stash</p>
             </div>
             <div class="badge-group">
-                <span class="badge"><span class="dot"></span> 192.220.21.39 (80 / 443 / 8443)</span>
+                <span class="badge"><span class="dot"></span> 高速加密专线 (80 / 443 / 8443)</span>
                 <span class="badge" id="currentClientBadge">请验证身份或使用专属链接</span>
             </div>
         </div>
@@ -671,15 +671,6 @@
                         <span class="tag-pill" id="activeClientPill">-</span>
                     </div>
                     <div class="card-desc">Mac 旧版 <b>ClashX Pro</b> 请点击绿色按钮；<b>Clash Meta / Mihomo / Clash Verge</b> 请点击蓝色按钮。</div>
-
-                    <div class="source-switch">
-                        <button class="source-btn active" id="srcHttps" onclick="switchSource('https')">
-                            HTTPS 动态源 (apple-dm.xyz 推荐)
-                        </button>
-                        <button class="source-btn" id="srcVps" onclick="switchSource('vps')">
-                            VPS 直连动态源 (192.220.21.39)
-                        </button>
-                    </div>
 
                     <div class="launch-grid">
                         <a class="launch-btn clash-pro" id="btnLaunchClashPro" href="javascript:;">
@@ -797,11 +788,11 @@
                     </div>
                     <div class="param-item">
                         <div class="param-key">节点 1 (ClashX Pro 兼容)</div>
-                        <div class="param-val">192.220.21.39 : 80 (VMess+WS /ray)</div>
+                        <div class="param-val">US-West 专线 : 80 (VMess+WS)</div>
                     </div>
                     <div class="param-item">
                         <div class="param-key">节点 2 & 3 (Reality)</div>
-                        <div class="param-val">192.220.21.39 : 443 / 8443</div>
+                        <div class="param-val">US-West 专线 : 443 / 8443</div>
                     </div>
                 </div>
             </div>
@@ -813,19 +804,18 @@
     <script>
         let allClients = [];
         let currentClient = null;
-        let currentSource = 'https';
         let currentQrMode = 'node';
         let currentYamlMode = 'pro';
         let yamlCache = { pro: '', meta: '' };
 
         function getApiCandidates() {
-            const list = [];
+            const list = ['https://apple-dm.xyz/vpn/api'];
             if (location.protocol.startsWith('http') && !location.hostname.includes('127.0.0.1') && !location.hostname.includes('localhost')) {
-                list.push(location.origin + '/vpn-api');
-                list.push(location.origin + '/vpn/api');
+                list.unshift(location.origin + '/vpn/api');
+                list.unshift(location.origin + '/vpn-api');
+            } else {
+                list.push(atob('aHR0cDovLzE5Mi4yMjAuMjEuMzkvdnBuLWFwaQ=='));
             }
-            list.push('http://192.220.21.39/vpn-api');
-            list.push('https://apple-dm.xyz/vpn/api');
             return [...new Set(list)];
         }
 
@@ -996,16 +986,9 @@
         function getClientSources(client) {
             const subId = client.subId;
             return {
-                https: {
-                    clashProUrl: `https://apple-dm.xyz/vpn/api/clash-pro/${subId}.yaml`,
-                    clashMetaUrl: `https://apple-dm.xyz/vpn/api/clash-meta/${subId}.yaml`,
-                    subUrl: `https://apple-dm.xyz/vpn/api/sub/${subId}.txt`
-                },
-                vps: {
-                    clashProUrl: `http://192.220.21.39/vpn-api/clash-pro/${subId}.yaml`,
-                    clashMetaUrl: `http://192.220.21.39/vpn-api/clash-meta/${subId}.yaml`,
-                    subUrl: `http://192.220.21.39/vpn-api/sub/${subId}.txt`
-                }
+                clashProUrl: `https://apple-dm.xyz/vpn/api/clash-pro/${subId}.yaml`,
+                clashMetaUrl: `https://apple-dm.xyz/vpn/api/clash-meta/${subId}.yaml`,
+                subUrl: `https://apple-dm.xyz/vpn/api/sub/${subId}.txt`
             };
         }
 
@@ -1034,8 +1017,7 @@
 
         function updateLinks() {
             if (!currentClient) return;
-            const sources = getClientSources(currentClient);
-            const src = sources[currentSource];
+            const src = getClientSources(currentClient);
             const vlessUri = currentClient.nodes ? currentClient.nodes.vless443 : '';
             const tagSuffix = currentClient.isMaster ? '' : `-${currentClient.comment || currentClient.email}`;
             const quotaStr = currentClient.totalBytes > 0
@@ -1069,13 +1051,6 @@
             renderQr();
         }
 
-        function switchSource(mode) {
-            currentSource = mode;
-            document.getElementById('srcHttps').classList.toggle('active', mode === 'https');
-            document.getElementById('srcVps').classList.toggle('active', mode === 'vps');
-            updateLinks();
-        }
-
         function switchQr(mode) {
             currentQrMode = mode;
             document.getElementById('qrTabNode').classList.toggle('active', mode === 'node');
@@ -1087,8 +1062,7 @@
 
         function renderQr() {
             if (!currentClient) return;
-            const sources = getClientSources(currentClient);
-            const src = sources[currentSource];
+            const src = getClientSources(currentClient);
             const vlessUri = currentClient.nodes ? currentClient.nodes.vless443 : '';
             const container = document.getElementById('qrcode');
             const caption = document.getElementById('qrCaption');
